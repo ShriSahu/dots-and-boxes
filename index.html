@@ -348,38 +348,6 @@ canvas { touch-action: none; cursor: crosshair; border-radius: 4px; display: blo
 
 .hidden { display: none !important; }
 
-/* Home screen theme button — top-right corner */
-.home-theme-btn {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  z-index: 2;
-  font-size: 1.4rem;
-  line-height: 1;
-  background: none;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 5px 10px;
-  color: var(--muted);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.home-theme-btn:hover { color: var(--ink); border-color: var(--ink); }
-
-/* ── DARK MODE ─────────────────────────────────────────── */
-html[data-theme="dark"] {
-  --bg: #1c1c1e;
-  --bg2: #242426;
-  --ink: #e8e0d0;
-  --muted: #8a8070;
-  --border: rgba(200,190,170,0.18);
-  --p1: #7ab3e8;
-  --p2: #e87a7a;
-  --p1l: rgba(122,179,232,0.15);
-  --p2l: rgba(232,122,122,0.15);
-  --paper-line: rgba(255,255,255,0.025);
-}
-html[data-theme="dark"] body::after { opacity: 0.12; }
 
 /* ── TIMER ─────────────────────────────────────────────── */
 .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -417,7 +385,6 @@ html[data-theme="dark"] body::after { opacity: 0.12; }
 
 <!-- ═══════════════════════ HOME SCREEN ═══════════════════════ -->
 <div class="screen" id="homeScreen">
-  <button class="home-theme-btn" id="homeThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
   <div class="title-wrap">
     <div class="title-main">
       <span class="title-dots">Dots</span>
@@ -515,8 +482,7 @@ html[data-theme="dark"] body::after { opacity: 0.12; }
     <button class="back-btn" onclick="goHome()">← Home</button>
     <div style="display:flex;gap:6px;align-items:center;">
       <button class="icon-btn" id="undoBtn" onclick="undoMove()" title="Undo last move" disabled>↩</button>
-      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
-      <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Toggle sound">🔊</button>
+<button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Toggle sound">🔊</button>
       <button class="back-btn" onclick="restartGame()" style="color:var(--p1);">↺ Restart</button>
     </div>
   </div>
@@ -633,30 +599,6 @@ function toggleSound() {
   try { localStorage.setItem('db_sound', soundEnabled ? '1' : '0'); } catch (_) {}
 }
 
-// ═══════════════════════════════════════════════════════
-// DARK MODE
-// ═══════════════════════════════════════════════════════
-function _applyThemeColors() {
-  P1 = isDark ? '#7ab3e8' : '#1a3a6b';
-  P2 = isDark ? '#e87a7a' : '#8b1a1a';
-}
-
-function toggleTheme() {
-  isDark = !isDark;
-  _applyTheme();
-}
-
-function _applyTheme() {
-  const icon = isDark ? '☀️' : '🌙';
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  const gb = document.getElementById('themeBtn');
-  const hb = document.getElementById('homeThemeBtn');
-  if (gb) gb.textContent = icon;
-  if (hb) hb.textContent = icon;
-  _applyThemeColors();
-  try { localStorage.setItem('db_theme', isDark ? 'dark' : 'light'); } catch (_) {}
-  if (gameState && ctx) render();
-}
 
 // ═══════════════════════════════════════════════════════
 // TURN TIMER
@@ -772,13 +714,7 @@ function loadPrefs() {
     const diff = localStorage.getItem('db_diff') || 'medium';
     selectDiff(diff);
 
-    const savedTheme = localStorage.getItem('db_theme') || 'light';
-    if (savedTheme === 'dark') {
-      isDark = true;
-      _applyTheme();
-    }
-
-    const savedTimer = parseInt(localStorage.getItem('db_timer') || '0', 10);
+const savedTimer = parseInt(localStorage.getItem('db_timer') || '0', 10);
     selectTimer([0, 10, 15, 30].includes(savedTimer) ? savedTimer : 0);
   } catch (_) {}
   loadStats();
@@ -1074,9 +1010,8 @@ function showToast(msg) {
 // ═══════════════════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════════════════
-let P1 = '#1a3a6b';
-let P2 = '#8b1a1a';
-let isDark = false;
+const P1 = '#1a3a6b';
+const P2 = '#8b1a1a';
 
 function dotPos(r, c) {
   return { x: padding + c * cellSize, y: padding + r * cellSize };
