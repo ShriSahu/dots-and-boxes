@@ -1,0 +1,12 @@
+# Local dev files
+serve.ps1
+srv_out.txt
+srv_err.txt
+generate-icons.html
+
+# Claude workspace
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

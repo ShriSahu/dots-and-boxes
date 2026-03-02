@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Dots &amp; Boxes</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#f5f0e8"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Dots &amp; Boxes"/>
+<link rel="icon" type="image/svg+xml" href="icon.svg"/>
+<link rel="apple-touch-icon" href="icon.svg"/>
+
+<!-- SEO / Social -->
+<meta name="description" content="The classic pen &amp; paper Dots and Boxes game — play vs a smart AI or challenge a friend locally!"/>
+<meta property="og:title" content="Dots &amp; Boxes"/>
+<meta property="og:description" content="Classic pen &amp; paper game, now digital. Play vs AI or a friend — no install needed!"/>
+<meta property="og:type" content="website"/>
+<!-- og:url and og:image: replace YOUR_DOMAIN with your deployed URL -->
+<!-- <meta property="og:url" content="https://YOUR_DOMAIN/index.html"/> -->
+<!-- <meta property="og:image" content="https://YOUR_DOMAIN/icons/icon-512.png"/> -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Dots &amp; Boxes"/>
+<meta name="twitter:description" content="Classic Dots and Boxes — play vs AI or a friend!"/>
+<!-- <meta name="twitter:image" content="https://YOUR_DOMAIN/icons/icon-512.png"/> -->
+
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f0e8;
+  --bg2: #ede8d8;
+  --ink: #2a2418;
+  --muted: #7a6f5a;
+  --border: rgba(90,80,60,0.22);
+  --p1: #1a3a6b;
+  --p2: #8b1a1a;
+  --p1l: rgba(26,58,107,0.18);
+  --p2l: rgba(139,26,26,0.18);
+  --paper-line: rgba(160,150,120,0.35);
+  --font: 'Caveat', cursive;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Paper texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 27px,
+    var(--paper-line) 27px, var(--paper-line) 28px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Red margin line */
+body::after {
+  content: '';
+  position: fixed;
+  left: 52px; top: 0; bottom: 0;
+  width: 1.5px;
+  background: rgba(200,80,80,0.25);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.screen {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+.screen.game-screen {
+  max-width: 620px;
+  justify-content: flex-start;
+  padding-top: 16px;
+  gap: 10px;
+}
+
+/* TITLE */
+.title-wrap { text-align: center; margin-bottom: 4px; }
+.title-main {
+  font-size: 3.8rem; font-weight: 700; color: var(--ink);
+  line-height: 1; letter-spacing: -1px;
+}
+.title-dots  { color: var(--p1); }
+.title-amp   { color: var(--muted); font-weight: 400; }
+.title-boxes { color: var(--p2); }
+.title-sub   { font-size: 1.1rem; color: var(--muted); margin-top: 4px; }
+
+/* CARDS */
+.card {
+  background: rgba(255,252,245,0.7);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  width: 100%;
+  box-shadow: 2px 3px 12px var(--border), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.card-title {
+  font-size: 1.3rem; font-weight: 600; color: var(--muted);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+
+/* INPUT */
+.input-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.input-label { font-size: 1rem; color: var(--muted); margin-bottom: 2px; }
+.paper-input {
+  font-family: var(--font); font-size: 1.3rem;
+  background: transparent; border: none;
+  border-bottom: 2px solid var(--border);
+  padding: 4px 2px; color: var(--ink); width: 100%;
+  outline: none; transition: border-color 0.2s;
+}
+.paper-input:focus        { border-bottom-color: var(--p1); }
+.paper-input.p2:focus     { border-bottom-color: var(--p2); }
+.paper-input::placeholder { color: var(--border); font-style: italic; }
+
+/* MODE BUTTONS */
+.mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.mode-btn {
+  font-family: var(--font); font-size: 1.25rem; font-weight: 600;
+  padding: 16px 12px; border: 2px solid var(--border); border-radius: 10px;
+  background: transparent; color: var(--ink); cursor: pointer;
+  transition: all 0.18s; display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+}
+.mode-btn .mode-icon  { font-size: 2rem; }
+.mode-btn .mode-label { font-size: 1rem; color: var(--muted); font-weight: 400; }
+.mode-btn:hover       { background: rgba(42,36,24,0.05); border-color: var(--ink); }
+.mode-btn.active      { border-color: var(--p1); background: var(--p1l); color: var(--p1); }
+.mode-btn.active .mode-label { color: var(--p1); }
+
+/* GRID SIZE */
+.size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.size-btn {
+  font-family: var(--font); font-size: 1.2rem; font-weight: 600;
+  padding: 12px 6px; border: 2px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--ink); cursor: pointer;
+  transition: all 0.18s; text-align: center;
+}
+.size-btn small {
+  display: block; font-size: 0.75rem; font-weight: 400;
+  color: var(--muted); margin-top: 2px;
+}
+.size-btn:hover      { background: rgba(42,36,24,0.05); }
+.size-btn.active     { border-color: var(--p2); background: var(--p2l); color: var(--p2); }
+.size-btn.active small { color: var(--p2); }
+
+/* BUTTONS */
+.start-btn {
+  font-family: var(--font); font-size: 1.6rem; font-weight: 700;
+  padding: 14px 48px; background: var(--ink); color: var(--bg);
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: all 0.18s; box-shadow: 3px 4px 0 rgba(42,36,24,0.3);
+  letter-spacing: 0.5px;
+}
+.start-btn:hover  { transform: translateY(-2px); box-shadow: 3px 6px 0 rgba(42,36,24,0.3); }
+.start-btn:active { transform: translateY(1px);  box-shadow: 1px 2px 0 rgba(42,36,24,0.3); }
+
+.back-btn {
+  font-family: var(--font); font-size: 1.1rem; background: none;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 6px 16px; color: var(--muted); cursor: pointer; transition: all 0.15s;
+}
+.back-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+.icon-btn {
+  font-family: var(--font); font-size: 1.3rem; line-height: 1;
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 5px 10px;
+  color: var(--muted); cursor: pointer; transition: all 0.15s;
+}
+.icon-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+.outline-btn {
+  font-family: var(--font); font-size: 1.2rem; font-weight: 600;
+  padding: 10px 28px; border: 2px solid var(--border); border-radius: 10px;
+  background: transparent; color: var(--ink); cursor: pointer; transition: all 0.15s;
+}
+.outline-btn:hover { border-color: var(--ink); background: rgba(42,36,24,0.05); }
+
+/* GAME HEADER */
+.game-header {
+  display: flex; align-items: center;
+  justify-content: space-between; width: 100%; gap: 8px;
+}
+
+/* SCORE BAR */
+.score-bar {
+  width: 100%; display: flex; align-items: center;
+  background: rgba(255,252,245,0.7); border: 1.5px solid var(--border);
+  border-radius: 10px; overflow: hidden; box-shadow: 1px 2px 8px var(--border);
+}
+.score-player {
+  flex: 1; padding: 10px 14px; display: flex;
+  flex-direction: column; align-items: center;
+  transition: background 0.25s;
+}
+.score-player.active-p1 { background: var(--p1l); }
+.score-player.active-p2 { background: var(--p2l); }
+.score-name {
+  font-size: 1.1rem; font-weight: 600; color: var(--muted);
+  transition: color 0.25s; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 100%;
+}
+.score-player.active-p1 .score-name { color: var(--p1); }
+.score-player.active-p2 .score-name { color: var(--p2); }
+.score-num {
+  font-size: 2.2rem; font-weight: 700; line-height: 1; color: var(--ink);
+  transition: transform 0.15s;
+}
+.score-num.bump { transform: scale(1.25); }
+.score-turn-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 4px; opacity: 0; transition: opacity 0.25s;
+}
+.active-p1 .score-turn-dot { background: var(--p1); opacity: 1; }
+.active-p2 .score-turn-dot { background: var(--p2); opacity: 1; }
+.score-divider { width: 1.5px; align-self: stretch; background: var(--border); flex-shrink: 0; }
+.score-mid {
+  padding: 8px 10px; font-size: 0.9rem; color: var(--muted);
+  text-align: center; display: flex; flex-direction: column;
+  align-items: center; gap: 2px; min-width: 70px;
+}
+.ai-thinking { font-size: 0.85rem; color: var(--p2); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+
+/* PROGRESS */
+.progress-row {
+  width: 100%; display: flex; flex-direction: column; gap: 4px;
+}
+.progress-wrap {
+  width: 100%; height: 7px; background: rgba(90,80,60,0.12);
+  border-radius: 4px; overflow: hidden; position: relative;
+}
+.progress-p1 {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: var(--p1); border-radius: 4px 0 0 4px;
+  transition: width 0.4s cubic-bezier(.4,0,.2,1);
+}
+.progress-p2 {
+  position: absolute; top: 0; height: 100%;
+  background: var(--p2); border-radius: 0 4px 4px 0;
+  transition: width 0.4s cubic-bezier(.4,0,.2,1), left 0.4s cubic-bezier(.4,0,.2,1);
+}
+.progress-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.82rem; color: var(--muted);
+}
+
+/* BOARD */
+.board-wrap { width: 100%; display: flex; justify-content: center; align-items: center; }
+canvas { touch-action: none; cursor: crosshair; border-radius: 4px; display: block; max-width: 100%; }
+
+/* RESULT */
+.result-trophy { font-size: 5rem; line-height: 1; filter: drop-shadow(2px 4px 0 rgba(42,36,24,0.2)); }
+.result-title  { font-size: 3rem; font-weight: 700; color: var(--ink); text-align: center; }
+.result-sub    { font-size: 1.3rem; color: var(--muted); text-align: center; }
+.result-scores { display: flex; gap: 24px; align-items: center; margin: 8px 0; }
+.result-score-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.result-score-name { font-size: 1.1rem; color: var(--muted); }
+.result-score-num  { font-size: 3rem; font-weight: 700; }
+.result-score-num.p1 { color: var(--p1); }
+.result-score-num.p2 { color: var(--p2); }
+.result-score-vs   { font-size: 1.5rem; color: var(--muted); }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 72px; left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: rgba(42,36,24,0.88); color: #f5f0e8;
+  padding: 9px 20px; border-radius: 20px;
+  font-size: 1.05rem; font-family: var(--font);
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 999; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* INSTALL BANNER */
+.install-banner {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,252,245,0.96); border-top: 1.5px solid var(--border);
+  padding: 12px 20px; display: flex; align-items: center;
+  gap: 12px; z-index: 100; font-family: var(--font);
+  box-shadow: 0 -2px 12px rgba(42,36,24,0.08);
+}
+.install-banner span { flex: 1; font-size: 1rem; color: var(--ink); }
+.install-banner button {
+  font-family: var(--font); font-size: 1rem; font-weight: 600;
+  padding: 7px 16px; border-radius: 8px; cursor: pointer;
+  border: none; transition: opacity 0.15s;
+}
+.install-banner .install-yes { background: var(--ink); color: var(--bg); }
+.install-banner .install-no  { background: none; color: var(--muted); }
+
+/* DIFFICULTY */
+.diff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.diff-btn {
+  font-family: var(--font); font-size: 1.15rem; font-weight: 600;
+  padding: 10px 6px; border: 2px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--ink); cursor: pointer;
+  transition: all 0.18s; text-align: center;
+}
+.diff-btn small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.diff-btn:hover  { background: rgba(42,36,24,0.05); border-color: var(--ink); }
+.diff-btn.active { border-color: var(--p1); background: var(--p1l); color: var(--p1); }
+.diff-btn.active small { color: var(--p1); }
+
+/* STATS */
+.stats-row { display: flex; gap: 12px; justify-content: center; align-items: center; padding: 4px 0; }
+.stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stat-num  { font-size: 2.1rem; font-weight: 700; color: var(--ink); line-height: 1; }
+.stat-lbl  { font-size: 0.8rem; color: var(--muted); }
+.stat-sep  { font-size: 1.3rem; color: var(--border); margin-bottom: 14px; }
+
+/* UNDO */
+.icon-btn:disabled { opacity: 0.3; cursor: default; }
+
+.hidden { display: none !important; }
+
+/* Home screen theme button — top-right corner */
+.home-theme-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 2;
+  font-size: 1.4rem;
+  line-height: 1;
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.home-theme-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+/* ── DARK MODE ─────────────────────────────────────────── */
+html[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --bg2: #242426;
+  --ink: #e8e0d0;
+  --muted: #8a8070;
+  --border: rgba(200,190,170,0.18);
+  --p1: #7ab3e8;
+  --p2: #e87a7a;
+  --p1l: rgba(122,179,232,0.15);
+  --p2l: rgba(232,122,122,0.15);
+  --paper-line: rgba(255,255,255,0.025);
+}
+html[data-theme="dark"] body::after { opacity: 0.12; }
+
+/* ── TIMER ─────────────────────────────────────────────── */
+.timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.timer-btn {
+  font-family: var(--font); font-size: 1.15rem; font-weight: 600;
+  padding: 10px 6px; border: 2px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--ink); cursor: pointer;
+  transition: all 0.18s; text-align: center;
+}
+.timer-btn small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.timer-btn:hover  { background: rgba(42,36,24,0.05); border-color: var(--ink); }
+.timer-btn.active { border-color: var(--p1); background: var(--p1l); color: var(--p1); }
+.timer-btn.active small { color: var(--p1); }
+.timer-display {
+  font-size: 1.5rem; font-weight: 700; color: var(--ink);
+  line-height: 1; min-height: 1.6rem; text-align: center; transition: color 0.3s;
+}
+.timer-display.urgent { color: var(--p2); animation: pulse 0.6s ease-in-out infinite; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .title-main { font-size: 2.8rem; }
+  body::after  { left: 36px; }
+  .screen      { padding: 16px 14px; gap: 14px; }
+}
+@media (max-height: 620px) and (orientation: landscape) {
+  .screen         { min-height: unset; padding: 8px 16px; gap: 8px; }
+  .title-main     { font-size: 2rem; }
+  .title-sub      { display: none; }
+  .screen.game-screen { gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HOME SCREEN ═══════════════════════ -->
+<div class="screen" id="homeScreen">
+  <button class="home-theme-btn" id="homeThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+  <div class="title-wrap">
+    <div class="title-main">
+      <span class="title-dots">Dots</span>
+      <span class="title-amp"> &amp; </span>
+      <span class="title-boxes">Boxes</span>
+    </div>
+    <div class="title-sub">the classic pen &amp; paper game</div>
+  </div>
+
+  <!-- MODE -->
+  <div class="card">
+    <div class="card-title">✏️ Game Mode</div>
+    <div class="mode-grid">
+      <button class="mode-btn active" id="btn2p" onclick="selectMode('2player')">
+        <span class="mode-icon">👥</span>
+        2 Players
+        <span class="mode-label">Local</span>
+      </button>
+      <button class="mode-btn" id="btnAI" onclick="selectMode('ai')">
+        <span class="mode-icon">🤖</span>
+        vs AI
+        <span class="mode-label">Smart bot</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- NAMES -->
+  <div class="card">
+    <div class="card-title">🖊️ Player Names</div>
+    <div class="input-group">
+      <div>
+        <div class="input-label" style="color:var(--p1)">Player 1 (Navy)</div>
+        <input class="paper-input" id="p1Input" placeholder="Your name…" maxlength="16"/>
+      </div>
+      <div id="p2InputWrap">
+        <div class="input-label" style="color:var(--p2)">Player 2 (Crimson)</div>
+        <input class="paper-input p2" id="p2Input" placeholder="Opponent's name…" maxlength="16"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIFFICULTY (shown only in AI mode) -->
+  <div class="card hidden" id="diffCard">
+    <div class="card-title">🧠 AI Difficulty</div>
+    <div class="diff-grid">
+      <button class="diff-btn" onclick="selectDiff('easy')">Easy<small>Random moves</small></button>
+      <button class="diff-btn active" onclick="selectDiff('medium')">Medium<small>Smart bot</small></button>
+      <button class="diff-btn" onclick="selectDiff('hard')">Hard<small>Minimax AI</small></button>
+    </div>
+  </div>
+
+  <!-- GRID SIZE -->
+  <div class="card">
+    <div class="card-title">📐 Grid Size</div>
+    <div class="size-grid">
+      <button class="size-btn" onclick="selectSize(3)">3×3<small>9 boxes</small></button>
+      <button class="size-btn active" onclick="selectSize(4)">4×4<small>16 boxes</small></button>
+      <button class="size-btn" onclick="selectSize(5)">5×5<small>25 boxes</small></button>
+      <button class="size-btn" onclick="selectSize(6)">6×6<small>36 boxes</small></button>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div class="card">
+    <div class="card-title">⏱️ Turn Timer</div>
+    <div class="timer-grid">
+      <button class="timer-btn active" onclick="selectTimer(0)">Off</button>
+      <button class="timer-btn" onclick="selectTimer(10)">10s</button>
+      <button class="timer-btn" onclick="selectTimer(15)">15s<small>default</small></button>
+      <button class="timer-btn" onclick="selectTimer(30)">30s</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="card" id="statsCard">
+    <div class="card-title" style="justify-content:space-between;">
+      📊 Record
+      <button class="icon-btn" style="font-size:0.82rem;padding:3px 9px;" onclick="resetStats()">reset</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num" id="statW">0</div><div class="stat-lbl">Wins</div></div>
+      <div class="stat-sep">—</div>
+      <div class="stat-item"><div class="stat-num" id="statL">0</div><div class="stat-lbl">Losses</div></div>
+      <div class="stat-sep">—</div>
+      <div class="stat-item"><div class="stat-num" id="statD">0</div><div class="stat-lbl">Draws</div></div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startGame()">Start Game →</button>
+</div>
+
+<!-- ═══════════════════════ GAME SCREEN ═══════════════════════ -->
+<div class="screen game-screen hidden" id="gameScreen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="icon-btn" id="undoBtn" onclick="undoMove()" title="Undo last move" disabled>↩</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+      <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Toggle sound">🔊</button>
+      <button class="back-btn" onclick="restartGame()" style="color:var(--p1);">↺ Restart</button>
+    </div>
+  </div>
+
+  <!-- Score bar -->
+  <div class="score-bar">
+    <div class="score-player" id="scoreP1">
+      <div class="score-name" id="scoreP1Name">Player 1</div>
+      <div class="score-num"  id="scoreP1Num">0</div>
+      <div class="score-turn-dot"></div>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-mid">
+      <div id="turnLabel" style="font-size:0.85rem;color:var(--muted)">Turn</div>
+      <div id="aiThinkingLabel"></div>
+      <div id="timerDisplay" class="timer-display"></div>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-player" id="scoreP2">
+      <div class="score-name" id="scoreP2Name">Player 2</div>
+      <div class="score-num"  id="scoreP2Num">0</div>
+      <div class="score-turn-dot"></div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-row">
+    <div class="progress-wrap">
+      <div class="progress-p1" id="progressP1" style="width:0%"></div>
+      <div class="progress-p2" id="progressP2" style="width:0%;left:0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span id="progressText">0 of 0 boxes claimed</span>
+      <span id="turnIndicator"></span>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <canvas id="gameCanvas"></canvas>
+  </div>
+</div>
+
+<!-- ═══════════════════════ RESULT SCREEN ═══════════════════════ -->
+<div class="screen hidden" id="resultScreen">
+  <div class="result-trophy" id="resultTrophy">🏆</div>
+  <div class="result-title" id="resultTitle">Player 1 Wins!</div>
+  <div class="result-sub"   id="resultSub">Well played!</div>
+  <div class="result-scores">
+    <div class="result-score-item">
+      <div class="result-score-name" id="resultP1Name">P1</div>
+      <div class="result-score-num p1" id="resultP1Score">0</div>
+    </div>
+    <div class="result-score-vs">vs</div>
+    <div class="result-score-item">
+      <div class="result-score-name" id="resultP2Name">P2</div>
+      <div class="result-score-num p2" id="resultP2Score">0</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="start-btn" onclick="playAgain()">Play Again</button>
+    <button class="outline-btn" onclick="goHome()">Home</button>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- PWA install banner (shown when installable) -->
+<div class="install-banner hidden" id="installBanner">
+  <span>📲 Add Dots &amp; Boxes to your home screen!</span>
+  <button class="install-yes" onclick="installApp()">Install</button>
+  <button class="install-no"  onclick="dismissInstall()">✕</button>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════
+// SOUND (Web Audio API — no external files needed)
+// ═══════════════════════════════════════════════════════
+let _audioCtx = null;
+let soundEnabled = true;
+
+function _getCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function _beep(freq, dur, type = 'sine', vol = 0.12) {
+  if (!soundEnabled) return;
+  try {
+    const ctx  = _getCtx();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch (_) {}
+}
+
+function sndLine()      { _beep(320, 0.07, 'square', 0.07); }
+function sndBox(count)  { _beep(520, 0.12); if (count > 1) setTimeout(() => _beep(660, 0.12), 100); }
+function sndWin()       { [440, 554, 659, 880].forEach((f, i) => setTimeout(() => _beep(f, 0.22), i * 80)); }
+function sndDraw()      { [440, 440, 330].forEach((f, i) => setTimeout(() => _beep(f, 0.18), i * 90)); }
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundBtn').textContent = soundEnabled ? '🔊' : '🔇';
+  try { localStorage.setItem('db_sound', soundEnabled ? '1' : '0'); } catch (_) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════════════════
+function _applyThemeColors() {
+  P1 = isDark ? '#7ab3e8' : '#1a3a6b';
+  P2 = isDark ? '#e87a7a' : '#8b1a1a';
+}
+
+function toggleTheme() {
+  isDark = !isDark;
+  _applyTheme();
+}
+
+function _applyTheme() {
+  const icon = isDark ? '☀️' : '🌙';
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  const gb = document.getElementById('themeBtn');
+  const hb = document.getElementById('homeThemeBtn');
+  if (gb) gb.textContent = icon;
+  if (hb) hb.textContent = icon;
+  _applyThemeColors();
+  try { localStorage.setItem('db_theme', isDark ? 'dark' : 'light'); } catch (_) {}
+  if (gameState && ctx) render();
+}
+
+// ═══════════════════════════════════════════════════════
+// TURN TIMER
+// ═══════════════════════════════════════════════════════
+let timerInterval  = null;
+let timerRemaining = 0;
+
+function selectTimer(secs) {
+  config.timerSeconds = secs;
+  document.querySelectorAll('.timer-btn').forEach((b, i) => {
+    b.classList.toggle('active', [0, 10, 15, 30][i] === secs);
+  });
+  try { localStorage.setItem('db_timer', String(secs)); } catch (_) {}
+}
+
+function _stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  _updateTimerDisplay();
+}
+
+function _startTimer() {
+  _stopTimer();
+  if (!config.timerSeconds || !gameState || gameState.isGameOver) return;
+  if (config.mode === 'ai' && gameState.currentPlayer === 2) return;
+  timerRemaining = config.timerSeconds;
+  _updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    if (!gameState || gameState.isGameOver || gameState.isAIThinking) { _stopTimer(); return; }
+    timerRemaining--;
+    _updateTimerDisplay();
+    if (timerRemaining <= 0) { _stopTimer(); _autoSkipTurn(); }
+  }, 1000);
+}
+
+function _updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el) return;
+  const show = config.timerSeconds && gameState && !gameState.isGameOver && !gameState.isAIThinking
+               && !(config.mode === 'ai' && gameState.currentPlayer === 2);
+  el.textContent = show && timerRemaining > 0 ? timerRemaining : '';
+  el.classList.toggle('urgent', !!(show && timerRemaining <= 3 && timerRemaining > 0));
+}
+
+function _autoSkipTurn() {
+  if (!gameState || gameState.isGameOver) return;
+  const avail = _aiAvail(gameState, config.gridSize);
+  if (!avail.length) return;
+  const cells = config.gridSize - 1;
+  const safe = avail.filter(l => {
+    const sim = _simApply(gameState, l);
+    for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
+      if (sim.boxes[r][c]) continue;
+      if (_countSides(sim, r, c) === 3) return false;
+    }
+    return true;
+  });
+  const move = safe.length ? safe[Math.floor(Math.random() * safe.length)]
+                           : avail[Math.floor(Math.random() * avail.length)];
+  const name = gameState.currentPlayer === 1 ? config.p1Name : config.p2Name;
+  showToast(`⏰ Time's up — auto-move for ${name}!`);
+  handleLineClick(move);
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let config = { mode: '2player', gridSize: 4, p1Name: 'Player 1', p2Name: 'Player 2', difficulty: 'medium', timerSeconds: 0 };
+let gameState   = null;
+let canvas      = null;
+let ctx         = null;
+let cellSize    = 70;
+let padding     = 36;
+let hoverLine   = null;
+let resizeTimer = null;
+
+// ── Animations ─────────────────────────────────────────
+const LINE_ANIM_DUR = 180;   // ms — line draw
+const BOX_ANIM_DUR  = 400;   // ms — box fill
+const FLOAT_DUR     = 700;   // ms — floating +N text
+let _rafId = null;
+let _now   = 0;
+
+function _easeOut(t) { const c = Math.min(1, t); return 1 - (1 - c) * (1 - c); }
+
+function _startAnimLoop() {
+  if (_rafId) return;
+  _rafId = requestAnimationFrame(() => { _rafId = null; render(); });
+}
+
+// ═══════════════════════════════════════════════════════
+// LOCAL STORAGE — remember preferences
+// ═══════════════════════════════════════════════════════
+function loadPrefs() {
+  try {
+    const p1   = localStorage.getItem('db_p1')   || '';
+    const mode = localStorage.getItem('db_mode')  || '2player';
+    const size = parseInt(localStorage.getItem('db_size') || '4', 10);
+    const snd  = localStorage.getItem('db_sound');
+
+    if (p1) document.getElementById('p1Input').value = p1;
+    if (mode === 'ai') selectMode('ai');
+    else {
+      const p2 = localStorage.getItem('db_p2') || '';
+      if (p2) document.getElementById('p2Input').value = p2;
+    }
+    selectSize([3,4,5,6].includes(size) ? size : 4);
+
+    if (snd === '0') {
+      soundEnabled = false;
+      document.getElementById('soundBtn').textContent = '🔇';
+    }
+
+    const diff = localStorage.getItem('db_diff') || 'medium';
+    selectDiff(diff);
+
+    const savedTheme = localStorage.getItem('db_theme') || 'light';
+    if (savedTheme === 'dark') {
+      isDark = true;
+      _applyTheme();
+    }
+
+    const savedTimer = parseInt(localStorage.getItem('db_timer') || '0', 10);
+    selectTimer([0, 10, 15, 30].includes(savedTimer) ? savedTimer : 0);
+  } catch (_) {}
+  loadStats();
+}
+
+function savePrefs() {
+  try {
+    localStorage.setItem('db_p1',   config.p1Name);
+    localStorage.setItem('db_p2',   config.mode === 'ai' ? '' : config.p2Name);
+    localStorage.setItem('db_mode', config.mode);
+    localStorage.setItem('db_size', String(config.gridSize));
+    localStorage.setItem('db_diff', config.difficulty);
+  } catch (_) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// DIFFICULTY
+// ═══════════════════════════════════════════════════════
+function selectDiff(d) {
+  config.difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['easy', 'medium', 'hard'][i] === d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════════
+function loadStats() {
+  try {
+    const s = JSON.parse(localStorage.getItem('db_stats') || '{"w":0,"l":0,"d":0}');
+    document.getElementById('statW').textContent = s.w || 0;
+    document.getElementById('statL').textContent = s.l || 0;
+    document.getElementById('statD').textContent = s.d || 0;
+  } catch (_) {}
+}
+
+function recordStat(result) { // 'w' | 'l' | 'd'
+  try {
+    const s = JSON.parse(localStorage.getItem('db_stats') || '{"w":0,"l":0,"d":0}');
+    s[result] = (s[result] || 0) + 1;
+    localStorage.setItem('db_stats', JSON.stringify(s));
+    loadStats();
+  } catch (_) {}
+}
+
+function resetStats() {
+  try { localStorage.removeItem('db_stats'); loadStats(); } catch (_) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// UNDO
+// ═══════════════════════════════════════════════════════
+function updateUndoBtn() {
+  const btn = document.getElementById('undoBtn');
+  if (btn) btn.disabled = !gameState || !gameState.history || !gameState.history.length;
+}
+
+function _restoreSnapshot(snap) {
+  gameState.hLines        = snap.hLines;
+  gameState.vLines        = snap.vLines;
+  gameState.boxes         = snap.boxes;
+  gameState.lineColors    = snap.lineColors;
+  gameState.wobbleH       = snap.wobbleH;
+  gameState.wobbleV       = snap.wobbleV;
+  gameState.lineAnimH     = snap.lineAnimH.map(r => r.slice());
+  gameState.lineAnimV     = snap.lineAnimV.map(r => r.slice());
+  gameState.boxAnim       = snap.boxAnim.map(r => r.slice());
+  gameState.floatTexts    = [];
+  gameState.currentPlayer = snap.currentPlayer;
+  gameState.scores        = snap.scores;
+  gameState.isGameOver    = false;
+  gameState.isAIThinking  = false;
+}
+
+function undoMove() {
+  if (!gameState || !gameState.history || !gameState.history.length) return;
+  if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+  gameState.isAIThinking = false; // cancel any pending AI
+
+  if (config.mode === 'ai') {
+    // In AI mode: pop back until we reach a snapshot where it was the player's (P1) turn,
+    // so the player undoes the AI's response too
+    let snap;
+    do {
+      snap = gameState.history.pop();
+    } while (gameState.history.length > 0 && snap.currentPlayer !== 1);
+    _restoreSnapshot(snap);
+  } else {
+    _restoreSnapshot(gameState.history.pop());
+  }
+
+  hoverLine = null;
+  render(); updateScoreBar(); updateProgress(); updateUndoBtn();
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME SCREEN
+// ═══════════════════════════════════════════════════════
+function selectMode(mode) {
+  config.mode = mode;
+  document.getElementById('btn2p').classList.toggle('active', mode === '2player');
+  document.getElementById('btnAI').classList.toggle('active', mode === 'ai');
+  document.getElementById('diffCard').classList.toggle('hidden', mode !== 'ai');
+  const wrap = document.getElementById('p2InputWrap');
+  if (mode === 'ai') {
+    wrap.innerHTML =
+      '<div class="input-label" style="color:var(--p2)">AI Opponent</div>' +
+      '<input class="paper-input p2" id="p2Input" value="AI Bot 🤖" readonly style="opacity:0.5"/>';
+  } else {
+    wrap.innerHTML =
+      '<div class="input-label" style="color:var(--p2)">Player 2 (Crimson)</div>' +
+      '<input class="paper-input p2" id="p2Input" placeholder="Opponent\'s name…" maxlength="16"/>';
+    try {
+      const saved = localStorage.getItem('db_p2') || '';
+      if (saved) document.getElementById('p2Input').value = saved;
+    } catch (_) {}
+  }
+}
+
+function selectSize(n) {
+  config.gridSize = n;
+  document.querySelectorAll('.size-btn').forEach((b, i) => {
+    b.classList.toggle('active', [3,4,5,6][i] === n);
+  });
+}
+
+function startGame() {
+  const p1Val = document.getElementById('p1Input').value.trim();
+  const p2Val = document.getElementById('p2Input').value.trim();
+  config.p1Name = p1Val || 'Player 1';
+  config.p2Name = p2Val || (config.mode === 'ai' ? 'AI Bot' : 'Player 2');
+  savePrefs();
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  initGame();
+}
+
+function goHome() {
+  _stopTimer();
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('homeScreen').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════
+// GAME INIT
+// ═══════════════════════════════════════════════════════
+function createGameState(g) {
+  const dots  = g;
+  const cells = g - 1;
+  return {
+    hLines:     Array.from({ length: dots  }, () => Array(cells).fill(false)),
+    vLines:     Array.from({ length: cells }, () => Array(dots).fill(false)),
+    boxes:      Array.from({ length: cells }, () => Array(cells).fill(0)),
+    lineColors: {
+      h: Array.from({ length: dots  }, () => Array(cells).fill(0)),
+      v: Array.from({ length: cells }, () => Array(dots).fill(0)),
+    },
+    // FIX: pre-compute wobble offsets once per line so they don't change each render
+    wobbleH:    Array.from({ length: dots  }, () => Array(cells).fill(null)),
+    wobbleV:    Array.from({ length: cells }, () => Array(dots).fill(null)),
+    lineAnimH:  Array.from({ length: dots  }, () => Array(cells).fill(0)),
+    lineAnimV:  Array.from({ length: cells }, () => Array(dots).fill(0)),
+    boxAnim:    Array.from({ length: cells }, () => Array(cells).fill(0)),
+    floatTexts: [],
+    currentPlayer: 1,
+    scores:        { p1: 0, p2: 0 },
+    isGameOver:    false,
+    isAIThinking:  false,
+    history:       [],
+  };
+}
+
+function _computeLayout() {
+  const g    = config.gridSize;
+  const maxW = Math.min(window.innerWidth - 40, 560);
+  const maxH = window.innerHeight - 280;
+  const max  = Math.floor(Math.min(maxW, maxH) / g) - 2;
+  cellSize   = Math.max(50, Math.min(100, max));
+  padding    = Math.round(cellSize * 0.5);
+}
+
+function initGame() {
+  if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+  _stopTimer();
+  gameState  = createGameState(config.gridSize);
+  hoverLine  = null;
+  canvas     = document.getElementById('gameCanvas');
+  ctx        = canvas.getContext('2d');
+  _applyCanvasSize();
+
+  // FIX: use addEventListener with passive:false so preventDefault works on mobile
+  canvas.removeEventListener('touchstart', _onTouch);
+  canvas.addEventListener('touchstart', _onTouch, { passive: false });
+  canvas.onmousemove  = _onMouseMove;
+  canvas.onmouseleave = () => { hoverLine = null; render(); };
+  canvas.onclick      = _onCanvasClick;
+
+  updateScoreBar();
+  updateProgress();
+  updateUndoBtn();
+  render();
+  _startTimer();
+  triggerAIIfNeeded();
+}
+
+// FIX: separate canvas resize from game reset — resize no longer wipes state
+function _applyCanvasSize() {
+  _computeLayout();
+  const size = (config.gridSize - 1) * cellSize + padding * 2;
+  canvas.width  = size;
+  canvas.height = size;
+}
+
+function restartGame() { initGame(); }
+
+function playAgain() {
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  initGame();
+}
+
+// ═══════════════════════════════════════════════════════
+// SCORE BAR + PROGRESS
+// ═══════════════════════════════════════════════════════
+function updateScoreBar() {
+  const gs = gameState;
+  document.getElementById('scoreP1Name').textContent = config.p1Name;
+  document.getElementById('scoreP2Name').textContent = config.p2Name;
+  document.getElementById('scoreP1Num').textContent  = gs.scores.p1;
+  document.getElementById('scoreP2Num').textContent  = gs.scores.p2;
+
+  document.getElementById('scoreP1').className =
+    'score-player' + (gs.currentPlayer === 1 && !gs.isGameOver ? ' active-p1' : '');
+  document.getElementById('scoreP2').className =
+    'score-player' + (gs.currentPlayer === 2 && !gs.isGameOver ? ' active-p2' : '');
+
+  const tl = document.getElementById('turnLabel');
+  const ai = document.getElementById('aiThinkingLabel');
+  if (gs.isGameOver) {
+    tl.textContent = 'Done!'; ai.textContent = '';
+  } else if (gs.isAIThinking) {
+    tl.textContent = 'AI Turn';
+    ai.innerHTML   = '<span class="ai-thinking">thinking…</span>';
+  } else {
+    tl.textContent = 'Turn'; ai.textContent = '';
+  }
+}
+
+function updateProgress() {
+  if (!gameState) return;
+  const total   = (config.gridSize - 1) ** 2;
+  const p1      = gameState.scores.p1;
+  const p2      = gameState.scores.p2;
+  const claimed = p1 + p2;
+  const p1pct   = total > 0 ? (p1 / total * 100) : 0;
+  const p2pct   = total > 0 ? (p2 / total * 100) : 0;
+
+  document.getElementById('progressP1').style.width = p1pct + '%';
+  document.getElementById('progressP2').style.width = p2pct + '%';
+  document.getElementById('progressP2').style.left  = p1pct + '%';
+  document.getElementById('progressText').textContent = `${claimed} of ${total} boxes claimed`;
+
+  const ti = document.getElementById('turnIndicator');
+  if (!gameState.isGameOver) {
+    const name = gameState.currentPlayer === 1 ? config.p1Name : config.p2Name;
+    ti.textContent  = `${name}'s turn`;
+    ti.style.color  = gameState.currentPlayer === 1 ? 'var(--p1)' : 'var(--p2)';
+  } else {
+    ti.textContent = '';
+  }
+}
+
+function bumpScore(player) {
+  const el = document.getElementById(player === 1 ? 'scoreP1Num' : 'scoreP2Num');
+  el.classList.add('bump');
+  setTimeout(() => el.classList.remove('bump'), 200);
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+let P1 = '#1a3a6b';
+let P2 = '#8b1a1a';
+let isDark = false;
+
+function dotPos(r, c) {
+  return { x: padding + c * cellSize, y: padding + r * cellSize };
+}
+
+function render() {
+  if (!ctx || !gameState) return;
+  _now = Date.now();
+  const now    = _now;
+  let needsRaf = false;
+  const g     = config.gridSize;
+  const cells = g - 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ── Claimed boxes ──
+  for (let r = 0; r < cells; r++) {
+    for (let c = 0; c < cells; c++) {
+      const owner = gameState.boxes[r][c];
+      if (!owner) continue;
+      const tl    = dotPos(r, c);
+      const animT = gameState.boxAnim[r][c];
+      let fillAlpha = 0.20, textAlpha = 1, bScale = 1;
+      if (animT > 0 && now < animT + BOX_ANIM_DUR) {
+        const t = _easeOut((now - animT) / BOX_ANIM_DUR);
+        fillAlpha = 0.20 * t; textAlpha = t; bScale = 0.35 + 0.65 * t;
+        needsRaf = true;
+      }
+      const bcx = tl.x + cellSize / 2, bcy = tl.y + cellSize / 2;
+      ctx.save();
+      ctx.translate(bcx, bcy); ctx.scale(bScale, bScale); ctx.translate(-bcx, -bcy);
+      ctx.fillStyle = owner === 1 ? `rgba(26,58,107,${fillAlpha})` : `rgba(139,26,26,${fillAlpha})`;
+      ctx.fillRect(tl.x + 2, tl.y + 2, cellSize - 4, cellSize - 4);
+      ctx.globalAlpha  = textAlpha;
+      ctx.fillStyle    = owner === 1 ? P1 : P2;
+      ctx.font         = `bold ${Math.round(cellSize * 0.38)}px 'Caveat', cursive`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      const init = (owner === 1 ? config.p1Name : config.p2Name)[0].toUpperCase();
+      ctx.fillText(init, bcx, bcy);
+      ctx.restore();
+    }
+  }
+
+  // ── Hover preview (dashed) ──
+  if (hoverLine && !gameState.isGameOver && !gameState.isAIThinking) {
+    const { type, row, col } = hoverLine;
+    const a = dotPos(row, col);
+    const b = type === 'h' ? dotPos(row, col + 1) : dotPos(row + 1, col);
+    ctx.save();
+    ctx.strokeStyle  = gameState.currentPlayer === 1 ? P1 : P2;
+    ctx.globalAlpha  = 0.32;
+    ctx.lineWidth    = Math.max(3, cellSize * 0.12);
+    ctx.lineCap      = 'round';
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ── Drawn lines — horizontal ──
+  for (let r = 0; r < g; r++) {
+    for (let c = 0; c < cells; c++) {
+      if (!gameState.hLines[r][c]) continue;
+      if (_renderAnimatedLine(dotPos(r, c), dotPos(r, c + 1),
+        gameState.wobbleH[r][c], gameState.lineColors.h[r][c], gameState.lineAnimH[r][c])) needsRaf = true;
+    }
+  }
+
+  // ── Drawn lines — vertical ──
+  for (let r = 0; r < cells; r++) {
+    for (let c = 0; c < g; c++) {
+      if (!gameState.vLines[r][c]) continue;
+      if (_renderAnimatedLine(dotPos(r, c), dotPos(r + 1, c),
+        gameState.wobbleV[r][c], gameState.lineColors.v[r][c], gameState.lineAnimV[r][c])) needsRaf = true;
+    }
+  }
+
+  // ── Dots ──
+  for (let r = 0; r < g; r++) {
+    for (let c = 0; c < g; c++) {
+      const { x, y } = dotPos(r, c);
+      const dotR = Math.max(4, cellSize * 0.1);
+      // shadow
+      ctx.beginPath(); ctx.arc(x + 1, y + 1.5, dotR, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(42,36,24,0.2)'; ctx.fill();
+      // dot
+      ctx.beginPath(); ctx.arc(x, y, dotR, 0, Math.PI * 2);
+      ctx.fillStyle = '#2a2418'; ctx.fill();
+    }
+  }
+
+  // ── Float texts ──
+  if (gameState.floatTexts && gameState.floatTexts.length) {
+    gameState.floatTexts = gameState.floatTexts.filter(ft => now - ft.start < FLOAT_DUR);
+    for (const ft of gameState.floatTexts) {
+      const elapsed = now - ft.start;
+      if (elapsed < 0) { needsRaf = true; continue; }
+      const t     = elapsed / FLOAT_DUR;
+      const alpha = Math.max(0, 1 - t * 1.6);
+      const rise  = t * cellSize * 0.85;
+      ctx.save();
+      ctx.globalAlpha  = alpha;
+      ctx.fillStyle    = ft.color;
+      ctx.font         = `bold ${Math.round(cellSize * 0.52)}px 'Caveat', cursive`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(ft.text, ft.x, ft.y - rise);
+      ctx.restore();
+      needsRaf = true;
+    }
+  }
+
+  if (needsRaf) _startAnimLoop();
+}
+
+// FIX: wobble is stored per-line, so lines are stable across re-renders
+function _renderLine(a, b, wobble, owner) {
+  const w  = wobble || { mx: 0, my: 0 };
+  const mx = (a.x + b.x) / 2 + w.mx;
+  const my = (a.y + b.y) / 2 + w.my;
+  ctx.save();
+  ctx.strokeStyle = owner === 1 ? P1 : P2;
+  ctx.lineWidth   = Math.max(3.5, cellSize * 0.13);
+  ctx.lineCap     = 'round';
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.quadraticCurveTo(mx, my, b.x, b.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Returns true if the line is still mid-animation (caller should schedule RAF)
+function _renderAnimatedLine(a, b, wobble, owner, animT) {
+  if (animT > 0 && _now - animT < LINE_ANIM_DUR) {
+    const t  = _easeOut((_now - animT) / LINE_ANIM_DUR);
+    const ex = a.x + (b.x - a.x) * t;
+    const ey = a.y + (b.y - a.y) * t;
+    ctx.save();
+    ctx.strokeStyle = owner === 1 ? P1 : P2;
+    ctx.lineWidth   = Math.max(3.5, cellSize * 0.13);
+    ctx.lineCap     = 'round';
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.restore();
+    return true;
+  }
+  _renderLine(a, b, wobble, owner);
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════
+// INPUT / HIT DETECTION
+// ═══════════════════════════════════════════════════════
+function _getCanvasPos(e) {
+  const rect   = canvas.getBoundingClientRect();
+  const scaleX = canvas.width  / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const src    = e.touches ? e.touches[0] : e;
+  return {
+    cx: (src.clientX - rect.left) * scaleX,
+    cy: (src.clientY - rect.top)  * scaleY,
+  };
+}
+
+// FIX: use true segment-distance instead of midpoint-only (better click accuracy)
+function _distToSegment(px, py, ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay;
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(px - ax, py - ay);
+  const t  = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+
+function _getNearestLine(cx, cy) {
+  const g = config.gridSize, cells = g - 1;
+  const threshold = cellSize * 0.40;
+  let best = null, bestDist = threshold;
+
+  for (let r = 0; r < g; r++) {
+    for (let c = 0; c < cells; c++) {
+      const a = dotPos(r, c), b = dotPos(r, c + 1);
+      const d = _distToSegment(cx, cy, a.x, a.y, b.x, b.y);
+      if (d < bestDist) { bestDist = d; best = { type: 'h', row: r, col: c }; }
+    }
+  }
+  for (let r = 0; r < cells; r++) {
+    for (let c = 0; c < g; c++) {
+      const a = dotPos(r, c), b = dotPos(r + 1, c);
+      const d = _distToSegment(cx, cy, a.x, a.y, b.x, b.y);
+      if (d < bestDist) { bestDist = d; best = { type: 'v', row: r, col: c }; }
+    }
+  }
+  return best;
+}
+
+function _onMouseMove(e) {
+  if (!gameState || gameState.isGameOver || gameState.isAIThinking) return;
+  const { cx, cy } = _getCanvasPos(e);
+  const line = _getNearestLine(cx, cy);
+  if (!line) { hoverLine = null; render(); return; }
+  const drawn = line.type === 'h'
+    ? gameState.hLines[line.row][line.col]
+    : gameState.vLines[line.row][line.col];
+  hoverLine = drawn ? null : line;
+  render();
+}
+
+function _onTouch(e) {
+  e.preventDefault();
+  if (!gameState || gameState.isGameOver || gameState.isAIThinking) return;
+  const { cx, cy } = _getCanvasPos(e);
+  const line = _getNearestLine(cx, cy);
+  if (line) handleLineClick(line);
+}
+
+function _onCanvasClick(e) {
+  if (!gameState || gameState.isGameOver || gameState.isAIThinking) return;
+  const { cx, cy } = _getCanvasPos(e);
+  const line = _getNearestLine(cx, cy);
+  if (line) handleLineClick(line);
+}
+
+// ═══════════════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════════════
+function handleLineClick(line) {
+  const gs = gameState;
+  const isDrawn = line.type === 'h'
+    ? gs.hLines[line.row][line.col]
+    : gs.vLines[line.row][line.col];
+  if (isDrawn) return;
+  _stopTimer();
+
+  // Save snapshot BEFORE mutation so undo can restore it
+  gs.history.push({
+    hLines:        gs.hLines.map(r => r.slice()),
+    vLines:        gs.vLines.map(r => r.slice()),
+    boxes:         gs.boxes.map(r => r.slice()),
+    lineColors:    { h: gs.lineColors.h.map(r => r.slice()), v: gs.lineColors.v.map(r => r.slice()) },
+    wobbleH:       gs.wobbleH.map(r => r.slice()),
+    wobbleV:       gs.wobbleV.map(r => r.slice()),
+    lineAnimH:     gs.lineAnimH.map(r => r.slice()),
+    lineAnimV:     gs.lineAnimV.map(r => r.slice()),
+    boxAnim:       gs.boxAnim.map(r => r.slice()),
+    currentPlayer: gs.currentPlayer,
+    scores:        { ...gs.scores },
+  });
+
+  // Store random wobble ONCE at draw time — stable across all future re-renders
+  const wobble = { mx: (Math.random() - 0.5) * 2.4, my: (Math.random() - 0.5) * 2.4 };
+  const now = Date.now();
+
+  if (line.type === 'h') {
+    gs.hLines[line.row][line.col]       = true;
+    gs.lineColors.h[line.row][line.col] = gs.currentPlayer;
+    gs.wobbleH[line.row][line.col]      = wobble;
+    gs.lineAnimH[line.row][line.col]    = now;
+  } else {
+    gs.vLines[line.row][line.col]       = true;
+    gs.lineColors.v[line.row][line.col] = gs.currentPlayer;
+    gs.wobbleV[line.row][line.col]      = wobble;
+    gs.lineAnimV[line.row][line.col]    = now;
+  }
+
+  sndLine();
+
+  // Check boxes — pure function, no mutation
+  const completed = getCompletedBoxes(gs, line, config.gridSize);
+  const boxAnimStart = now + LINE_ANIM_DUR;
+  completed.forEach(([r, c]) => { gs.boxes[r][c] = gs.currentPlayer; gs.boxAnim[r][c] = boxAnimStart; });
+
+  const prevPlayer = gs.currentPlayer;
+  if (prevPlayer === 1) gs.scores.p1 += completed.length;
+  else                  gs.scores.p2 += completed.length;
+
+  if (completed.length > 0) {
+    const ftCx = completed.reduce((s, [r, c]) => s + dotPos(r, c).x + cellSize / 2, 0) / completed.length;
+    const ftCy = completed.reduce((s, [r, c]) => s + dotPos(r, c).y + cellSize / 2, 0) / completed.length;
+    gs.floatTexts.push({ x: ftCx, y: ftCy, text: `+${completed.length}`, color: prevPlayer === 1 ? P1 : P2, start: boxAnimStart });
+    const name   = prevPlayer === 1 ? config.p1Name : config.p2Name;
+    const plural = completed.length === 1 ? 'box' : 'boxes';
+    showToast(`${name} claims ${completed.length} ${plural}!`);
+    sndBox(completed.length);
+    bumpScore(prevPlayer);
+  }
+
+  const total   = (config.gridSize - 1) ** 2;
+  const claimed = gs.scores.p1 + gs.scores.p2;
+
+  if (claimed === total) {
+    gs.isGameOver = true;
+    hoverLine = null;
+    _stopTimer();
+    render(); updateScoreBar(); updateProgress(); _startAnimLoop();
+    if (gs.scores.p1 === gs.scores.p2) sndDraw(); else sndWin();
+    setTimeout(showResult, 800);
+    return;
+  }
+
+  if (completed.length === 0) {
+    gs.currentPlayer = gs.currentPlayer === 1 ? 2 : 1;
+  }
+
+  hoverLine = null;
+  render(); updateScoreBar(); updateProgress(); updateUndoBtn();
+  _startAnimLoop();
+  _startTimer();
+  triggerAIIfNeeded();
+}
+
+// Pure — does NOT mutate state
+function getCompletedBoxes(state, line, gridSize) {
+  const cells     = gridSize - 1;
+  const completed = [];
+  const check     = (r, c) => {
+    if (r < 0 || r >= cells || c < 0 || c >= cells) return;
+    if (state.boxes[r][c] !== 0) return;
+    if (state.hLines[r][c] && state.hLines[r+1][c] &&
+        state.vLines[r][c] && state.vLines[r][c+1]) completed.push([r, c]);
+  };
+  if (line.type === 'h') { check(line.row - 1, line.col); check(line.row, line.col); }
+  else                   { check(line.row, line.col - 1); check(line.row, line.col); }
+  return completed;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI — pure simulation, never mutates real state
+// ═══════════════════════════════════════════════════════
+function triggerAIIfNeeded() {
+  if (config.mode !== 'ai')      return;
+  if (gameState.currentPlayer !== 2) return;
+  if (gameState.isGameOver)      return;
+  gameState.isAIThinking = true;
+  _stopTimer();
+  updateScoreBar();
+  setTimeout(() => {
+    if (!gameState || gameState.isGameOver) return;
+    gameState.isAIThinking = false;
+    const move = getAIMove(gameState, config.gridSize);
+    if (move) handleLineClick(move); else updateScoreBar();
+  }, 520);
+}
+
+// Returns a shallow clone with the given line applied — real state untouched
+function _simApply(state, line) {
+  const hLines = state.hLines.map(r => r.slice());
+  const vLines = state.vLines.map(r => r.slice());
+  if (line.type === 'h') hLines[line.row][line.col] = true;
+  else                   vLines[line.row][line.col]  = true;
+  return { hLines, vLines, boxes: state.boxes };
+}
+
+// ── AI entry point — routes by difficulty ──
+function getAIMove(state, g) {
+  const d = config.difficulty;
+  if (d === 'easy') return _aiEasy(state, g);
+  if (d === 'hard') return _aiHard(state, g);
+  return _aiMedium(state, g);
+}
+
+function _aiAvail(state, g) {
+  const dots = g, cells = g - 1, all = [];
+  for (let r = 0; r < dots;  r++) for (let c = 0; c < cells; c++) all.push({ type: 'h', row: r, col: c });
+  for (let r = 0; r < cells; r++) for (let c = 0; c < dots;  c++) all.push({ type: 'v', row: r, col: c });
+  return all.filter(l => l.type === 'h' ? !state.hLines[l.row][l.col] : !state.vLines[l.row][l.col]);
+}
+
+function _countSides(sim, r, c) {
+  return (sim.hLines[r][c]?1:0) + (sim.hLines[r+1][c]?1:0)
+       + (sim.vLines[r][c]?1:0) + (sim.vLines[r][c+1]?1:0);
+}
+
+// Easy — takes a winning move if available, otherwise completely random
+function _aiEasy(state, g) {
+  const avail = _aiAvail(state, g);
+  if (!avail.length) return null;
+  for (const l of avail) {
+    if (getCompletedBoxes(_simApply(state, l), l, g).length > 0) return l;
+  }
+  return avail[Math.floor(Math.random() * avail.length)];
+}
+
+// Medium — 3-tier: win → safe → minimize gift (original AI)
+function _aiMedium(state, g) {
+  const avail = _aiAvail(state, g);
+  if (!avail.length) return null;
+  const cells = g - 1;
+
+  for (const l of avail) {
+    if (getCompletedBoxes(_simApply(state, l), l, g).length > 0) return l;
+  }
+
+  const safe = avail.filter(l => {
+    const sim = _simApply(state, l);
+    for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
+      if (sim.boxes[r][c]) continue;
+      if (_countSides(sim, r, c) === 3) return false;
+    }
+    return true;
+  });
+  if (safe.length) return safe[Math.floor(Math.random() * safe.length)];
+
+  let best = avail[0], bestGift = Infinity;
+  for (const l of avail) {
+    const sim = _simApply(state, l);
+    let gift = 0;
+    for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
+      if (sim.boxes[r][c]) continue;
+      if (_countSides(sim, r, c) === 3) gift++;
+    }
+    if (gift < bestGift) { bestGift = gift; best = l; }
+  }
+  return best;
+}
+
+// Hard — minimax with alpha-beta pruning (depth-limited)
+function _aiHard(state, g) {
+  const avail = _aiAvail(state, g);
+  if (!avail.length) return null;
+  const cells = g - 1;
+
+  // Tier 1: Always grab immediate wins
+  for (const l of avail) {
+    if (getCompletedBoxes(_simApply(state, l), l, g).length > 0) return l;
+  }
+
+  // Tier 2: Safe moves — don't create 3-sided boxes
+  const safe = avail.filter(l => {
+    const sim = _simApply(state, l);
+    for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
+      if (sim.boxes[r][c]) continue;
+      if (_countSides(sim, r, c) === 3) return false;
+    }
+    return true;
+  });
+  if (safe.length) return safe[Math.floor(Math.random() * safe.length)];
+
+  // Tier 3: Minimax with alpha-beta pruning
+  const maxDepth = g <= 3 ? 8 : g <= 4 ? 6 : g <= 5 ? 4 : 3;
+  let bestMove = avail[0], bestVal = -Infinity;
+  for (const l of avail) {
+    const { ns, claimed } = _mmStep(state, l, g, 2);
+    const val = _mmSearch(ns, g, maxDepth - 1, -Infinity, Infinity, claimed > 0);
+    if (val > bestVal) { bestVal = val; bestMove = l; }
+  }
+  return bestMove;
+}
+
+// Pure simulation step — applies one line, claims any completed boxes
+function _mmStep(state, line, g, player) {
+  const hLines = state.hLines.map(r => r.slice());
+  const vLines = state.vLines.map(r => r.slice());
+  const boxes  = state.boxes.map(r => r.slice());
+  if (line.type === 'h') hLines[line.row][line.col] = true;
+  else                   vLines[line.row][line.col]  = true;
+  const ns = { hLines, vLines, boxes };
+  const completed = getCompletedBoxes(ns, line, g);
+  completed.forEach(([r, c]) => { boxes[r][c] = player; });
+  return { ns, claimed: completed.length };
+}
+
+// Minimax: isAITurn=true → AI (player 2) maximises score = p2_boxes - p1_boxes
+function _mmSearch(state, g, depth, alpha, beta, isAITurn) {
+  const cells = g - 1;
+  const avail = _aiAvail(state, g);
+  if (!avail.length || depth <= 0) {
+    let score = 0;
+    for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
+      const o = state.boxes[r][c];
+      if (o === 2) score++; else if (o === 1) score--;
+    }
+    return score;
+  }
+  const player = isAITurn ? 2 : 1;
+  if (isAITurn) {
+    let best = -Infinity;
+    for (const l of avail) {
+      const { ns, claimed } = _mmStep(state, l, g, player);
+      const v = _mmSearch(ns, g, depth - 1, alpha, beta, claimed > 0);
+      if (v > best) best = v;
+      if (v > alpha) alpha = v;
+      if (beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (const l of avail) {
+      const { ns, claimed } = _mmStep(state, l, g, player);
+      const v = _mmSearch(ns, g, depth - 1, alpha, beta, claimed > 0 ? false : true);
+      if (v < best) best = v;
+      if (v < beta) beta = v;
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// RESULT SCREEN
+// ═══════════════════════════════════════════════════════
+function showResult() {
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  const { p1, p2 } = gameState.scores;
+  document.getElementById('resultP1Name').textContent  = config.p1Name;
+  document.getElementById('resultP2Name').textContent  = config.p2Name;
+  document.getElementById('resultP1Score').textContent = p1;
+  document.getElementById('resultP2Score').textContent = p2;
+  if (p1 > p2) {
+    recordStat('w');
+    document.getElementById('resultTrophy').textContent   = '🏆';
+    document.getElementById('resultTitle').textContent    = config.p1Name + ' Wins!';
+    document.getElementById('resultSub').textContent      = `${p1} boxes to ${p2} — well played!`;
+    document.getElementById('resultTitle').style.color   = P1;
+  } else if (p2 > p1) {
+    recordStat('l');
+    document.getElementById('resultTrophy').textContent   = '🏆';
+    document.getElementById('resultTitle').textContent    = config.p2Name + ' Wins!';
+    document.getElementById('resultSub').textContent      = `${p2} boxes to ${p1} — well played!`;
+    document.getElementById('resultTitle').style.color   = P2;
+  } else {
+    recordStat('d');
+    document.getElementById('resultTrophy').textContent   = '🤝';
+    document.getElementById('resultTitle').textContent    = "It's a Draw!";
+    document.getElementById('resultSub').textContent      = `${p1} boxes each — equally matched!`;
+    document.getElementById('resultTitle').style.color   = '#2a2418';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// RESPONSIVE RESIZE  — FIX: preserves game state
+// ═══════════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (gameState && !document.getElementById('gameScreen').classList.contains('hidden')) {
+      _applyCanvasSize();
+      render();
+    }
+  }, 150);
+});
+
+// ═══════════════════════════════════════════════════════
+// PWA — Install prompt
+// ═══════════════════════════════════════════════════════
+let _deferredInstall = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstall = e;
+  try {
+    const dismissed = localStorage.getItem('db_install_dismissed');
+    if (!dismissed) document.getElementById('installBanner').classList.remove('hidden');
+  } catch (_) {}
+});
+
+function installApp() {
+  document.getElementById('installBanner').classList.add('hidden');
+  if (_deferredInstall) { _deferredInstall.prompt(); _deferredInstall = null; }
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').classList.add('hidden');
+  try { localStorage.setItem('db_install_dismissed', '1'); } catch (_) {}
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.add('hidden');
+});
+
+// ═══════════════════════════════════════════════════════
+// SERVICE WORKER
+// ═══════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', loadPrefs);
+</script>
+</body>
+</html>
