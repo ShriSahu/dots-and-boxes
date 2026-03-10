@@ -222,10 +222,11 @@ body::after {
 .score-player {
   flex: 1; padding: 10px 14px; display: flex;
   flex-direction: column; align-items: center;
-  transition: background 0.25s;
+  transition: background 0.25s, border-top-color 0.25s;
+  border-top: 3px solid transparent;
 }
-.score-player.active-p1 { background: var(--p1l); }
-.score-player.active-p2 { background: var(--p2l); }
+.score-player.active-p1 { background: var(--p1l); border-top-color: var(--p1); }
+.score-player.active-p2 { background: var(--p2l); border-top-color: var(--p2); }
 .score-name {
   font-size: 1.1rem; font-weight: 600; color: var(--muted);
   transition: color 0.25s; white-space: nowrap; overflow: hidden;
@@ -238,12 +239,14 @@ body::after {
   transition: transform 0.15s;
 }
 .score-num.bump { transform: scale(1.25); }
-.score-turn-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  margin-top: 4px; opacity: 0; transition: opacity 0.25s;
+.score-turn-chip {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.6px;
+  padding: 2px 8px; border-radius: 10px; margin-top: 5px;
+  opacity: 0; transition: opacity 0.25s; text-transform: uppercase;
+  background: transparent; color: transparent;
 }
-.active-p1 .score-turn-dot { background: var(--p1); opacity: 1; }
-.active-p2 .score-turn-dot { background: var(--p2); opacity: 1; }
+.active-p1 .score-turn-chip { background: var(--p1); color: #fff; opacity: 1; }
+.active-p2 .score-turn-chip { background: var(--p2); color: #fff; opacity: 1; }
 .score-divider { width: 1.5px; align-self: stretch; background: var(--border); flex-shrink: 0; }
 .score-mid {
   padding: 8px 10px; font-size: 0.9rem; color: var(--muted);
@@ -365,7 +368,20 @@ canvas { touch-action: none; cursor: crosshair; border-radius: 4px; display: blo
   font-size: 1.5rem; font-weight: 700; color: var(--ink);
   line-height: 1; min-height: 1.6rem; text-align: center; transition: color 0.3s;
 }
-.timer-display.urgent { color: var(--p2); animation: pulse 0.6s ease-in-out infinite; }
+.timer-display.urgent { color: var(--p2) !important; animation: pulse 0.6s ease-in-out infinite; }
+
+/* Timer progress bar */
+.timer-bar-wrap {
+  width: 100%; height: 5px;
+  background: rgba(90,80,60,0.10);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+.timer-bar-fill {
+  height: 100%;
+  border-radius: 0 0 10px 10px;
+  transition: width 0.85s linear, background-color 0.3s;
+}
 
 /* Responsive */
 @media (max-width: 480px) {
@@ -492,7 +508,7 @@ canvas { touch-action: none; cursor: crosshair; border-radius: 4px; display: blo
     <div class="score-player" id="scoreP1">
       <div class="score-name" id="scoreP1Name">Player 1</div>
       <div class="score-num"  id="scoreP1Num">0</div>
-      <div class="score-turn-dot"></div>
+      <div class="score-turn-chip">▶ Turn</div>
     </div>
     <div class="score-divider"></div>
     <div class="score-mid">
@@ -504,8 +520,13 @@ canvas { touch-action: none; cursor: crosshair; border-radius: 4px; display: blo
     <div class="score-player" id="scoreP2">
       <div class="score-name" id="scoreP2Name">Player 2</div>
       <div class="score-num"  id="scoreP2Num">0</div>
-      <div class="score-turn-dot"></div>
+      <div class="score-turn-chip">▶ Turn</div>
     </div>
+  </div>
+
+  <!-- Timer progress bar (appears just below score bar when timer is active) -->
+  <div class="timer-bar-wrap hidden" id="timerBarWrap">
+    <div class="timer-bar-fill" id="timerBarFill" style="width:100%"></div>
   </div>
 
   <!-- Progress bar -->
@@ -638,14 +659,32 @@ function _updateTimerDisplay() {
   if (!el) return;
   const show = config.timerSeconds && gameState && !gameState.isGameOver && !gameState.isAIThinking
                && !(config.mode === 'ai' && gameState.currentPlayer === 2);
+  const urgent = !!(show && timerRemaining <= 3 && timerRemaining > 0);
   el.textContent = show && timerRemaining > 0 ? timerRemaining : '';
-  el.classList.toggle('urgent', !!(show && timerRemaining <= 3 && timerRemaining > 0));
+  el.classList.toggle('urgent', urgent);
+  // Colour the timer number to match the active player (overridden by .urgent CSS when urgent)
+  el.style.color = urgent ? '' : (gameState && gameState.currentPlayer === 1 ? 'var(--p1)' : 'var(--p2)');
+
+  // Timer progress bar
+  const barWrap = document.getElementById('timerBarWrap');
+  const barFill = document.getElementById('timerBarFill');
+  if (barWrap && barFill) {
+    if (show && config.timerSeconds > 0 && timerRemaining > 0) {
+      barWrap.classList.remove('hidden');
+      const pct = Math.max(0, timerRemaining / config.timerSeconds * 100);
+      barFill.style.width = pct + '%';
+      barFill.style.backgroundColor = urgent ? 'var(--p2)'
+        : (gameState.currentPlayer === 1 ? 'var(--p1)' : 'var(--p2)');
+    } else {
+      barWrap.classList.add('hidden');
+    }
+  }
 }
 
 function _autoSkipTurn() {
   if (!gameState || gameState.isGameOver) return;
   const avail = _aiAvail(gameState, config.gridSize);
-  if (!avail.length) return;
+  if (!avail.length) { _startTimer(); return; } // safety: no move found, keep timer going
   const cells = config.gridSize - 1;
   const safe = avail.filter(l => {
     const sim = _simApply(gameState, l);
@@ -659,7 +698,8 @@ function _autoSkipTurn() {
                            : avail[Math.floor(Math.random() * avail.length)];
   const name = gameState.currentPlayer === 1 ? config.p1Name : config.p2Name;
   showToast(`⏰ Time's up — auto-move for ${name}!`);
-  handleLineClick(move);
+  // Small delay so the "time's up" toast is seen before the turn-switch toast replaces it
+  setTimeout(() => handleLineClick(move), 120);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1002,9 +1042,27 @@ let _toastTimer = null;
 function showToast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
+  el.style.background = '';
+  el.style.color = '';
   el.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// Coloured turn-switch announcement (2-player only)
+function showTurnToast(player) {
+  const name  = player === 1 ? config.p1Name : config.p2Name;
+  const color = player === 1 ? P1 : P2;
+  const el    = document.getElementById('toast');
+  el.textContent    = `▶  ${name}'s Turn`;
+  el.style.background = color;
+  el.style.color      = '#f5f0e8';
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => { el.style.background = ''; el.style.color = ''; }, 300);
+  }, 1600);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1312,6 +1370,8 @@ function handleLineClick(line) {
 
   if (completed.length === 0) {
     gs.currentPlayer = gs.currentPlayer === 1 ? 2 : 1;
+    // Announce whose turn it is now (2-player only — AI has its own "thinking…" label)
+    if (config.mode === '2player') showTurnToast(gs.currentPlayer);
   }
 
   hoverLine = null;
