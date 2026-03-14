@@ -1,8 +1,8 @@
 import { getApps, initializeApp } from 'firebase/app';
 // getReactNativePersistence is available in Metro's RN bundle but not browser types
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { initializeAuth, getReactNativePersistence, signInAnonymously } = require('firebase/auth');
-import { initializeFirestore, memoryLocalCache } from 'firebase/firestore';
+const { initializeAuth, getAuth, getReactNativePersistence, signInAnonymously } = require('firebase/auth');
+import { initializeFirestore, getFirestore, memoryLocalCache } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
@@ -17,13 +17,21 @@ const firebaseConfig = {
 // Guard against re-initialization during Fast Refresh
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+let _auth: any;
+try {
+  _auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+} catch {
+  _auth = getAuth(app);
+}
+export const auth = _auth;
 
-export const db = initializeFirestore(app, {
-  localCache: memoryLocalCache(),
-});
+let _db: any;
+try {
+  _db = initializeFirestore(app, { localCache: memoryLocalCache() });
+} catch {
+  _db = getFirestore(app);
+}
+export const db = _db;
 
 /** Sign in anonymously if needed and return the stable UID. */
 export async function getAnonymousUid(): Promise<string> {
