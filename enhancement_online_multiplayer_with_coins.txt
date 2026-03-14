@@ -1,0 +1,43 @@
+  ---
+  Enhance the Dots & Boxes React Native / Expo app at C:\Shri_Development\dots-and-boxes with two major features: online
+   multiplayer and a coin system. The full codebase is already built — app/index.tsx (home), app/game.tsx (game screen),
+   src/hooks/useGameEngine.ts, src/components/GameBoard.tsx, src/components/ScoreBar.tsx, src/utils/storage.ts,
+  src/types/game.types.ts, src/constants/theme.ts.
+
+  Tech stack additions: Firebase JS SDK (Firestore + Anonymous Auth). Do NOT use @react-native-firebase — use the
+  firebase npm package (web SDK) which works in Expo without native builds.
+
+  Feature 1 — Online Multiplayer:
+  - Add a third game mode 'online' alongside '2player' and 'ai'
+  - New screen app/lobby.tsx: two options — "Create Room" (generates a 6-char room code, shows it, waits for opponent)
+  and "Join Room" (enter a code). Show a waiting spinner until opponent joins.
+  - New hook src/hooks/useOnlineGame.ts: wraps useGameEngine, syncs every move to Firestore rooms/{roomId}/state. Only
+  the current player's client can write moves. Listen for opponent moves via onSnapshot.
+  - New service src/services/firebase.ts: Firebase config + getAnonymousUid().
+  - New service src/services/gameRoom.ts: createRoom(config), joinRoom(code, uid), pushMove(roomId, lineId),
+  listenRoom(roomId, cb), leaveRoom(roomId).
+  - In app/game.tsx: detect online mode — disable board when it's opponent's turn, show "Opponent disconnected" overlay
+  if they leave (use Firestore presence), add a "Rematch" button on game over that writes to rooms/{roomId}/rematch.
+  - Handle edge cases: room not found, room full (already 2 players), opponent quits mid-game.
+  - No timer in online mode (turn timer is disabled for fairness).
+
+  Feature 2 — Coin System:
+  - New service src/services/coins.ts: getCoins(uid), addCoins(uid, amount, reason), spendCoins(uid, amount, reason) —
+  all backed by Firestore users/{uid}/coins.
+  - Coin rewards: win vs AI → +10, win online → +25, draw → +3, loss → +1, daily first game → +5 (store last-played date
+   in Firestore).
+  - Show coin balance in app/index.tsx header (gold coin icon + number).
+  - New screen app/shop.tsx: list of themes (Parchment=default free, Neon=150 coins, Chalkboard=200 coins, Blueprint=250
+   coins). Each theme changes dot colour, line colours, box fill colours, background. Store purchased + active theme in
+  Firestore users/{uid}/purchases.
+  - Apply active theme via a useTheme() hook that overrides src/constants/theme.ts values.
+  - New type additions to src/types/game.types.ts: OnlineRoom, RoomStatus, CoinTransaction, Theme.
+  - Add a small coin animation (+25!) that floats up on the game over screen when coins are awarded.
+  - Update app/index.tsx: add "Play Online" button in the mode row, add a shop icon button (🪙) in the header linking to
+   app/shop.tsx.
+
+  Do NOT change: useGameEngine.ts core logic, GameBoard.tsx, ScoreBar.tsx, src/ai/, src/utils/gameHelpers.ts. Only
+  extend, never break existing local play.
+
+  Plan the implementation first, list all files to create/modify, then implement one file at a time. Ask before
+  installing any new packages.

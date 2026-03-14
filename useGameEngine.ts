@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+javaimport { useState, useCallback, useEffect } from 'react';
 import { GameState, GameConfig, LineId, Player, BoxOwner } from '../types/game.types';
 import { createInitialState, getCompletedBoxes, isLineDrawn } from '../utils/gameHelpers';
 import { getAIMove } from '../ai/aiPlayer';

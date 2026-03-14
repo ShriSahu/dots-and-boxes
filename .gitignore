@@ -10,3 +10,22 @@ generate-icons.html
 # OS
 .DS_Store
 Thumbs.db
+
+# Node
+node_modules/
+
+# Expo / EAS
+.expo/
+dist/
+build/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+google-service-account.json
+
+# Secrets
+.env
+.env.local

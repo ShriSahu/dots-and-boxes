@@ -6,27 +6,47 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
       "backgroundColor": "#f5f0e8"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.dotsandboxes"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.shrisahu.dotsandboxes",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f5f0e8"
       },
-      "package": "com.yourname.dotsandboxes"
+      "package": "com.shrisahu.dotsandboxes",
+      "versionCode": 1,
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f5f0e8",
+          "image": "./assets/splash.png",
+          "imageWidth": 200
+        }
+      ]
     ],
-    "scheme": "dotsandboxes"
+    "scheme": "dotsandboxes",
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    }
   }
 }
