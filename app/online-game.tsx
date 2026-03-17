@@ -2,18 +2,22 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
   SafeAreaView, Animated, Pressable, ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useTheme } from '../src/hooks/useTheme';
 import { useOnlineGame } from '../src/hooks/useOnlineGame';
 import GameBoard from '../src/components/GameBoard';
 import ScoreBar from '../src/components/ScoreBar';
-import { awardCoins } from '../src/services/coins';
+import { recordOnlineResult } from '../src/services/coins';
+import { initAudio, playSound } from '../src/services/audio';
 import type { GameConfig, GameResult, LineId, GridSize } from '../src/types/game.types';
 
 export default function OnlineGameScreen() {
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
   const params = useLocalSearchParams<{
     roomCode: string;
     isHost: string;
@@ -31,12 +35,22 @@ export default function OnlineGameScreen() {
   const [disconnected, setDisconnected] = useState(false);
   const [rematchWaiting, setRematchWaiting] = useState(false);
   const [coinsEarned, setCoinsEarned] = useState(0);
+  const [newBoxes, setNewBoxes]       = useState<string[]>([]);
+  const [afkWarning, setAfkWarning]   = useState(false);
 
   const toastOpacity  = useRef(new Animated.Value(0)).current;
   const coinAnim      = useRef(new Animated.Value(0)).current;
   const toastTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
+  const confettiRef   = useRef<any>(null);
+  const prevLastLine  = useRef<string>('');
+  const lastMoveTimeRef = useRef(Date.now());
+
+  // ── Init audio ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    initAudio();
+  }, []);
 
   const showToast = useCallback((text: string, color: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -51,13 +65,16 @@ export default function OnlineGameScreen() {
     });
   }, [toastOpacity]);
 
-  const { room, state, isMyTurn, isSubmitting, opponentName, myName, drawLine, abandon, requestRematch } =
+  const { room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine, abandon, requestRematch } =
     useOnlineGame(roomCode, myUid, isHost, gridSize, {
-      onBoxClaimed: (count, player) => {
+      onBoxClaimed: (count, player, boxKeys, line) => {
+        playSound(count >= 3 ? 'chain' : 'pop');
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         const name  = player === 1 ? (isHost ? myName : opponentName) : (isHost ? opponentName : myName);
         const color = player === 1 ? theme.p1 : theme.p2;
         showToast(`${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
+        setNewBoxes(boxKeys);
+        setTimeout(() => setNewBoxes([]), 700);
       },
       onTurnSwitch: () => {
         const nextName  = room?.currentPlayerUid === myUid ? myName : opponentName;
@@ -81,6 +98,18 @@ export default function OnlineGameScreen() {
     timerSeconds: 0,
   };
 
+  // ── Detect opponent moves via lastLine changes ─────────────────────────────
+  useEffect(() => {
+    if (!lastLine) return;
+    const key = `${lastLine.type}-${lastLine.row}-${lastLine.col}`;
+    if (key !== prevLastLine.current) {
+      prevLastLine.current = key;
+      if (!isMyTurn) { // only play click for opponent's moves (mine already played on tap)
+        playSound('click');
+      }
+    }
+  }, [lastLine]);
+
   // ── Game over ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (state.isGameOver && !prevGameOver.current) {
@@ -93,25 +122,34 @@ export default function OnlineGameScreen() {
       setResult({ winner, scores, p1Name: config.p1Name, p2Name: config.p2Name });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
+      // Play win/draw sound
+      if (winner !== 'draw') {
+        playSound('win');
+      } else {
+        playSound('draw');
+      }
+
+      // Fire confetti if local player wins
+      if (winner === (isHost ? 'p1' : 'p2')) {
+        setTimeout(() => confettiRef.current?.start(), 200);
+      }
+
       // Award coins
       if (!coinsAwarded.current && myUid) {
         coinsAwarded.current = true;
         const myPlayer = isHost ? 'p1' : 'p2';
-        let delta = 1; // participation
-        let reason: 'win' | 'draw' | 'participation' = 'participation';
-        if (winner === myPlayer)       { delta = 25; reason = 'win'; }
-        else if (winner === 'draw')    { delta = 3;  reason = 'draw'; }
+        const outcomeResult: 'win' | 'draw' | 'loss' =
+          winner === myPlayer ? 'win' : winner === 'draw' ? 'draw' : 'loss';
 
-        setCoinsEarned(delta);
-        awardCoins(myUid, delta, reason, roomCode);
-
-        // Float coin animation
-        coinAnim.setValue(0);
-        Animated.sequence([
-          Animated.timing(coinAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-          Animated.delay(600),
-          Animated.timing(coinAnim, { toValue: 2, duration: 400, useNativeDriver: true }),
-        ]).start();
+        recordOnlineResult(myUid, outcomeResult, roomCode).then(coins => {
+          setCoinsEarned(coins);
+          coinAnim.setValue(0);
+          Animated.sequence([
+            Animated.timing(coinAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+            Animated.delay(600),
+            Animated.timing(coinAnim, { toValue: 2, duration: 400, useNativeDriver: true }),
+          ]).start();
+        });
       }
     }
     if (!state.isGameOver) prevGameOver.current = false;
@@ -132,9 +170,37 @@ export default function OnlineGameScreen() {
     }
   }, [room?.rematchRoomCode]); // eslint-disable-line
 
+  // ── AFK: reset timer on new moves ─────────────────────────────────────────
+  useEffect(() => {
+    if (room?.moveCount) lastMoveTimeRef.current = Date.now();
+  }, [room?.moveCount]);
+
+  // ── AFK watcher ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (state.isGameOver || result || disconnected || !room || room.status !== 'active') return;
+    if (isMyTurn) {
+      // Reset timer whenever it becomes my turn
+      lastMoveTimeRef.current = Date.now();
+      setAfkWarning(false);
+      return;
+    }
+    const check = setInterval(() => {
+      const elapsed = (Date.now() - lastMoveTimeRef.current) / 1000;
+      if (elapsed > 300) {        // 5 minutes — auto-leave
+        clearInterval(check);
+        abandon();
+        router.back();
+      } else if (elapsed > 120) { // 2 minutes — show warning
+        setAfkWarning(true);
+      }
+    }, 10000);
+    return () => clearInterval(check);
+  }, [isMyTurn, state.isGameOver, result, disconnected, room?.status]);
+
   const handleLineTap = (line: LineId) => {
     if (!isMyTurn || state.isGameOver || isSubmitting) return;
     Haptics.selectionAsync();
+    playSound('click');
     drawLine(line);
   };
 
@@ -227,6 +293,15 @@ export default function OnlineGameScreen() {
         </View>
       )}
 
+      {/* ── AFK warning banner ── */}
+      {afkWarning && !state.isGameOver && (
+        <View style={[styles.afkBanner, { backgroundColor: '#ff9500', borderColor: '#ff6b00' }]}>
+          <Text style={[styles.afkText, { color: '#fff', fontFamily: theme.fontRegular }]}>
+            Opponent hasn't moved in a while…
+          </Text>
+        </View>
+      )}
+
       {/* ── Score bar ── */}
       <View style={styles.scoreWrap}>
         <ScoreBar
@@ -245,6 +320,8 @@ export default function OnlineGameScreen() {
           config={config}
           onLineTap={handleLineTap}
           disabled={boardDisabled}
+          lastLine={lastLine}
+          newBoxes={newBoxes}
         />
       </View>
 
@@ -370,6 +447,19 @@ export default function OnlineGameScreen() {
         </Pressable>
       )}
 
+      {/* ── Confetti — pointerEvents none so it never blocks the board ── */}
+      <View pointerEvents="none" style={{ position: 'absolute', width: '100%', height: '100%' }}>
+        <ConfettiCannon
+          ref={confettiRef}
+          count={120}
+          origin={{ x: width / 2, y: -20 }}
+          autoStart={false}
+          fadeOut
+          colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
+          fallSpeed={3500}
+        />
+      </View>
+
     </SafeAreaView>
   );
 }
@@ -400,6 +490,13 @@ const styles = StyleSheet.create({
     paddingVertical: 7, paddingHorizontal: 14, alignItems: 'center',
   },
   turnBannerText: { fontSize: 16, fontWeight: '600' },
+
+  afkBanner: {
+    marginHorizontal: 16, marginBottom: 6,
+    borderWidth: 1.5, borderRadius: 8,
+    paddingVertical: 6, paddingHorizontal: 14, alignItems: 'center',
+  },
+  afkText: { fontSize: 13 },
 
   scoreWrap:  { paddingHorizontal: 16, marginBottom: 8 },
   boardWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center' },

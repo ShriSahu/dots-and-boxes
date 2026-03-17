@@ -11,7 +11,7 @@ import {
 import { getAIMove } from '../ai/aiPlayer';
 
 export interface EngineEvents {
-  onBoxClaimed?: (count: number, player: Player) => void;
+  onBoxClaimed?: (count: number, player: Player, boxKeys: string[], line: LineId) => void;
   onTurnSwitch?: (nextPlayer: Player) => void;
   onGameOver?: () => void;
   onAutoSkip?: (playerName: string) => void;
@@ -21,10 +21,10 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
   const [state, setState] = useState<GameState>(() =>
     buildInitialState(config.gridSize),
   );
-  const [isAIThinking, setIsAIThinking] = useState(false);
+  const [isAIThinking, setIsAIThinking]   = useState(false);
   const [timerRemaining, setTimerRemaining] = useState(0);
-  // Track a move counter to reliably trigger effects after each move
-  const [moveCount, setMoveCount] = useState(0);
+  const [lastLine, setLastLine]             = useState<LineId | null>(null);
+  const [moveCount, setMoveCount]           = useState(0);
 
   const stateRef         = useRef(state);
   const timerRef         = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -47,6 +47,11 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
   // ── Apply a move (human or AI) ─────────────────────────────────────────────
   const drawLine = useCallback((line: LineId) => {
     stopTimer();
+
+    // Flash the line immediately for both player and AI moves
+    setLastLine(line);
+    setTimeout(() => setLastLine(null), 260);
+
     setState(prev => {
       if (prev.isGameOver) return prev;
       const drawn = line.type === 'h'
@@ -54,22 +59,29 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
         : prev.vLines[line.row][line.col];
       if (drawn) return prev;
 
-      const snapshot = takeSnapshot(prev);
-      const hLines = prev.hLines.map(r => [...r]);
-      const vLines = prev.vLines.map(r => [...r]);
-      if (line.type === 'h') hLines[line.row][line.col] = true;
-      else vLines[line.row][line.col] = true;
+      const snapshot  = takeSnapshot(prev);
+      const hLines    = prev.hLines.map(r => [...r]);
+      const vLines    = prev.vLines.map(r => [...r]);
+      const hLineOwners = prev.hLineOwners.map(r => [...r]) as BoxOwner[][];
+      const vLineOwners = prev.vLineOwners.map(r => [...r]) as BoxOwner[][];
+      if (line.type === 'h') {
+        hLines[line.row][line.col]      = true;
+        hLineOwners[line.row][line.col] = prev.currentPlayer;
+      } else {
+        vLines[line.row][line.col]      = true;
+        vLineOwners[line.row][line.col] = prev.currentPlayer;
+      }
 
       const tempState = { ...prev, hLines, vLines };
       const completed = getCompletedBoxes(tempState, line, config.gridSize);
-      const boxes = prev.boxes.map(r => [...r]) as BoxOwner[][];
+      const boxes     = prev.boxes.map(r => [...r]) as BoxOwner[][];
       completed.forEach(([r, c]) => { boxes[r][c] = prev.currentPlayer; });
 
       const scores = { ...prev.scores };
       if (prev.currentPlayer === 1) scores.p1 += completed.length;
-      else scores.p2 += completed.length;
+      else                          scores.p2 += completed.length;
 
-      const claimed = scores.p1 + scores.p2;
+      const claimed    = scores.p1 + scores.p2;
       const isGameOver = claimed === totalBoxes;
       const nextPlayer: Player = completed.length > 0
         ? prev.currentPlayer
@@ -77,9 +89,11 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
 
       // Fire callbacks (via setTimeout so they run outside setState)
       if (completed.length > 0) {
-        const p = prev.currentPlayer;
-        const count = completed.length;
-        setTimeout(() => eventsRef.current.onBoxClaimed?.(count, p), 0);
+        const p            = prev.currentPlayer;
+        const count        = completed.length;
+        const completedKeys = completed.map(([r, c]) => `${r}-${c}`);
+        const capturedLine  = line;
+        setTimeout(() => eventsRef.current.onBoxClaimed?.(count, p, completedKeys, capturedLine), 0);
       }
       if (!isGameOver && completed.length === 0) {
         const np = nextPlayer;
@@ -90,7 +104,7 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
       }
 
       return {
-        hLines, vLines, boxes,
+        hLines, vLines, hLineOwners, vLineOwners, boxes,
         currentPlayer: nextPlayer,
         scores,
         isGameOver,
@@ -106,7 +120,6 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
     setState(prev => {
       if (!prev.history.length) return prev;
       if (configRef.current.mode === 'ai') {
-        // In AI mode: undo until we reach a state where it was P1's turn
         let history = [...prev.history];
         let snap = history.pop()!;
         while (history.length > 0 && snap.currentPlayer !== 1) {
@@ -115,7 +128,7 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
         return { ...prev, ...snap, isGameOver: false, history };
       }
       const history = prev.history.slice(0, -1);
-      const snap = prev.history[prev.history.length - 1];
+      const snap    = prev.history[prev.history.length - 1];
       return { ...prev, ...snap, isGameOver: false, history };
     });
     setIsAIThinking(false);
@@ -126,6 +139,7 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
   const resetGame = useCallback(() => {
     stopTimer();
     setIsAIThinking(false);
+    setLastLine(null);
     setState(buildInitialState(config.gridSize));
     setMoveCount(0);
   }, [config.gridSize, stopTimer]);
@@ -146,7 +160,6 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
     }, 520);
 
     return () => { clearTimeout(t); };
-    // moveCount ensures re-trigger when AI claims a box and stays as P2
   }, [moveCount, state.isGameOver]); // eslint-disable-line
 
   // ── Timer effect: starts after each move when it's a human's turn ───────────
@@ -181,7 +194,7 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
     if (!avail.length) return;
 
     const cells = configRef.current.gridSize - 1;
-    const safe = avail.filter(l => {
+    const safe  = avail.filter(l => {
       const sim = simApplyLine(s, l);
       for (let r = 0; r < cells; r++) for (let c = 0; c < cells; c++) {
         if (sim.boxes[r][c]) continue;
@@ -198,9 +211,8 @@ export function useGameEngine(config: GameConfig, events: EngineEvents = {}) {
       : configRef.current.p2Name;
 
     eventsRef.current.onAutoSkip?.(name);
-    // Small delay so the auto-skip toast is visible before turn switch toast
     setTimeout(() => drawLine(move), 150);
   }
 
-  return { state, isAIThinking, timerRemaining, drawLine, undoMove, resetGame };
+  return { state, isAIThinking, timerRemaining, lastLine, drawLine, undoMove, resetGame };
 }

@@ -6,13 +6,14 @@ import { db } from './firebase';
 import type { UserProfile } from '../types/game.types';
 
 export async function ensureUserProfile(uid: string, displayName: string): Promise<void> {
-  const ref = doc(db, 'users', uid);
+  const ref  = doc(db, 'users', uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     await setDoc(ref, {
       displayName,
       coins: 0,
-      createdAt: new Date(),
+      onlineWins: 0,
+      createdAt:  new Date(),
       lastSeenAt: new Date(),
       stats: { onlineWins: 0, onlineLosses: 0, onlineDraws: 0 },
     });
@@ -63,7 +64,7 @@ export async function checkAndAwardDailyBonus(uid: string): Promise<number> {
   if (!snap.exists()) return 0;
   const data = snap.data();
   const last: Date | null = data.lastDailyBonus?.toDate?.() ?? null;
-  const now = new Date();
+  const now  = new Date();
   if (!last || now.toDateString() !== last.toDateString()) {
     await updateDoc(doc(db, 'users', uid), {
       lastDailyBonus: now,
@@ -75,6 +76,33 @@ export async function checkAndAwardDailyBonus(uid: string): Promise<number> {
     return 5;
   }
   return 0;
+}
+
+/** Records the result of an online game: awards coins and updates stats. */
+export async function recordOnlineResult(
+  uid: string,
+  result: 'win' | 'draw' | 'loss',
+  roomCode: string,
+): Promise<number> {
+  const coinMap:   Record<string, number> = { win: 25, draw: 3, loss: 1 };
+  const statField: Record<string, string> = {
+    win:  'stats.onlineWins',
+    draw: 'stats.onlineDraws',
+    loss: 'stats.onlineLosses',
+  };
+  const coins  = coinMap[result];
+  const reason = result === 'win' ? 'win' : result === 'draw' ? 'draw' : 'participation';
+
+  await updateDoc(doc(db, 'users', uid), {
+    coins: increment(coins),
+    [statField[result]]: increment(1),
+    // Denormalised top-level field for leaderboard queries
+    ...(result === 'win' ? { onlineWins: increment(1) } : {}),
+  });
+  await addDoc(collection(db, 'coinTransactions'), {
+    uid, delta: coins, reason, roomCode, createdAt: new Date(),
+  });
+  return coins;
 }
 
 export async function getPurchasedThemes(uid: string): Promise<string[]> {

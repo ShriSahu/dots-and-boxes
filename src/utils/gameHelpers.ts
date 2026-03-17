@@ -4,9 +4,11 @@ export function buildInitialState(gridSize: GridSize): GameState {
   const dots = gridSize;
   const cells = gridSize - 1;
   return {
-    hLines: Array.from({ length: dots }, () => Array(cells).fill(false)),
-    vLines: Array.from({ length: cells }, () => Array(dots).fill(false)),
-    boxes: Array.from({ length: cells }, () => Array(cells).fill(0) as BoxOwner[]),
+    hLines:      Array.from({ length: dots  }, () => Array(cells).fill(false)),
+    vLines:      Array.from({ length: cells }, () => Array(dots).fill(false)),
+    hLineOwners: Array.from({ length: dots  }, () => Array(cells).fill(0) as BoxOwner[]),
+    vLineOwners: Array.from({ length: cells }, () => Array(dots).fill(0)  as BoxOwner[]),
+    boxes:       Array.from({ length: cells }, () => Array(cells).fill(0) as BoxOwner[]),
     currentPlayer: 1,
     scores: { p1: 0, p2: 0 },
     isGameOver: false,
@@ -88,9 +90,11 @@ export function simApplyLine(
 
 export function takeSnapshot(state: GameState): Snapshot {
   return {
-    hLines: state.hLines.map(r => [...r]),
-    vLines: state.vLines.map(r => [...r]),
-    boxes: state.boxes.map(r => [...r]) as BoxOwner[][],
+    hLines:      state.hLines.map(r => [...r]),
+    vLines:      state.vLines.map(r => [...r]),
+    hLineOwners: state.hLineOwners.map(r => [...r]) as BoxOwner[][],
+    vLineOwners: state.vLineOwners.map(r => [...r]) as BoxOwner[][],
+    boxes:       state.boxes.map(r => [...r]) as BoxOwner[][],
     currentPlayer: state.currentPlayer,
     scores: { ...state.scores },
   };

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  ScrollView, StyleSheet, SafeAreaView,
+  ScrollView, StyleSheet, SafeAreaView, Animated,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
@@ -28,9 +28,11 @@ export default function HomeScreen() {
   const [gridSize, setGridSize] = useState<GridSize>(4);
   const [difficulty, setDiff]   = useState<Difficulty>('medium');
   const [timerSecs, setTimer]   = useState<TimerOption>(0);
-  const [stats, setStats]       = useState<Stats>({ w: 0, l: 0, d: 0 });
+  const [stats, setStats]       = useState<Stats>({ w: 0, l: 0, d: 0, streak: 0, bestStreak: 0 });
   const [coins, setCoins]       = useState(0);
   const [uid, setUid]           = useState('');
+  const [dailyBonus, setDailyBonus] = useState(0);
+  const bonusAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     (async () => {
@@ -42,15 +44,23 @@ export default function HomeScreen() {
       if (prefs.gridSize)   setGridSize(prefs.gridSize);
       if (prefs.difficulty) setDiff(prefs.difficulty);
       if (prefs.timerSeconds !== undefined) setTimer(prefs.timerSeconds);
-      const s = await loadStats();
-      setStats(s);
+      const st = await loadStats();
+      setStats(st);
 
       // Firebase auth + profile
       const id = await getAnonymousUid();
       setUid(id);
       const name = prefs.p1Name?.trim() || 'Player';
       await ensureUserProfile(id, name);
-      await checkAndAwardDailyBonus(id);
+      const bonus = await checkAndAwardDailyBonus(id);
+      if (bonus > 0) {
+        setDailyBonus(bonus);
+        Animated.sequence([
+          Animated.timing(bonusAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+          Animated.delay(2000),
+          Animated.timing(bonusAnim, { toValue: 0, duration: 400, useNativeDriver: true }),
+        ]).start(() => setDailyBonus(0));
+      }
     })();
   }, []);
 
@@ -80,7 +90,7 @@ export default function HomeScreen() {
 
   const handleResetStats = async () => {
     await resetStatsStorage();
-    setStats({ w: 0, l: 0, d: 0 });
+    setStats({ w: 0, l: 0, d: 0, streak: 0, bestStreak: 0 });
   };
 
   return (
@@ -90,13 +100,21 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ── Top bar: coin balance + shop ── */}
+        {/* ── Top bar: coin balance + leaderboard + shop ── */}
         <View style={s.topBar}>
           <View style={[s.coinBadge, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
             <Text style={[s.coinText, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
               🪙 {coins}
             </Text>
           </View>
+          <TouchableOpacity
+            style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onPress={() => router.push('/leaderboard')}
+          >
+            <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+              🏆 Top
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
             onPress={() => router.push('/shop')}
@@ -106,6 +124,18 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* ── Daily bonus toast ── */}
+        {dailyBonus > 0 && (
+          <Animated.View
+            pointerEvents="none"
+            style={[s.bonusBadge, { opacity: bonusAnim, backgroundColor: '#f5c842' }]}
+          >
+            <Text style={[s.bonusText, { fontFamily: theme.fontHandwritten }]}>
+              +{dailyBonus} 🪙 Daily bonus!
+            </Text>
+          </Animated.View>
+        )}
 
         {/* ── Title ── */}
         <View style={s.titleWrap}>
@@ -266,6 +296,18 @@ export default function HomeScreen() {
               <Text style={[s.statLbl, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Draws</Text>
             </View>
           </View>
+          {stats.streak >= 2 && (
+            <View style={[s.streakRow, { marginTop: 10 }]}>
+              <Text style={[s.streakText, { color: theme.p1, fontFamily: theme.fontHandwritten }]}>
+                🔥 {stats.streak} win streak!
+              </Text>
+              {stats.bestStreak > stats.streak && (
+                <Text style={[s.streakBest, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+                  Best: {stats.bestStreak}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
 
         {/* ── Online info card ── */}
@@ -314,6 +356,23 @@ function makeStyles(theme: any) {
     },
     shopBtnText: { fontSize: 15 },
 
+    bonusBadge: {
+      position: 'absolute',
+      top: 60,
+      alignSelf: 'center',
+      backgroundColor: '#f5c842',
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      zIndex: 10,
+      elevation: 10,
+    },
+    bonusText: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: '#2a2418',
+    },
+
     titleWrap:  { alignItems: 'center', marginBottom: 4 },
     titleMain:  { fontSize: 52, fontWeight: '700', letterSpacing: -1, lineHeight: 56 },
     titleSub:   { fontSize: 16, marginTop: 2 },
@@ -355,6 +414,10 @@ function makeStyles(theme: any) {
     statNum:   { fontSize: 32, fontWeight: '700' },
     statLbl:   { fontSize: 12 },
     statSep:   { fontSize: 20, marginBottom: 16 },
+
+    streakRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
+    streakText: { fontSize: 22, fontWeight: '700' },
+    streakBest: { fontSize: 14 },
 
     onlineInfoText: { fontSize: 15, lineHeight: 22 },
 

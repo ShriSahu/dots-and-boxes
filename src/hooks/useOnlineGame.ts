@@ -8,7 +8,7 @@ import { getCompletedBoxes } from '../utils/gameHelpers';
 import { buildInitialState } from '../utils/gameHelpers';
 
 export interface OnlineGameEvents {
-  onBoxClaimed?: (count: number, player: Player) => void;
+  onBoxClaimed?: (count: number, player: Player, boxKeys: string[], line: LineId) => void;
   onTurnSwitch?: () => void;
   onGameOver?: () => void;
   onOpponentDisconnected?: () => void;
@@ -21,14 +21,23 @@ export function useOnlineGame(
   gridSize: GridSize,
   events: OnlineGameEvents = {},
 ) {
-  const [room, setRoom]   = useState<OnlineRoom | null>(null);
-  const [state, setState] = useState<GameState>(() => buildInitialState(gridSize));
+  const [room, setRoom]       = useState<OnlineRoom | null>(null);
+  const [state, setState]     = useState<GameState>(() => buildInitialState(gridSize));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastLine, setLastLine]         = useState<LineId | null>(null);
 
   const prevMoveCount  = useRef(-1);
   const prevStatus     = useRef<OnlineRoom['status'] | null>(null);
   const eventsRef      = useRef(events);
   eventsRef.current    = events;
+
+  // Client-side line ownership tracking (Firestore only stores booleans)
+  const dots  = gridSize;
+  const cells = gridSize - 1;
+  const lineOwnersRef = useRef({
+    hLineOwners: Array.from({ length: dots  }, () => Array(cells).fill(0) as BoxOwner[]),
+    vLineOwners: Array.from({ length: cells }, () => Array(dots).fill(0)  as BoxOwner[]),
+  });
 
   // ── Subscribe to Firestore room ──────────────────────────────────────────
   useEffect(() => {
@@ -41,22 +50,21 @@ export function useOnlineGame(
         r.gridSize,
       );
 
-      setState({
-        hLines,
-        vLines,
-        boxes: boxes as BoxOwner[][],
-        currentPlayer: r.currentPlayerUid === r.host.uid ? 1 : 2,
-        scores: { p1: r.host.score, p2: r.guest.score },
-        isGameOver: r.status === 'finished',
-        history: [],
-      });
-
       // Fire events when move count changes
       if (prevMoveCount.current !== -1 && r.moveCount > prevMoveCount.current) {
-        const movedUid = r.lastMove?.uid;
+        const movedUid  = r.lastMove?.uid;
         const player: Player = movedUid === r.host.uid ? 1 : 2;
-        const boxesClaimed = (r.host.score + r.guest.score);
-        const prevBoxes = prevMoveCount.current; // approximate
+
+        // Track which player owns each line
+        if (r.lastMove) {
+          const lm = r.lastMove;
+          if (lm.type === 'h') lineOwnersRef.current.hLineOwners[lm.row][lm.col] = player;
+          else                  lineOwnersRef.current.vLineOwners[lm.row][lm.col] = player;
+
+          const line: LineId = { type: lm.type, row: lm.row, col: lm.col };
+          setLastLine(line);
+          setTimeout(() => setLastLine(null), 260);
+        }
 
         // Turn switched if the current player is different from who just moved
         if (r.currentPlayerUid !== movedUid) {
@@ -64,6 +72,18 @@ export function useOnlineGame(
         }
       }
       prevMoveCount.current = r.moveCount;
+
+      setState({
+        hLines,
+        vLines,
+        hLineOwners: lineOwnersRef.current.hLineOwners.map(row => [...row]) as BoxOwner[][],
+        vLineOwners: lineOwnersRef.current.vLineOwners.map(row => [...row]) as BoxOwner[][],
+        boxes: boxes as BoxOwner[][],
+        currentPlayer: r.currentPlayerUid === r.host.uid ? 1 : 2,
+        scores: { p1: r.host.score, p2: r.guest.score },
+        isGameOver: r.status === 'finished',
+        history: [],
+      });
 
       // Status changes
       if (prevStatus.current !== null && prevStatus.current !== r.status) {
@@ -96,21 +116,20 @@ export function useOnlineGame(
       const newHLines = hLines.map(r => [...r]);
       const newVLines = vLines.map(r => [...r]);
       if (line.type === 'h') newHLines[line.row][line.col] = true;
-      else newVLines[line.row][line.col] = true;
+      else                   newVLines[line.row][line.col] = true;
 
       const tempState = { hLines: newHLines, vLines: newVLines, boxes };
       const completed = getCompletedBoxes(tempState, line, room.gridSize);
 
-      const newBoxes = boxes.map(r => [...r]) as BoxOwner[][];
+      const newBoxes  = boxes.map(r => [...r]) as BoxOwner[][];
       const myPlayer: Player = isHost ? 1 : 2;
       completed.forEach(([r, c]) => { newBoxes[r][c] = myPlayer; });
 
-      const myScore   = (isHost ? room.host.score : room.guest.score) + completed.length;
-      const oppScore  = isHost ? room.guest.score : room.host.score;
+      const myScore    = (isHost ? room.host.score : room.guest.score) + completed.length;
+      const oppScore   = isHost ? room.guest.score : room.host.score;
       const totalBoxes = (room.gridSize - 1) ** 2;
       const isGameOver = (myScore + oppScore) === totalBoxes;
 
-      // Same player goes again if they claimed a box
       const nextUid = completed.length > 0
         ? myUid
         : (isHost ? room.guest.uid! : room.host.uid);
@@ -119,7 +138,8 @@ export function useOnlineGame(
       const guestScore = isHost ? oppScore : myScore;
 
       if (completed.length > 0) {
-        setTimeout(() => eventsRef.current.onBoxClaimed?.(completed.length, myPlayer), 0);
+        const completedKeys = completed.map(([r, c]) => `${r}-${c}`);
+        setTimeout(() => eventsRef.current.onBoxClaimed?.(completed.length, myPlayer, completedKeys, line), 0);
       }
 
       await applyMove(
@@ -158,6 +178,7 @@ export function useOnlineGame(
     opponentName,
     myName,
     timerRemaining: 0,
+    lastLine,
     drawLine,
     abandon,
     requestRematch,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, SafeAreaView, ActivityIndicator, Alert,
+  StyleSheet, SafeAreaView, ActivityIndicator, Alert, Share,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
@@ -19,20 +19,38 @@ export default function LobbyScreen() {
   const { theme } = useTheme();
   const s = makeStyles(theme);
 
-  const [view, setView]         = useState<LobbyView>('menu');
-  const [playerName, setName]   = useState('');
-  const [gridSize, setGrid]     = useState<GridSize>(4);
-  const [joinCode, setJoinCode] = useState('');
-  const [roomCode, setRoomCode] = useState('');
-  const [myUid, setMyUid]       = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [view, setView]           = useState<LobbyView>('menu');
+  const [playerName, setName]     = useState('');
+  const [gridSize, setGrid]       = useState<GridSize>(4);
+  const [joinCode, setJoinCode]   = useState('');
+  const [roomCode, setRoomCode]   = useState('');
+  const [myUid, setMyUid]         = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [waitSeconds, setWaitSeconds] = useState(300);
   const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     getAnonymousUid().then(setMyUid);
     return () => { unsubRef.current?.(); };
   }, []);
+
+  // ── Waiting room countdown ────────────────────────────────────────────────
+  useEffect(() => {
+    if (view !== 'waiting') return;
+    setWaitSeconds(300);
+    let remaining = 300;
+    const countdown = setInterval(() => {
+      remaining -= 1;
+      setWaitSeconds(remaining);
+      if (remaining <= 0) {
+        clearInterval(countdown);
+        handleCancelWait();
+        setError('No one joined in time. Share your code and try again!');
+      }
+    }, 1000);
+    return () => clearInterval(countdown);
+  }, [view]);
 
   // ── Create room ──────────────────────────────────────────────────────────
   const handleCreate = async () => {
@@ -217,9 +235,17 @@ export default function LobbyScreen() {
                 {roomCode}
               </Text>
             </View>
+            <TouchableOpacity
+              style={[s.copyBtn, { borderColor: theme.p1 }]}
+              onPress={() => Share.share({ message: `Join my Dots & Boxes game! Code: ${roomCode}` })}
+            >
+              <Text style={[s.copyBtnText, { color: theme.p1, fontFamily: theme.fontSemiBold }]}>
+                Share Code
+              </Text>
+            </TouchableOpacity>
             <ActivityIndicator size="large" color={theme.p1} style={{ marginTop: 24 }} />
             <Text style={[s.waitSub, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
-              Waiting for opponent to join…
+              Waiting for opponent… ({Math.floor(waitSeconds / 60)}:{String(waitSeconds % 60).padStart(2, '0')} left)
             </Text>
             <TouchableOpacity
               style={[s.cancelBtn, { borderColor: theme.border }]}
@@ -321,6 +347,11 @@ function makeStyles(theme: any) {
       marginTop: 8,
     },
     codeText:  { fontSize: 52, fontWeight: '700', letterSpacing: 8 },
+    copyBtn: {
+      borderWidth: 1.5, borderRadius: 8,
+      paddingHorizontal: 24, paddingVertical: 10, marginTop: 8,
+    },
+    copyBtnText: { fontSize: 16, fontWeight: '600' },
     waitSub:   { fontSize: 15, marginTop: 8 },
     cancelBtn: {
       marginTop: 24, borderWidth: 1.5, borderRadius: 8,
