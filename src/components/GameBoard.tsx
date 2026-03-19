@@ -30,7 +30,9 @@ export default function GameBoard({
   const dotR     = Math.max(4, cellSize * 0.1);
   const lineW    = Math.max(3.5, cellSize * 0.12);
   const half     = cellSize / 2;
-  const tapArea  = cellSize * 0.46; // tap target size (slightly larger than original)
+  // Generous tap area — slightly larger than cell to avoid dead zones at dots
+  const tapH = Math.round(cellSize * 0.52); // tap target height for horizontal lines
+  const tapW = Math.round(cellSize * 0.52); // tap target width  for vertical lines
 
   // ── Flash last drawn line briefly ────────────────────────────────────────
   const [flashLine, setFlashLine] = useState<LineId | null>(null);
@@ -41,7 +43,7 @@ export default function GameBoard({
     return () => clearTimeout(t);
   }, [lastLine]);
 
-  // ── Box claim flash: briefly highlight newly claimed boxes ────────────────
+  // ── Box-claim flash: briefly brighten newly claimed boxes ─────────────────
   const [flashBoxes, setFlashBoxes] = useState<Set<string>>(new Set());
   useEffect(() => {
     if (!newBoxes || newBoxes.length === 0) return;
@@ -61,7 +63,8 @@ export default function GameBoard({
   const isFlash = (type: 'h' | 'v', row: number, col: number) =>
     flashLine?.type === type && flashLine.row === row && flashLine.col === col;
 
-  const handleTap = (line: LineId) => {
+  // onPressIn fires on touch-DOWN (immediate) — no delay like onPress
+  const handlePressIn = (line: LineId) => {
     if (disabled) return;
     const drawn = line.type === 'h'
       ? state.hLines[line.row][line.col]
@@ -75,7 +78,7 @@ export default function GameBoard({
   const numRules    = Math.floor(svgSize / ruleSpacing) + 2;
 
   return (
-    <View style={{ width: svgSize, height: svgSize }}>
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={svgSize} height={svgSize}>
 
         {/* ── Ruled paper background ── */}
@@ -89,7 +92,7 @@ export default function GameBoard({
           />
         ))}
 
-        {/* ── Red margin line (left side) ── */}
+        {/* ── Red margin line ── */}
         <Line
           x1={Math.round(padding * 0.5)} y1={0}
           x2={Math.round(padding * 0.5)} y2={svgSize}
@@ -102,20 +105,18 @@ export default function GameBoard({
           Array.from({ length: cells }, (_, c) => {
             const owner = state.boxes[r][c];
             if (!owner) return null;
-            const tl      = dotPos(r, c);
-            const key     = `${r}-${c}`;
-            const isNew   = flashBoxes.has(key);
+            const tl    = dotPos(r, c);
+            const key   = `${r}-${c}`;
+            const isNew = flashBoxes.has(key);
             const initial = (owner === 1 ? config.p1Name : config.p2Name)[0].toUpperCase();
-            // Flash: slightly lighter fill when newly claimed
-            const fillColor = isNew
-              ? (owner === 1 ? theme.p1 + '55' : theme.p2 + '55')
-              : (owner === 1 ? theme.p1Light : theme.p2Light);
             return (
               <G key={`box-${r}-${c}`}>
                 <Rect
                   x={tl.x + 2} y={tl.y + 2}
                   width={cellSize - 4} height={cellSize - 4}
-                  fill={fillColor}
+                  fill={isNew
+                    ? (owner === 1 ? theme.p1 + '66' : theme.p2 + '66')
+                    : (owner === 1 ? theme.p1Light : theme.p2Light)}
                 />
                 <SvgText
                   x={tl.x + cellSize / 2}
@@ -125,7 +126,7 @@ export default function GameBoard({
                   fontWeight="bold"
                   fill={playerColor(owner)}
                   textAnchor="middle"
-                  opacity={isNew ? 0.5 : 1}
+                  opacity={isNew ? 0.6 : 1}
                 >
                   {initial}
                 </SvgText>
@@ -172,7 +173,7 @@ export default function GameBoard({
           })
         )}
 
-        {/* ── Tap targets — horizontal lines ── */}
+        {/* ── Tap targets — horizontal lines (onPressIn = fires on touch-down) ── */}
         {Array.from({ length: g }, (_, r) =>
           Array.from({ length: cells }, (_, c) => {
             if (state.hLines[r][c]) return null;
@@ -181,16 +182,16 @@ export default function GameBoard({
             return (
               <Rect
                 key={`ht-${r}-${c}`}
-                x={mx - cellSize / 2} y={a.y - tapArea / 2}
-                width={cellSize}      height={tapArea}
+                x={mx - half}       y={a.y - tapH / 2}
+                width={cellSize}    height={tapH}
                 fill="transparent"
-                onPress={() => handleTap({ type: 'h', row: r, col: c })}
+                onPressIn={() => handlePressIn({ type: 'h', row: r, col: c })}
               />
             );
           })
         )}
 
-        {/* ── Tap targets — vertical lines ── */}
+        {/* ── Tap targets — vertical lines (onPressIn = fires on touch-down) ── */}
         {Array.from({ length: cells }, (_, r) =>
           Array.from({ length: g }, (_, c) => {
             if (state.vLines[r][c]) return null;
@@ -199,16 +200,16 @@ export default function GameBoard({
             return (
               <Rect
                 key={`vt-${r}-${c}`}
-                x={a.x - tapArea / 2} y={my - cellSize / 2}
-                width={tapArea}       height={cellSize}
+                x={a.x - tapW / 2}  y={my - half}
+                width={tapW}        height={cellSize}
                 fill="transparent"
-                onPress={() => handleTap({ type: 'v', row: r, col: c })}
+                onPressIn={() => handlePressIn({ type: 'v', row: r, col: c })}
               />
             );
           })
         )}
 
-        {/* ── Dots (rendered last — on top) ── */}
+        {/* ── Dots (on top) ── */}
         {Array.from({ length: g }, (_, r) =>
           Array.from({ length: g }, (_, c) => {
             const { x, y } = dotPos(r, c);
