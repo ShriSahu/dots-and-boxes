@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { GameState, LineId, Player, BoxOwner, OnlineRoom, GridSize } from '../types/game.types';
 import {
   subscribeToRoom, applyMove, abandonRoom,
-  requestRematch as reqRematch, unflattenBoard,
+  requestRematch as reqRematch, unflattenBoard, skipTurn,
 } from '../services/gameRoom';
 import { getCompletedBoxes } from '../utils/gameHelpers';
 import { buildInitialState } from '../utils/gameHelpers';
@@ -12,6 +12,7 @@ export interface OnlineGameEvents {
   onTurnSwitch?: () => void;
   onGameOver?: () => void;
   onOpponentDisconnected?: () => void;
+  onAutoSkip?: (playerName: string) => void;
 }
 
 export function useOnlineGame(
@@ -25,6 +26,8 @@ export function useOnlineGame(
   const [state, setState]     = useState<GameState>(() => buildInitialState(gridSize));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastLine, setLastLine]         = useState<LineId | null>(null);
+  const [timerRemaining, setTimerRemaining] = useState(0);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const prevMoveCount  = useRef(-1);
   const prevStatus     = useRef<OnlineRoom['status'] | null>(null);
@@ -38,6 +41,37 @@ export function useOnlineGame(
     hLineOwners: Array.from({ length: dots  }, () => Array(cells).fill(0) as BoxOwner[]),
     vLineOwners: Array.from({ length: cells }, () => Array(dots).fill(0)  as BoxOwner[]),
   });
+
+  // ── Online turn timer ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    if (!room?.turnStartedAt || room.status !== 'active') {
+      setTimerRemaining(0);
+      return;
+    }
+
+    const timerMax = room.timerSeconds || 15;
+
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - room.turnStartedAt!) / 1000);
+      const remaining = Math.max(0, timerMax - elapsed);
+      setTimerRemaining(remaining);
+
+      if (remaining === 0 && room.currentPlayerUid === myUid) {
+        // It's my turn and time is up — submit skip
+        skipTurn(roomCode, myUid).catch(() => {});
+        eventsRef.current.onAutoSkip?.(isHost ? room.host.name : (room.guest.name ?? ''));
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+      }
+    };
+
+    tick(); // run immediately
+    timerIntervalRef.current = setInterval(tick, 1000);
+
+    return () => {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    };
+  }, [room?.moveCount, room?.status]); // reset on every move
 
   // ── Subscribe to Firestore room ──────────────────────────────────────────
   useEffect(() => {
@@ -58,12 +92,14 @@ export function useOnlineGame(
         // Track which player owns each line
         if (r.lastMove) {
           const lm = r.lastMove;
-          if (lm.type === 'h') lineOwnersRef.current.hLineOwners[lm.row][lm.col] = player;
-          else                  lineOwnersRef.current.vLineOwners[lm.row][lm.col] = player;
-
-          const line: LineId = { type: lm.type, row: lm.row, col: lm.col };
-          setLastLine(line);
-          setTimeout(() => setLastLine(null), 260);
+          if (lm.type !== 'skip') {
+            // Only update line owners for real moves (not skips)
+            if (lm.type === 'h') lineOwnersRef.current.hLineOwners[lm.row][lm.col] = player;
+            else                  lineOwnersRef.current.vLineOwners[lm.row][lm.col] = player;
+            const line: LineId = { type: lm.type as 'h' | 'v', row: lm.row, col: lm.col };
+            setLastLine(line);
+            setTimeout(() => setLastLine(null), 260);
+          }
         }
 
         // Turn switched if the current player is different from who just moved
@@ -162,6 +198,13 @@ export function useOnlineGame(
     return reqRematch(roomCode, myUid, myName, isHost, room.gridSize);
   }, [room, roomCode, myUid, isHost]);
 
+  // ── Cleanup timer on unmount ─────────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    };
+  }, []);
+
   const isMyTurn     = room?.currentPlayerUid === myUid && room?.status === 'active';
   const opponentName = room
     ? (isHost ? (room.guest.name ?? 'Waiting…') : room.host.name)
@@ -177,7 +220,7 @@ export function useOnlineGame(
     isSubmitting,
     opponentName,
     myName,
-    timerRemaining: 0,
+    timerRemaining,
     lastLine,
     drawLine,
     abandon,
