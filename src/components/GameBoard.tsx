@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, PanResponder, useWindowDimensions } from 'react-native';
 import Svg, { Circle, Line, Rect, Text as SvgText, G } from 'react-native-svg';
 import { GameState, GameConfig, LineId, Player } from '../types/game.types';
 import { useTheme } from '../hooks/useTheme';
@@ -12,10 +12,11 @@ interface Props {
   lastLine?: LineId | null;
   newBoxes?: string[];
   boardKey?: number;
+  allowedLines?: Set<string>;   // tutorial restriction (key format: "h-row-col")
 }
 
 export default function GameBoard({
-  state, config, onLineTap, disabled, lastLine, newBoxes = [], boardKey,
+  state, config, onLineTap, disabled, lastLine, newBoxes = [], boardKey, allowedLines,
 }: Props) {
   const { theme } = useTheme();
   const { width, height } = useWindowDimensions();
@@ -30,9 +31,6 @@ export default function GameBoard({
   const dotR     = Math.max(4, cellSize * 0.1);
   const lineW    = Math.max(3.5, cellSize * 0.12);
   const half     = cellSize / 2;
-  // Generous tap area — slightly larger than cell to avoid dead zones at dots
-  const tapH = Math.round(cellSize * 0.52); // tap target height for horizontal lines
-  const tapW = Math.round(cellSize * 0.52); // tap target width  for vertical lines
 
   // ── Flash last drawn line briefly ────────────────────────────────────────
   const [flashLine, setFlashLine] = useState<LineId | null>(null);
@@ -63,22 +61,126 @@ export default function GameBoard({
   const isFlash = (type: 'h' | 'v', row: number, col: number) =>
     flashLine?.type === type && flashLine.row === row && flashLine.col === col;
 
-  // onPressIn fires on touch-DOWN (immediate) — no delay like onPress
-  const handlePressIn = (line: LineId) => {
-    if (disabled) return;
-    const drawn = line.type === 'h'
-      ? state.hLines[line.row][line.col]
-      : state.vLines[line.row][line.col];
-    if (drawn) return;
-    onLineTap(line);
-  };
-
   // Paper ruling — equally spaced horizontal lines like a notebook
   const ruleSpacing = Math.round(half);
   const numRules    = Math.floor(svgSize / ruleSpacing) + 2;
 
+  // ── PanResponder snap-to-line input ──────────────────────────────────────
+  const boardViewRef = useRef<View>(null);
+  const boardOrigin  = useRef({ x: 0, y: 0 });
+  const [previewLine, setPreviewLine] = useState<LineId | null>(null);
+
+  const findNearestLine = useCallback((localX: number, localY: number): LineId | null => {
+    const threshold = cellSize * 0.45;
+    let best: LineId | null = null;
+    let bestDist = Infinity;
+
+    const checkLine = (type: 'h' | 'v', row: number, col: number, mx: number, my: number) => {
+      const drawn = type === 'h' ? state.hLines[row][col] : state.vLines[row][col];
+      if (drawn) return;
+      const dx = localX - mx;
+      const dy = localY - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < threshold && dist < bestDist) {
+        bestDist = dist;
+        best = { type, row, col };
+      }
+    };
+
+    // Horizontal line midpoints
+    for (let r = 0; r < g; r++) {
+      for (let c = 0; c < cells; c++) {
+        const a = dotPos(r, c);
+        const b = dotPos(r, c + 1);
+        checkLine('h', r, c, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      }
+    }
+    // Vertical line midpoints
+    for (let r = 0; r < cells; r++) {
+      for (let c = 0; c < g; c++) {
+        const a = dotPos(r, c);
+        const b = dotPos(r + 1, c);
+        checkLine('v', r, c, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      }
+    }
+    return best;
+  }, [state.hLines, state.vLines, cellSize, g, cells, padding]);
+
+  const disabledRef    = useRef(disabled ?? false);
+  const allowedRef     = useRef(allowedLines);
+  const onLineTapRef   = useRef(onLineTap);
+  const previewLineRef = useRef<LineId | null>(null);
+  const findNearestRef = useRef(findNearestLine);
+
+  // Keep refs current on every render
+  useEffect(() => { disabledRef.current    = disabled ?? false; }, [disabled]);
+  useEffect(() => { allowedRef.current     = allowedLines; }, [allowedLines]);
+  useEffect(() => { onLineTapRef.current   = onLineTap; }, [onLineTap]);
+  useEffect(() => { findNearestRef.current = findNearestLine; }, [findNearestLine]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => !disabledRef.current,
+      onMoveShouldSetPanResponder:  () => !disabledRef.current,
+
+      onPanResponderGrant: (_, gestureState) => {
+        if (disabledRef.current) return;
+        const localX = gestureState.x0 - boardOrigin.current.x;
+        const localY = gestureState.y0 - boardOrigin.current.y;
+        const nearest = findNearestRef.current(localX, localY);
+        if (nearest) {
+          const key = `${nearest.type}-${nearest.row}-${nearest.col}`;
+          if (!allowedRef.current || allowedRef.current.has(key)) {
+            previewLineRef.current = nearest;
+            setPreviewLine(nearest);
+          }
+        }
+      },
+
+      onPanResponderMove: (_, gestureState) => {
+        if (disabledRef.current) return;
+        const localX = gestureState.moveX - boardOrigin.current.x;
+        const localY = gestureState.moveY - boardOrigin.current.y;
+        const nearest = findNearestRef.current(localX, localY);
+        if (nearest) {
+          const key = `${nearest.type}-${nearest.row}-${nearest.col}`;
+          if (!allowedRef.current || allowedRef.current.has(key)) {
+            previewLineRef.current = nearest;
+            setPreviewLine(nearest);
+            return;
+          }
+        }
+        previewLineRef.current = null;
+        setPreviewLine(null);
+      },
+
+      onPanResponderRelease: () => {
+        const line = previewLineRef.current;
+        if (line && !disabledRef.current) {
+          onLineTapRef.current(line);
+        }
+        previewLineRef.current = null;
+        setPreviewLine(null);
+      },
+
+      onPanResponderTerminate: () => {
+        previewLineRef.current = null;
+        setPreviewLine(null);
+      },
+    })
+  ).current;
+
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        ref={boardViewRef}
+        {...panResponder.panHandlers}
+        onLayout={() => {
+          boardViewRef.current?.measure((_x, _y, _w, _h, pageX, pageY) => {
+            boardOrigin.current = { x: pageX, y: pageY };
+          });
+        }}
+      >
       <Svg width={svgSize} height={svgSize}>
 
         {/* ── Ruled paper background ── */}
@@ -173,41 +275,24 @@ export default function GameBoard({
           })
         )}
 
-        {/* ── Tap targets — horizontal lines (onPressIn = fires on touch-down) ── */}
-        {Array.from({ length: g }, (_, r) =>
-          Array.from({ length: cells }, (_, c) => {
-            if (state.hLines[r][c]) return null;
-            const a = dotPos(r, c), b = dotPos(r, c + 1);
-            const mx = (a.x + b.x) / 2;
-            return (
-              <Rect
-                key={`ht-${r}-${c}`}
-                x={mx - half}       y={a.y - tapH / 2}
-                width={cellSize}    height={tapH}
-                fill="transparent"
-                onPressIn={() => handlePressIn({ type: 'h', row: r, col: c })}
-              />
-            );
-          })
-        )}
-
-        {/* ── Tap targets — vertical lines (onPressIn = fires on touch-down) ── */}
-        {Array.from({ length: cells }, (_, r) =>
-          Array.from({ length: g }, (_, c) => {
-            if (state.vLines[r][c]) return null;
-            const a = dotPos(r, c), b = dotPos(r + 1, c);
-            const my = (a.y + b.y) / 2;
-            return (
-              <Rect
-                key={`vt-${r}-${c}`}
-                x={a.x - tapW / 2}  y={my - half}
-                width={tapW}        height={cellSize}
-                fill="transparent"
-                onPressIn={() => handlePressIn({ type: 'v', row: r, col: c })}
-              />
-            );
-          })
-        )}
+        {/* ── Ghost preview line ── */}
+        {previewLine && (() => {
+          const pl = previewLine;
+          const isH = pl.type === 'h';
+          const a = dotPos(pl.row, pl.col);
+          const b = isH ? dotPos(pl.row, pl.col + 1) : dotPos(pl.row + 1, pl.col);
+          const currentColor = state.currentPlayer === 1 ? theme.p1 : theme.p2;
+          return (
+            <Line
+              key="preview"
+              x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+              stroke={currentColor}
+              strokeWidth={lineW}
+              strokeLinecap="round"
+              opacity={0.4}
+            />
+          );
+        })()}
 
         {/* ── Dots (on top) ── */}
         {Array.from({ length: g }, (_, r) =>
@@ -223,6 +308,7 @@ export default function GameBoard({
         )}
 
       </Svg>
+      </View>   {/* closes the panResponder View */}
     </View>
   );
 }
