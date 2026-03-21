@@ -1,6 +1,6 @@
 import {
   doc, setDoc, getDoc, updateDoc, onSnapshot,
-  runTransaction, serverTimestamp,
+  runTransaction, serverTimestamp, increment,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { OnlineRoom, GridSize, TimerOption, LineId, BoxOwner } from '../types/game.types';
@@ -161,8 +161,61 @@ export async function applyMove(
       'guest.score': guestScore,
       status: isGameOver ? 'finished' : 'active',
       updatedAt: serverTimestamp(),
+      turnStartedAt: serverTimestamp(),
     });
   });
+}
+
+export async function skipTurn(
+  roomCode: string,
+  myUid: string,
+): Promise<void> {
+  const ref = doc(db, 'rooms', roomCode.toUpperCase());
+
+  await runTransaction(db, async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) throw new Error('Room not found');
+    const data = snap.data() as OnlineRoom;
+    if (data.currentPlayerUid !== myUid) throw new Error('Not your turn');
+    if (data.status !== 'active') throw new Error('Game not active');
+
+    const nextUid = myUid === data.host.uid ? data.guest.uid! : data.host.uid;
+
+    tx.update(ref, {
+      currentPlayerUid: nextUid,
+      moveCount: increment(1),
+      lastMove: { type: 'skip', row: -1, col: -1, uid: myUid },
+      updatedAt: serverTimestamp(),
+      turnStartedAt: serverTimestamp(),
+    });
+  });
+}
+
+/** Pure function — no Firestore reads. Used by matchmaking transaction. */
+export function buildInitialRoomDoc(
+  hostUid: string,
+  hostName: string,
+  guestUid: string,
+  guestName: string,
+  gridSize: GridSize,
+) {
+  const board = emptyBoard(gridSize);
+  return {
+    status: 'active' as const,
+    gridSize,
+    timerSeconds: 15 as TimerOption,
+    host:  { uid: hostUid,  name: hostName,  score: 0 },
+    guest: { uid: guestUid, name: guestName, score: 0 },
+    currentPlayerUid: hostUid,
+    moveCount: 0,
+    ...board,
+    lastMove: null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    rematchRequestedBy: null,
+    rematchRoomCode: null,
+    turnStartedAt: null,
+  };
 }
 
 export async function abandonRoom(roomCode: string): Promise<void> {
