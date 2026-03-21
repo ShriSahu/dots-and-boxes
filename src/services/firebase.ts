@@ -1,9 +1,8 @@
 import { getApps, initializeApp } from 'firebase/app';
-// getReactNativePersistence is available in Metro's RN bundle but not browser types
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { initializeAuth, getAuth, getReactNativePersistence, signInAnonymously } = require('firebase/auth');
+import {
+  initializeAuth, getAuth, signInAnonymously, indexedDBLocalPersistence,
+} from 'firebase/auth';
 import { initializeFirestore, getFirestore, memoryLocalCache } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyA_dtLz8mZEyRVqQD_aDudsUPyN3K0-HS8',
@@ -19,7 +18,7 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 
 let _auth: any;
 try {
-  _auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+  _auth = initializeAuth(app, { persistence: indexedDBLocalPersistence });
 } catch {
   _auth = getAuth(app);
 }

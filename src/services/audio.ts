@@ -3,9 +3,17 @@
  * PCM math. No external audio files required; works fully offline.
  *
  * Sounds are written as WAV files to the app cache and loaded via expo-av.
+ * Falls back silently if expo-av native module is unavailable (e.g. Expo Go SDK 55).
  */
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+// Lazy imports — expo-av native module may be absent in some Expo Go versions
+let Audio: any = null;
+let FileSystem: any = null;
+try {
+  Audio = require('expo-av').Audio;
+} catch (_) { /* audio unavailable */ }
+try {
+  FileSystem = require('expo-file-system');
+} catch (_) { /* file system unavailable */ }
 
 // ─── WAV encoder ─────────────────────────────────────────────────────────────
 
@@ -144,7 +152,7 @@ function genTimerBeep(): Float32Array {
 
 type SoundName = 'click' | 'pop' | 'chain' | 'win' | 'draw' | 'timerBeep';
 
-const cache    = new Map<SoundName, Audio.Sound>();
+const cache    = new Map<SoundName, any>();
 let initDone   = false;
 let initPromise: Promise<void> | null = null;
 
@@ -160,6 +168,7 @@ async function writeAndLoad(name: SoundName, samples: Float32Array): Promise<voi
 
 /** Call once at app startup (or before first game screen). Idempotent. */
 export async function initAudio(): Promise<void> {
+  if (!Audio || !FileSystem) return;
   if (initDone) return;
   if (initPromise) return initPromise;
 

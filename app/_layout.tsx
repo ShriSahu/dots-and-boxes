@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts,
   Caveat_400Regular,
@@ -18,7 +19,7 @@ SplashScreen.preventAutoHideAsync();
 const THEME_KEY = 'db_active_theme';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontsError] = useFonts({
     Caveat_400Regular,
     Caveat_600SemiBold,
     Caveat_700Bold,
@@ -35,30 +36,32 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (fontsLoaded && themeLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded, themeLoaded]);
+    if ((fontsLoaded || fontsError) && themeLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded, fontsError, themeLoaded]);
 
   const setTheme = (name: ThemeName) => {
     setThemeNameState(name);
     AsyncStorage.setItem(THEME_KEY, name);
   };
 
-  if (!fontsLoaded || !themeLoaded) {
+  if ((!fontsLoaded && !fontsError) || !themeLoaded) {
     return <View style={{ flex: 1, backgroundColor: '#f5f0e8' }} />;
   }
 
   const theme: ThemeTokens = THEMES[themeName];
 
   return (
-    <ThemeContext.Provider value={{ themeName, theme, setTheme }}>
-      <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.bg },
-          animation: 'fade',
-        }}
-      />
-    </ThemeContext.Provider>
+    <SafeAreaProvider>
+      <ThemeContext.Provider value={{ themeName, theme, setTheme }}>
+        <StatusBar style="auto" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.bg },
+            animation: 'fade',
+          }}
+        />
+      </ThemeContext.Provider>
+    </SafeAreaProvider>
   );
 }
