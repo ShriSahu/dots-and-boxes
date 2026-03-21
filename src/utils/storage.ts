@@ -14,6 +14,23 @@ const KEYS = {
   bestStreak: 'db_best',
 };
 
+const TUTORIAL_KEY = 'db_tutorial_seen';
+
+export async function getTutorialSeen(): Promise<boolean> {
+  try {
+    const v = await AsyncStorage.getItem(TUTORIAL_KEY);
+    return v === 'true';
+  } catch (_) {
+    return true; // on failure, skip tutorial to avoid blocking app
+  }
+}
+
+export async function setTutorialSeen(): Promise<void> {
+  try {
+    await AsyncStorage.setItem(TUTORIAL_KEY, 'true');
+  } catch (_) {}
+}
+
 export async function savePrefs(config: GameConfig): Promise<void> {
   try {
     await AsyncStorage.multiSet([
