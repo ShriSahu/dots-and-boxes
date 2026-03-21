@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  Animated, Pressable, useWindowDimensions,
+  Animated, Pressable, useWindowDimensions, Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -150,6 +150,24 @@ export default function GameScreen() {
     resetGame();
   };
 
+  const handleShare = useCallback(() => {
+    if (!result) return;
+    const trunc = (s: string) => s.length > 12 ? s.slice(0, 12) + '…' : s;
+    const p1 = trunc(result.p1Name);
+    const p2 = trunc(result.p2Name);
+    let message: string;
+    if (result.winner === 'draw') {
+      message = `${p1} and ${p2} tied ${result.scores.p1}–${result.scores.p2} in Dots & Boxes! 🤝`;
+    } else {
+      const winner = result.winner === 'p1' ? p1 : p2;
+      const loser  = result.winner === 'p1' ? p2 : p1;
+      const ws = result.winner === 'p1' ? result.scores.p1 : result.scores.p2;
+      const ls = result.winner === 'p1' ? result.scores.p2 : result.scores.p1;
+      message = `${winner} beat ${loser} ${ws}–${ls} in Dots & Boxes! 🎉`;
+    }
+    Share.share({ message });
+  }, [result]);
+
   const boardDisabled =
     isAIThinking || state.isGameOver ||
     (config.mode === 'ai' && state.currentPlayer === 2);
@@ -259,6 +277,13 @@ export default function GameScreen() {
                 🪙 +{coinsEarned} coins earned
               </Text>
             )}
+
+            <TouchableOpacity
+              style={styles.resultBtnSecondary}
+              onPress={handleShare}
+            >
+              <Text style={styles.resultBtnSecondaryText}>Share Result</Text>
+            </TouchableOpacity>
 
             <View style={styles.resultBtns}>
               <TouchableOpacity
