@@ -73,11 +73,12 @@ export interface OnlineRoom {
   hLines:  boolean[];
   vLines:  boolean[];
   boxes:   number[];
-  lastMove: { type: 'h' | 'v'; row: number; col: number; uid: string } | null;
+  lastMove: { type: 'h' | 'v' | 'skip'; row: number; col: number; uid: string } | null;
   createdAt:          any;
   updatedAt:          any;
   rematchRequestedBy: string | null;
   rematchRoomCode:    string | null;
+  turnStartedAt:      number | null;
 }
 
 export interface CoinTransaction {
@@ -94,4 +95,15 @@ export interface UserProfile {
   coins:        number;
   lastDailyBonus?: any;
   stats: { onlineWins: number; onlineLosses: number; onlineDraws: number };
+}
+
+export interface MatchmakingDoc {
+  uid:             string;
+  name:            string;
+  gridSize:        GridSize;
+  joinedAt:        any;
+  status:          'waiting' | 'matched' | 'cancelled' | 'timeout';
+  roomCode:        string | null;
+  matchedGridSize: GridSize | null;
+  hostUid:         string | null;
 }
