@@ -85,6 +85,7 @@ export async function createRoom(
     updatedAt: serverTimestamp(),
     rematchRequestedBy: null,
     rematchRoomCode: null,
+    turnStartedAt: null,
   };
 
   await setDoc(doc(db, 'rooms', roomCode), room);
