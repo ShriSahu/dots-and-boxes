@@ -6,7 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
-import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage } from '../src/utils/storage';
+import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTutorialSeen } from '../src/utils/storage';
+import TutorialOverlay from '../src/components/TutorialOverlay';
 import { getAnonymousUid } from '../src/services/firebase';
 import { ensureUserProfile, subscribeToBalance, checkAndAwardDailyBonus } from '../src/services/coins';
 import type { GameMode, GridSize, Difficulty, TimerOption, GameConfig, Stats } from '../src/types/game.types';
@@ -34,6 +35,8 @@ export default function HomeScreen() {
   const [uid, setUid]           = useState('');
   const [dailyBonus, setDailyBonus] = useState(0);
   const bonusAnim = useRef(new Animated.Value(0)).current;
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialSeen, setTutorialSeenState] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -47,6 +50,9 @@ export default function HomeScreen() {
       if (prefs.timerSeconds !== undefined) setTimer(prefs.timerSeconds);
       const st = await loadStats();
       setStats(st);
+      const seen = await getTutorialSeen();
+      setTutorialSeenState(seen);
+      if (!seen) setShowTutorial(true);
 
       // Firebase auth + profile
       const id = await getAnonymousUid();
@@ -122,6 +128,14 @@ export default function HomeScreen() {
           >
             <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
               Shop
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onPress={() => setShowTutorial(true)}
+          >
+            <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+              ?
             </Text>
           </TouchableOpacity>
         </View>
@@ -333,6 +347,12 @@ export default function HomeScreen() {
 
         <View style={{ height: 32 }} />
       </ScrollView>
+      {showTutorial && (
+        <TutorialOverlay
+          onDone={() => setShowTutorial(false)}
+          replayMode={tutorialSeen}
+        />
+      )}
     </SafeAreaView>
   );
 }
