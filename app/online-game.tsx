@@ -66,7 +66,7 @@ export default function OnlineGameScreen() {
     });
   }, [toastOpacity]);
 
-  const { room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine, abandon, requestRematch } =
+  const { room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine, abandon, requestRematch, timerRemaining } =
     useOnlineGame(roomCode, myUid, isHost, gridSize, {
       onBoxClaimed: (count, player, boxKeys, line) => {
         playSound(count >= 3 ? 'chain' : 'pop');
@@ -86,6 +86,9 @@ export default function OnlineGameScreen() {
       onOpponentDisconnected: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         setDisconnected(true);
+      },
+      onAutoSkip: (playerName) => {
+        showToast(`Time's up — ${playerName} skipped`, theme.textMuted);
       },
     });
 
@@ -327,8 +330,8 @@ export default function OnlineGameScreen() {
           state={state}
           config={config}
           isAIThinking={false}
-          timerRemaining={0}
-          timerMax={0}
+          timerRemaining={timerRemaining}
+          timerMax={room?.timerSeconds ?? 15}
         />
       </View>
 
