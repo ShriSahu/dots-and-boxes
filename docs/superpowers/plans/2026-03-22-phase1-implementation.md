@@ -79,6 +79,7 @@ export interface MatchmakingDoc {
   status:          'waiting' | 'matched' | 'cancelled' | 'timeout';
   roomCode:        string | null;
   matchedGridSize: GridSize | null;
+  hostUid:         string | null;  // set by transaction; both clients read this to derive isHost
 }
 ```
 
@@ -1217,6 +1218,7 @@ export async function joinQueue(
     status: 'waiting',
     roomCode: null,
     matchedGridSize: null,
+    hostUid: null,
   } as Omit<MatchmakingDoc, 'joinedAt'> & { joinedAt: any });
 }
 
@@ -1230,13 +1232,15 @@ export async function cancelQueue(uid: string): Promise<void> {
 
 export function subscribeToMyMatch(
   uid: string,
-  onMatched: (roomCode: string, matchedGridSize: GridSize) => void,
+  onMatched: (roomCode: string, matchedGridSize: GridSize, isHost: boolean) => void,
 ): () => void {
   return onSnapshot(doc(db, MATCHMAKING, uid), snap => {
     if (!snap.exists()) return;
     const data = snap.data() as MatchmakingDoc;
-    if (data.status === 'matched' && data.roomCode && data.matchedGridSize) {
-      onMatched(data.roomCode, data.matchedGridSize);
+    if (data.status === 'matched' && data.roomCode && data.matchedGridSize && data.hostUid) {
+      // isHost is derived from hostUid written by the transaction — no race condition
+      const isHost = data.hostUid === uid;
+      onMatched(data.roomCode, data.matchedGridSize, isHost);
     }
   });
 }
@@ -1306,9 +1310,10 @@ export async function attemptMatch(myUid: string, partnerUid: string): Promise<v
       const roomDoc = buildInitialRoomDoc(hostUid, hostName, guestUid, guestName, resolvedGrid);
       tx.set(doc(db, ROOMS, roomCode), roomDoc);
 
-      // Update both matchmaking docs
-      tx.update(myRef,      { status: 'matched', roomCode, matchedGridSize: resolvedGrid });
-      tx.update(partnerRef, { status: 'matched', roomCode, matchedGridSize: resolvedGrid });
+      // Update both matchmaking docs — write hostUid so both clients derive isHost reliably
+      // (avoids race where partnerUidRef is empty when the match snapshot fires)
+      tx.update(myRef,      { status: 'matched', roomCode, matchedGridSize: resolvedGrid, hostUid });
+      tx.update(partnerRef, { status: 'matched', roomCode, matchedGridSize: resolvedGrid, hostUid });
     });
   } catch (_) {
     // Transaction failed (already matched, stale, or conflict) — ignore silently
@@ -1358,17 +1363,11 @@ const unsubMyMatchRef  = useRef<(() => void) | null>(null);
 
 - [ ] **Step 3: Add `handleQuickMatch` and `handleCancelMatch`**
 
-Add `partnerUidRef` to the state block from Step 2:
-```ts
-const partnerUidRef    = useRef<string>('');
-```
-
-Then add the handlers:
+Add the handlers:
 ```ts
 const handleQuickMatch = useCallback(async () => {
   if (!uid) return;
   setMatchState('waiting');
-  partnerUidRef.current = '';
 
   const name = p1Name.trim() || 'Player';
 
@@ -1383,17 +1382,14 @@ const handleQuickMatch = useCallback(async () => {
     unsubMyMatchRef.current?.();
   }, 30_000);
 
-  // Listen to waiting pool — store partner uid and attempt match
+  // Listen to waiting pool — attempt match when partner appears
   unsubPoolRef.current = subscribeToWaitingPool(uid, async (partnerUid) => {
-    partnerUidRef.current = partnerUid;
     await attemptMatch(uid, partnerUid);
   });
 
   // Listen to own doc for matched status
-  // isHost = lexicographically smaller uid (same logic as attemptMatch)
-  unsubMyMatchRef.current = subscribeToMyMatch(uid, (roomCode, matchedGridSize) => {
-    const partnerUid = partnerUidRef.current;
-    const isHost = uid < partnerUid;
+  // isHost comes from hostUid written by the transaction — no partnerUidRef race
+  unsubMyMatchRef.current = subscribeToMyMatch(uid, (roomCode, matchedGridSize, isHost) => {
     // Clean up
     if (matchTimeoutRef.current) clearTimeout(matchTimeoutRef.current);
     unsubPoolRef.current?.();
