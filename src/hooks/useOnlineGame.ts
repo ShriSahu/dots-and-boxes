@@ -51,17 +51,23 @@ export function useOnlineGame(
     }
 
     const timerMax = room.timerSeconds || 15;
+    let skipFired = false;  // one-shot guard — prevent double skip on same turn
 
     const tick = () => {
-      const elapsed = Math.floor((Date.now() - room.turnStartedAt!) / 1000);
+      const tsAt = room.turnStartedAt;
+      const tsMs: number = typeof tsAt === 'number'
+        ? tsAt
+        : (tsAt as any)?.toMillis?.() ?? Date.now();
+      const elapsed = Math.floor((Date.now() - tsMs) / 1000);
       const remaining = Math.max(0, timerMax - elapsed);
       setTimerRemaining(remaining);
 
-      if (remaining === 0 && room.currentPlayerUid === myUid) {
+      if (remaining === 0 && room.currentPlayerUid === myUid && !skipFired) {
+        skipFired = true;
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         // It's my turn and time is up — submit skip
         skipTurn(roomCode, myUid).catch(() => {});
         eventsRef.current.onAutoSkip?.(isHost ? room.host.name : (room.guest.name ?? ''));
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       }
     };
 

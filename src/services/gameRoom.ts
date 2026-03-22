@@ -215,7 +215,7 @@ export function buildInitialRoomDoc(
     updatedAt: serverTimestamp(),
     rematchRequestedBy: null,
     rematchRoomCode: null,
-    turnStartedAt: null,
+    turnStartedAt: serverTimestamp(),
   };
 }
 

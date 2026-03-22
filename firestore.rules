@@ -15,8 +15,10 @@ service cloud.firestore {
     match /matchmaking/{uid} {
       // Any authenticated user can read all docs (needed to find a waiting partner)
       allow read: if request.auth != null;
-      // Only the document owner can create or update their own doc
-      allow create, update: if request.auth != null && request.auth.uid == uid;
+      // Own writes OR match-resolution writes (status → matched, from transaction)
+      allow create, update: if request.auth != null
+        && (request.auth.uid == uid
+            || request.resource.data.status == 'matched');
       // No deletes (audit trail)
       allow delete: if false;
     }

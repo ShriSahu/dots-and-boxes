@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GameConfig, Stats } from '../types/game.types';
+import { GameConfig, GameMode, Stats } from '../types/game.types';
 
 const KEYS = {
   p1:         'db_p1',
@@ -55,7 +55,7 @@ export async function loadPrefs(): Promise<Partial<GameConfig>> {
     return {
       p1Name:       map[KEYS.p1] || '',
       p2Name:       map[KEYS.p2] || '',
-      mode:         (map[KEYS.mode] === 'ai' ? 'ai' : '2player'),
+      mode:         (['2player', 'ai', 'online'].includes(map[KEYS.mode]) ? map[KEYS.mode] : '2player') as GameMode,
       gridSize:     ([3, 4, 5, 6].includes(size) ? size : 4) as any,
       difficulty:   (['easy', 'medium', 'hard'].includes(map[KEYS.diff]) ? map[KEYS.diff] : 'medium') as any,
       timerSeconds: ([0, 10, 15, 30].includes(timer) ? timer : 0) as any,
