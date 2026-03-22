@@ -10,6 +10,10 @@ import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTu
 import TutorialOverlay from '../src/components/TutorialOverlay';
 import { getAnonymousUid } from '../src/services/firebase';
 import { ensureUserProfile, subscribeToBalance, checkAndAwardDailyBonus } from '../src/services/coins';
+import {
+  joinQueue, cancelQueue,
+  subscribeToMyMatch, subscribeToWaitingPool, attemptMatch,
+} from '../src/services/matchmaking';
 import type { GameMode, GridSize, Difficulty, TimerOption, GameConfig, Stats } from '../src/types/game.types';
 
 const GRID_SIZES: GridSize[]     = [3, 4, 5, 6];
@@ -37,6 +41,12 @@ export default function HomeScreen() {
   const bonusAnim = useRef(new Animated.Value(0)).current;
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeenState] = useState(false);
+
+  type MatchState = 'idle' | 'waiting' | 'timeout';
+  const [matchState, setMatchState] = useState<MatchState>('idle');
+  const matchTimeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const unsubPoolRef     = useRef<(() => void) | null>(null);
+  const unsubMyMatchRef  = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -99,6 +109,56 @@ export default function HomeScreen() {
     await resetStatsStorage();
     setStats({ w: 0, l: 0, d: 0, streak: 0, bestStreak: 0 });
   };
+
+  const handleQuickMatch = useCallback(async () => {
+    if (!uid) return;
+    setMatchState('waiting');
+
+    const name = p1Name.trim() || 'Player';
+
+    // Join the queue
+    await joinQueue(uid, name, gridSize);
+
+    // Timeout after 30s
+    matchTimeoutRef.current = setTimeout(async () => {
+      await cancelQueue(uid);
+      setMatchState('timeout');
+      unsubPoolRef.current?.();
+      unsubMyMatchRef.current?.();
+    }, 30_000);
+
+    // Listen to waiting pool — attempt match when partner appears
+    unsubPoolRef.current = subscribeToWaitingPool(uid, async (partnerUid) => {
+      await attemptMatch(uid, partnerUid);
+    });
+
+    // Listen to own doc for matched status
+    unsubMyMatchRef.current = subscribeToMyMatch(uid, (roomCode, matchedGridSize, isHost) => {
+      // Clean up
+      if (matchTimeoutRef.current) clearTimeout(matchTimeoutRef.current);
+      unsubPoolRef.current?.();
+      unsubMyMatchRef.current?.();
+      setMatchState('idle');
+      router.push({
+        pathname: '/online-game',
+        params: {
+          roomCode,
+          isHost: isHost ? 'true' : 'false',
+          myUid: uid,
+          gridSize: String(matchedGridSize),
+        },
+      });
+    });
+  }, [uid, p1Name, gridSize]);
+
+  const handleCancelMatch = useCallback(async () => {
+    if (!uid) return;
+    if (matchTimeoutRef.current) clearTimeout(matchTimeoutRef.current);
+    unsubPoolRef.current?.();
+    unsubMyMatchRef.current?.();
+    await cancelQueue(uid);
+    setMatchState('idle');
+  }, [uid]);
 
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: theme.bg }]}>
@@ -335,15 +395,62 @@ export default function HomeScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          style={[s.startBtn, { backgroundColor: theme.text, shadowColor: theme.text }]}
-          onPress={startGame}
-          activeOpacity={0.82}
-        >
-          <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
-            {mode === 'online' ? 'Go to Lobby →' : 'Start Game →'}
-          </Text>
-        </TouchableOpacity>
+        {mode === 'online' ? (
+          <View style={{ width: '100%', gap: 10 }}>
+            {matchState === 'waiting' ? (
+              <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.p1, alignItems: 'center', gap: 10 }]}>
+                <Text style={[s.cardTitle, { color: theme.p1, fontFamily: theme.fontHandwritten }]}>
+                  Looking for a match…
+                </Text>
+                <TouchableOpacity
+                  style={[s.shopBtn, { borderColor: theme.border, paddingHorizontal: 24 }]}
+                  onPress={handleCancelMatch}
+                >
+                  <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : matchState === 'timeout' ? (
+              <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border, alignItems: 'center' }]}>
+                <Text style={[{ color: theme.textMuted, fontFamily: theme.fontRegular, textAlign: 'center', fontSize: 14 }]}>
+                  No players found. Try again or use a room code instead.
+                </Text>
+              </View>
+            ) : null}
+
+            <TouchableOpacity
+              style={[s.startBtn, { backgroundColor: theme.text, shadowColor: theme.text }]}
+              onPress={handleQuickMatch}
+              disabled={matchState === 'waiting'}
+              activeOpacity={0.82}
+            >
+              <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+                Quick Match →
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[s.startBtn, { backgroundColor: 'transparent', borderWidth: 2, borderColor: theme.border }]}
+              onPress={() => router.push('/lobby')}
+              activeOpacity={0.82}
+            >
+              <Text style={[s.startBtnText, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
+                Use Room Code
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[s.startBtn, { backgroundColor: theme.text, shadowColor: theme.text }]}
+            onPress={startGame}
+            activeOpacity={0.82}
+          >
+            <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+              Start Game →
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <View style={{ height: 32 }} />
       </ScrollView>
