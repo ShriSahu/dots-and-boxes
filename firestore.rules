@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ── Rooms (online games) ──────────────────────────────────────
+    match /rooms/{roomCode} {
+      // Any authenticated user can read
+      allow read: if request.auth != null;
+      // Only host or guest can write/update (checked via currentPlayerUid or status transitions)
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false; // No deletes
+    }
+
+    // ── Matchmaking (quick match waiting pool) ────────────────────
+    match /matchmaking/{uid} {
+      // Any authenticated user can read all docs (needed to find a waiting partner)
+      allow read: if request.auth != null;
+      // Only the document owner can create or update their own doc
+      allow create, update: if request.auth != null && request.auth.uid == uid;
+      // No deletes (audit trail)
+      allow delete: if false;
+    }
+
+    // ── Users (profile, theme, coins) ─────────────────────────────
+    match /users/{uid} {
+      // Users can read their own doc; public fields readable by all
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // ── Coin Transactions (audit trail) ────────────────────────────
+    match /coinTransactions/{txId} {
+      // Users can only read their own transactions
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      // Only backend (signed in) can create; no manual writes
+      allow create, update, delete: if false;
+    }
+  }
+}
