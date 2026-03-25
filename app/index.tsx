@@ -24,6 +24,47 @@ const DIFF_SUBS                  = ['Random', 'Smart bot', 'Minimax AI'];
 const TIMER_OPTS: TimerOption[]  = [0, 10, 15, 30];
 const TIMER_LABELS               = ['Off', '10s', '15s', '30s'];
 
+type QuickPreset = {
+  id: string;
+  title: string;
+  subtitle: string;
+  config: Partial<Pick<GameConfig, 'mode' | 'gridSize' | 'difficulty' | 'timerSeconds'>>;
+};
+
+const QUICK_PRESETS: QuickPreset[] = [
+  {
+    id: 'blitz',
+    title: 'Blitz',
+    subtitle: '3x3 • AI • 10s',
+    config: { mode: 'ai', gridSize: 3, difficulty: 'medium', timerSeconds: 10 },
+  },
+  {
+    id: 'classic',
+    title: 'Classic',
+    subtitle: '4x4 • Local duel',
+    config: { mode: '2player', gridSize: 4, timerSeconds: 0 },
+  },
+  {
+    id: 'legend',
+    title: 'Legend',
+    subtitle: '5x5 • Hard AI • 15s',
+    config: { mode: 'ai', gridSize: 5, difficulty: 'hard', timerSeconds: 15 },
+  },
+];
+
+function getDailyChallenge() {
+  const today = new Date();
+  const daySeed = today.getFullYear() * 1000 + Math.floor(
+    (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000,
+  );
+  const options = [
+    { title: 'Speed Draft', detail: 'Beat medium AI on 3x3 with a 10s timer.', reward: 'Warm-up and sharpen your opening.' },
+    { title: 'Chain Hunter', detail: 'Win a 4x4 match and deny the last big chain.', reward: 'Best for improving endgame control.' },
+    { title: 'Boss Board', detail: 'Survive hard AI on 5x5 and force a close finish.', reward: 'High difficulty, high brag value.' },
+  ];
+  return options[daySeed % options.length];
+}
+
 export default function HomeScreen() {
   const { theme } = useTheme();
   const s = makeStyles(theme);
@@ -41,12 +82,22 @@ export default function HomeScreen() {
   const bonusAnim = useRef(new Animated.Value(0)).current;
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeenState] = useState(false);
+  const dailyChallengeCard = getDailyChallenge();
 
   type MatchState = 'idle' | 'waiting' | 'timeout';
   const [matchState, setMatchState] = useState<MatchState>('idle');
   const matchTimeoutRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const unsubPoolRef     = useRef<(() => void) | null>(null);
   const unsubMyMatchRef  = useRef<(() => void) | null>(null);
+  const totalGames = stats.w + stats.l + stats.d;
+  const winRate = totalGames ? Math.round((stats.w / totalGames) * 100) : 0;
+  const masteryGoal = stats.w < 3 ? 3 : stats.w < 10 ? 10 : stats.w < 25 ? 25 : 50;
+  const winsToGoal = Math.max(0, masteryGoal - stats.w);
+  const recommendation = stats.bestStreak >= 4
+    ? 'You are ready for 5x5 hard mode.'
+    : stats.w >= 3
+      ? 'Try timed matches to increase tension.'
+      : 'Start with Blitz to learn board control quickly.';
 
   useEffect(() => {
     (async () => {
@@ -104,6 +155,13 @@ export default function HomeScreen() {
     await savePrefs(config);
     router.push({ pathname: '/game', params: { config: JSON.stringify(config) } });
   }, [mode, p1Name, p2Name, gridSize, difficulty, timerSecs]);
+
+  const applyPreset = useCallback((preset: QuickPreset) => {
+    setMode(preset.config.mode ?? '2player');
+    setGridSize(preset.config.gridSize ?? 4);
+    setDiff(preset.config.difficulty ?? 'medium');
+    setTimer(preset.config.timerSeconds ?? 0);
+  }, []);
 
   const handleResetStats = async () => {
     await resetStatsStorage();
@@ -221,6 +279,86 @@ export default function HomeScreen() {
           </Text>
           <Text style={[s.titleSub, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
             the classic pen & paper game
+          </Text>
+        </View>
+
+        <View style={[s.heroCard, { backgroundColor: theme.text, shadowColor: theme.text }]}>
+          <Text style={[s.heroEyebrow, { color: theme.bg, fontFamily: theme.fontSemiBold }]}>
+            Fast mobile strategy
+          </Text>
+          <Text style={[s.heroTitle, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+            Quick rounds. Smart AI. One more match energy.
+          </Text>
+          <Text style={[s.heroBody, { color: theme.bg, fontFamily: theme.fontRegular }]}>
+            {recommendation}
+          </Text>
+          <View style={s.heroStats}>
+            <View style={[s.heroStatPill, { backgroundColor: 'rgba(255,255,255,0.12)' }]}>
+              <Text style={[s.heroStatValue, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+                {totalGames}
+              </Text>
+              <Text style={[s.heroStatLabel, { color: theme.bg, fontFamily: theme.fontRegular }]}>
+                games
+              </Text>
+            </View>
+            <View style={[s.heroStatPill, { backgroundColor: 'rgba(255,255,255,0.12)' }]}>
+              <Text style={[s.heroStatValue, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+                {winRate}%
+              </Text>
+              <Text style={[s.heroStatLabel, { color: theme.bg, fontFamily: theme.fontRegular }]}>
+                win rate
+              </Text>
+            </View>
+            <View style={[s.heroStatPill, { backgroundColor: 'rgba(255,255,255,0.12)' }]}>
+              <Text style={[s.heroStatValue, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>
+                {stats.bestStreak}
+              </Text>
+              <Text style={[s.heroStatLabel, { color: theme.bg, fontFamily: theme.fontRegular }]}>
+                best streak
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <View style={s.statsHeader}>
+            <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold, marginBottom: 0 }]}>
+              Quick Start
+            </Text>
+            <Text style={[s.quickHint, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+              tap to load a proven setup
+            </Text>
+          </View>
+          <View style={s.presetRow}>
+            {QUICK_PRESETS.map((preset) => (
+              <TouchableOpacity
+                key={preset.id}
+                style={[s.presetBtn, { borderColor: theme.border, backgroundColor: theme.bg }]}
+                onPress={() => applyPreset(preset)}
+              >
+                <Text style={[s.presetTitle, { color: theme.text, fontFamily: theme.fontSemiBold }]}>
+                  {preset.title}
+                </Text>
+                <Text style={[s.presetSubtitle, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+                  {preset.subtitle}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={[s.challengeCard, { backgroundColor: theme.p2Light, borderColor: theme.p2 }]}>
+          <Text style={[s.challengeEyebrow, { color: theme.p2, fontFamily: theme.fontSemiBold }]}>
+            Daily Challenge
+          </Text>
+          <Text style={[s.challengeTitle, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
+            {dailyChallengeCard.title}
+          </Text>
+          <Text style={[s.challengeBody, { color: theme.text, fontFamily: theme.fontRegular }]}>
+            {dailyChallengeCard.detail}
+          </Text>
+          <Text style={[s.challengeReward, { color: theme.p2, fontFamily: theme.fontRegular }]}>
+            {dailyChallengeCard.reward}
           </Text>
         </View>
 
@@ -385,6 +523,26 @@ export default function HomeScreen() {
           )}
         </View>
 
+        <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>
+            Mastery Track
+          </Text>
+          <Text style={[s.masteryTitle, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
+            {winsToGoal === 0 ? `Milestone ${masteryGoal} cleared` : `${winsToGoal} wins to reach ${masteryGoal}`}
+          </Text>
+          <Text style={[s.masteryBody, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+            Stack AI wins, build streaks, then push into harder boards for better clips and better shareable results.
+          </Text>
+          <View style={[s.masteryBar, { backgroundColor: theme.border }]}>
+            <View
+              style={[
+                s.masteryFill,
+                { backgroundColor: theme.p1, width: `${Math.min(100, Math.round((stats.w / masteryGoal) * 100))}%` },
+              ]}
+            />
+          </View>
+        </View>
+
         {/* ── Online info card ── */}
         {mode === 'online' && (
           <View style={[s.card, { backgroundColor: theme.p1Light, borderColor: theme.p1 }]}>
@@ -504,12 +662,92 @@ function makeStyles(theme: any) {
     titleWrap:  { alignItems: 'center', marginBottom: 4 },
     titleMain:  { fontSize: 52, fontWeight: '700', letterSpacing: -1, lineHeight: 56 },
     titleSub:   { fontSize: 16, marginTop: 2 },
+    heroCard: {
+      width: '100%',
+      borderRadius: 22,
+      padding: 20,
+      gap: 10,
+      shadowOffset: { width: 4, height: 6 },
+      shadowOpacity: 0.2,
+      shadowRadius: 0,
+      elevation: 5,
+    },
+    heroEyebrow: {
+      fontSize: 14,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    heroTitle: {
+      fontSize: 32,
+      lineHeight: 34,
+      fontWeight: '700',
+    },
+    heroBody: {
+      fontSize: 16,
+      lineHeight: 22,
+      maxWidth: '92%',
+    },
+    heroStats: {
+      flexDirection: 'row',
+      gap: 8,
+      marginTop: 6,
+    },
+    heroStatPill: {
+      flex: 1,
+      borderRadius: 16,
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+      alignItems: 'center',
+    },
+    heroStatValue: {
+      fontSize: 24,
+      fontWeight: '700',
+    },
+    heroStatLabel: {
+      fontSize: 12,
+    },
 
     card: {
       borderWidth: 1.5, borderRadius: 12, padding: 18, width: '100%',
       shadowOffset: { width: 2, height: 3 }, shadowOpacity: 1, shadowRadius: 8, elevation: 2,
     },
     cardTitle: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
+    quickHint: { fontSize: 12 },
+    presetRow: { flexDirection: 'row', gap: 8 },
+    presetBtn: {
+      flex: 1,
+      borderWidth: 1.5,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 10,
+      minHeight: 78,
+      justifyContent: 'center',
+    },
+    presetTitle: { fontSize: 17, fontWeight: '600' },
+    presetSubtitle: { fontSize: 12, marginTop: 4 },
+    challengeCard: {
+      width: '100%',
+      borderWidth: 1.5,
+      borderRadius: 18,
+      padding: 18,
+      gap: 6,
+    },
+    challengeEyebrow: {
+      fontSize: 13,
+      textTransform: 'uppercase',
+      letterSpacing: 0.8,
+    },
+    challengeTitle: {
+      fontSize: 28,
+      fontWeight: '700',
+    },
+    challengeBody: {
+      fontSize: 15,
+      lineHeight: 21,
+    },
+    challengeReward: {
+      fontSize: 14,
+    },
 
     modeRow: { flexDirection: 'row', gap: 8 },
     modeBtn: {
@@ -546,6 +784,25 @@ function makeStyles(theme: any) {
     streakRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
     streakText: { fontSize: 22, fontWeight: '700' },
     streakBest: { fontSize: 14 },
+    masteryTitle: {
+      fontSize: 26,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+    masteryBody: {
+      fontSize: 14,
+      lineHeight: 20,
+      marginBottom: 12,
+    },
+    masteryBar: {
+      height: 10,
+      borderRadius: 999,
+      overflow: 'hidden',
+    },
+    masteryFill: {
+      height: '100%',
+      borderRadius: 999,
+    },
 
     onlineInfoText: { fontSize: 15, lineHeight: 22 },
 

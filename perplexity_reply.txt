@@ -1,0 +1,35 @@
+Missing Features
+
+    No onboarding/tutorial at all; most casual players will bounce if their first game is confusing or they lose badly with no explanation. Add a 3–4 step interactive tutorial overlay on the first match (and a “?” button to replay it).
+
+    Zero meta‑progression beyond coins and a flat leaderboard; there’s nothing that says “come back tomorrow” beyond the +5 coin login. You need a simple level/xp system, player profile level, and small milestones (e.g., “Win 3 games on 4×4 to unlock X”).
+
+    No structured challenges / missions; add daily and weekly quests like “Win 2 online matches”, “Capture 10 boxes in one game”, “Win without undo”. Tie them to coin or cosmetic rewards and show a simple progress bar.
+
+    Missing proper matchmaking / rating in online mode; a bare room‑code lobby is fine for friends but useless for solo players who want fair opponents. At minimum, add a simple ELO or hidden MMR and “Quick Match” that auto‑pairs players.
+
+    No analytics / A/B hooks at all; if you want to iterate like a serious product, you need basic events (game start/end, mode, grid size, quit point, retention events) and flags to test things like reward amounts or timers.
+
+AI‑specific missing pieces:
+
+    No adaptive difficulty; your Easy/Medium/Hard are static. Add a system that tracks player performance (win rate, blunders like giving away long chains) and quietly nudges AI behavior up or down.
+
+    No AI coach / hint mode; this is a perfect game to show “good vs bad” moves. Add an optional “Hint” button that highlights 1–2 recommended moves and briefly explains why (“This avoids giving a chain of 3 boxes”).
+
+    No AI‑generated challenges/daily puzzles; you could use an AI routine to generate specific board states where the player has to find the winning line sequence. This gives you “Daily Challenge” content without hand‑crafting.
+
+    No personalization; all players see the same options and flows. Use simple bandit logic or AI scoring to suggest “Best mode for you” on the home screen (“You seem to like 4×4 vs AI Hard, try 5×5 Ranked next”).
+
+    No social hooks besides a planned share button; you’re missing friends lists, lightweight emotes, or simple “recent opponents” for rematching.
+
+Top 5 missing features for retention + shareability:
+
+    Short, interactive tutorial + “first session” guided flow.
+
+    Daily/weekly quests + simple progression (level/xp, titles, or badges).
+
+    Proper online quick‑match with basic rating/matchmaking.
+
+    AI adaptive difficulty + hint/coach mode for solo play.
+
+    Daily AI‑generated challenge puzzle + one‑tap share of result.

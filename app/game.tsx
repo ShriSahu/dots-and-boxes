@@ -81,6 +81,25 @@ export default function GameScreen() {
       },
     });
 
+  const totalBoxes = (config.gridSize - 1) ** 2;
+  const claimedBoxes = state.scores.p1 + state.scores.p2;
+  const boxesLeft = totalBoxes - claimedBoxes;
+  const targetScore = Math.floor(totalBoxes / 2) + 1;
+  const leader = state.scores.p1 === state.scores.p2
+    ? null
+    : (state.scores.p1 > state.scores.p2 ? 'p1' : 'p2');
+  const leaderName = leader === 'p1' ? config.p1Name : leader === 'p2' ? config.p2Name : null;
+  const statusHeadline = state.isGameOver
+    ? 'Final board'
+    : isAIThinking
+      ? `${config.p2Name} is calculating the next trap`
+      : leaderName
+        ? `${leaderName} leads the board`
+        : 'The board is still dead even';
+  const statusSubline = state.isGameOver
+    ? `${claimedBoxes}/${totalBoxes} boxes claimed`
+    : `${boxesLeft} boxes left • first to ${targetScore} usually controls the finish`;
+
   // ── Game over detection ───────────────────────────────────────────────────
   useEffect(() => {
     if (state.isGameOver && !prevGameOver.current) {
@@ -221,6 +240,11 @@ export default function GameScreen() {
         />
       </View>
 
+      <View style={styles.statusWrap}>
+        <Text style={styles.statusHeadline}>{statusHeadline}</Text>
+        <Text style={styles.statusSubline}>{statusSubline}</Text>
+      </View>
+
       {/* ── Board ── */}
       <View style={styles.boardWrap}>
         <GameBoard
@@ -297,7 +321,9 @@ export default function GameScreen() {
                 onPress={handleNewGame}
                 activeOpacity={0.82}
               >
-                <Text style={styles.resultBtnPrimaryText}>Play Again →</Text>
+                <Text style={styles.resultBtnPrimaryText}>
+                  {config.mode === 'ai' ? 'Rematch AI →' : 'Play Again →'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -373,6 +399,28 @@ function makeStyles(theme: any) {
     scoreWrap: {
       paddingHorizontal: 16,
       marginBottom: 8,
+    },
+    statusWrap: {
+      marginHorizontal: 16,
+      marginBottom: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      borderColor: theme.border,
+      backgroundColor: theme.bgCard,
+    },
+    statusHeadline: {
+      fontFamily: theme.fontSemiBold,
+      fontSize: 16,
+      color: theme.text,
+      fontWeight: '600',
+    },
+    statusSubline: {
+      marginTop: 2,
+      fontFamily: theme.fontRegular,
+      fontSize: 13,
+      color: theme.textMuted,
     },
 
     // Board
