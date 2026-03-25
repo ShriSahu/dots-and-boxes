@@ -18,6 +18,7 @@ import type { GameConfig, GameResult, LineId, GridSize } from '../src/types/game
 
 export default function OnlineGameScreen() {
   const { theme } = useTheme();
+  const styles = makeStyles(theme);
   const { width } = useWindowDimensions();
   const params = useLocalSearchParams<{
     roomCode: string;
@@ -41,6 +42,8 @@ export default function OnlineGameScreen() {
 
   const toastOpacity  = useRef(new Animated.Value(0)).current;
   const coinAnim      = useRef(new Animated.Value(0)).current;
+  const resultAnim    = useRef(new Animated.Value(0)).current;
+  const turnPulse     = useRef(new Animated.Value(1)).current;
   const toastTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
@@ -133,6 +136,15 @@ export default function OnlineGameScreen() {
         playSound('draw');
       }
 
+      // Animate result card in
+      resultAnim.setValue(0);
+      Animated.spring(resultAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 80,
+        friction: 9,
+      }).start();
+
       // Fire confetti if local player wins
       if (winner === (isHost ? 'p1' : 'p2')) {
         setTimeout(() => confettiRef.current?.start(), 200);
@@ -158,6 +170,24 @@ export default function OnlineGameScreen() {
     }
     if (!state.isGameOver) prevGameOver.current = false;
   }, [state.isGameOver]); // eslint-disable-line
+
+  // ── Turn banner pulse ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (isMyTurn && !state.isGameOver) {
+      turnPulse.setValue(1);
+      Animated.sequence([
+        Animated.timing(turnPulse, { toValue: 1.04, duration: 120, useNativeDriver: true }),
+        Animated.timing(turnPulse, { toValue: 1,    duration: 160, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [isMyTurn]);
+
+  // ── Timer warning beep ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (timerRemaining > 0 && timerRemaining <= 3) {
+      playSound('timerBeep');
+    }
+  }, [timerRemaining]);
 
   // ── Watch for rematch room code ───────────────────────────────────────────
   useEffect(() => {
@@ -302,9 +332,10 @@ export default function OnlineGameScreen() {
 
       {/* ── Turn indicator ── */}
       {!state.isGameOver && (
-        <View style={[styles.turnBanner, {
+        <Animated.View style={[styles.turnBanner, {
           backgroundColor: isMyTurn ? theme.p1Light : theme.bgCard,
           borderColor: isMyTurn ? theme.p1 : theme.border,
+          transform: [{ scale: turnPulse }],
         }]}>
           <Text style={[styles.turnBannerText, {
             color: isMyTurn ? theme.p1 : theme.textMuted,
@@ -312,7 +343,7 @@ export default function OnlineGameScreen() {
           }]}>
             {isMyTurn ? '▶ Your turn' : `${opponentName} is thinking…`}
           </Text>
-        </View>
+        </Animated.View>
       )}
 
       {/* ── AFK warning banner ── */}
@@ -389,7 +420,12 @@ export default function OnlineGameScreen() {
       {/* ── Game over overlay ── */}
       {result && (
         <Pressable style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.55)' }]}>
-          <View style={[styles.resultCard, { backgroundColor: theme.bg, borderColor: theme.border }]}>
+          <Animated.View style={[styles.resultCard, { backgroundColor: theme.bg, borderColor: theme.border }, {
+            opacity: resultAnim,
+            transform: [{
+              scale: resultAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }),
+            }],
+          }]}>
             <Text style={{ fontSize: 52, lineHeight: 60 }}>
               {result.winner === 'draw' ? '🤝' : '🎉'}
             </Text>
@@ -459,7 +495,7 @@ export default function OnlineGameScreen() {
                 Waiting for opponent to accept…
               </Text>
             )}
-          </View>
+          </Animated.View>
 
           {/* Floating coin animation */}
           {coinsEarned > 0 && (
@@ -495,81 +531,86 @@ export default function OnlineGameScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe:      { flex: 1 },
-  waitCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  waitText:  { fontSize: 18, marginTop: 12 },
-  leaveBtn:  { borderWidth: 1.5, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 10, marginTop: 16 },
-  leaveBtnText: { fontSize: 16 },
+function makeStyles(theme: any) {
+  return StyleSheet.create({
+    safe:      { flex: 1 },
+    waitCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+    waitText:  { fontSize: 18, marginTop: 12 },
+    leaveBtn:  { borderWidth: 1.5, borderRadius: 8, paddingHorizontal: 24, paddingVertical: 10, marginTop: 16 },
+    leaveBtnText: { fontSize: 16 },
 
-  header: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10,
-  },
-  headerCenter: { alignItems: 'center' },
-  headerTitle:  { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
-  headerSub:    { fontSize: 12, marginTop: 1 },
-  iconBtn: {
-    width: 44, height: 44, alignItems: 'center', justifyContent: 'center',
-    borderRadius: 22, borderWidth: 1.5,
-  },
-  iconBtnText: { fontSize: 20, fontWeight: '700' },
+    header: {
+      flexDirection: 'row', alignItems: 'center',
+      justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10,
+    },
+    headerCenter: { alignItems: 'center' },
+    headerTitle:  { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+    headerSub:    { fontSize: 12, marginTop: 1 },
+    iconBtn: {
+      width: 44, height: 44, alignItems: 'center', justifyContent: 'center',
+      borderRadius: 22, borderWidth: 1.5,
+    },
+    iconBtnText: { fontSize: 20, fontWeight: '700' },
 
-  turnBanner: {
-    marginHorizontal: 16, marginBottom: 6,
-    borderWidth: 1.5, borderRadius: 8,
-    paddingVertical: 7, paddingHorizontal: 14, alignItems: 'center',
-  },
-  turnBannerText: { fontSize: 16, fontWeight: '600' },
+    turnBanner: {
+      marginHorizontal: 16, marginBottom: 6,
+      borderWidth: 1.5, borderRadius: 8,
+      paddingVertical: 7, paddingHorizontal: 14, alignItems: 'center',
+    },
+    turnBannerText: { fontSize: 16, fontWeight: '600' },
 
-  afkBanner: {
-    marginHorizontal: 16, marginBottom: 6,
-    borderWidth: 1.5, borderRadius: 8,
-    paddingVertical: 6, paddingHorizontal: 14, alignItems: 'center',
-  },
-  afkText: { fontSize: 13 },
+    afkBanner: {
+      marginHorizontal: 16, marginBottom: 6,
+      borderWidth: 1.5, borderRadius: 8,
+      paddingVertical: 6, paddingHorizontal: 14, alignItems: 'center',
+    },
+    afkText: { fontSize: 13 },
 
-  scoreWrap:  { paddingHorizontal: 16, marginBottom: 8 },
-  boardWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    scoreWrap:  { paddingHorizontal: 16, marginBottom: 8 },
+    boardWrap:  { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
-  toast: {
-    position: 'absolute', bottom: 48, alignSelf: 'center',
-    borderWidth: 1.5, borderRadius: 20,
-    paddingHorizontal: 20, paddingVertical: 9,
-    shadowOffset: { width: 2, height: 3 }, shadowOpacity: 1, shadowRadius: 6, elevation: 6,
-  },
-  toastText: { fontSize: 18, fontWeight: '600' },
+    toast: {
+      position: 'absolute', bottom: 48, alignSelf: 'center',
+      borderWidth: 1.5, borderRadius: 20,
+      paddingHorizontal: 20, paddingVertical: 9,
+      shadowColor: theme.text,
+      shadowOffset: { width: 2, height: 3 }, shadowOpacity: 0.18, shadowRadius: 6, elevation: 6,
+    },
+    toastText: { fontSize: 18, fontWeight: '600' },
 
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  resultCard: {
-    borderRadius: 20, borderWidth: 2, padding: 28,
-    width: '82%', alignItems: 'center', gap: 10,
-    shadowOffset: { width: 4, height: 6 }, shadowOpacity: 0.18, shadowRadius: 0, elevation: 12,
-  },
-  resultTitle: { fontSize: 36, fontWeight: '700', textAlign: 'center' },
-  resultSub:   { fontSize: 15, textAlign: 'center', marginTop: 4 },
-  resultScoreRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
-  resultScoreName: { fontFamily: 'Caveat_600SemiBold', fontSize: 16, fontWeight: '600' },
-  resultScoreNums: { fontSize: 30, fontWeight: '700' },
-  coinRow:     { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  coinLabel:   { fontSize: 16 },
-  resultBtns:  { flexDirection: 'row', gap: 12, marginTop: 16 },
-  resultBtnSecondary: {
-    paddingVertical: 12, paddingHorizontal: 20,
-    borderRadius: 10, borderWidth: 2,
-  },
-  resultBtnSecondaryText: { fontSize: 18, fontWeight: '600' },
-  resultBtnPrimary: {
-    paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10, minWidth: 120, alignItems: 'center',
-    shadowOffset: { width: 3, height: 4 }, shadowOpacity: 0.25, shadowRadius: 0, elevation: 4,
-  },
-  resultBtnPrimaryText: { fontSize: 20, fontWeight: '700' },
-  rematchNote: { fontSize: 13, marginTop: 8 },
-  coinFloat: {
-    position: 'absolute', bottom: '35%', alignSelf: 'center',
-  },
-  coinFloatText: { fontSize: 36, fontWeight: '700' },
-});
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    resultCard: {
+      borderRadius: 20, borderWidth: 2, padding: 28,
+      width: '82%', alignItems: 'center', gap: 10,
+      shadowColor: theme.text,
+      shadowOffset: { width: 4, height: 6 }, shadowOpacity: 0.18, shadowRadius: 0, elevation: 12,
+    },
+    resultTitle: { fontSize: 36, fontWeight: '700', textAlign: 'center' },
+    resultSub:   { fontSize: 15, textAlign: 'center', marginTop: 4 },
+    resultScoreRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
+    resultScoreName: { fontFamily: theme.fontSemiBold, fontSize: 16, fontWeight: '600' },
+    resultScoreNums: { fontFamily: theme.fontHandwritten, fontSize: 30, fontWeight: '700' },
+    coinRow:     { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+    coinLabel:   { fontSize: 16 },
+    resultBtns:  { flexDirection: 'row', gap: 12, marginTop: 16 },
+    resultBtnSecondary: {
+      paddingVertical: 12, paddingHorizontal: 20,
+      borderRadius: 10, borderWidth: 2,
+    },
+    resultBtnSecondaryText: { fontSize: 18, fontWeight: '600' },
+    resultBtnPrimary: {
+      paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10, minWidth: 120, alignItems: 'center',
+      shadowColor: theme.text,
+      shadowOffset: { width: 3, height: 4 }, shadowOpacity: 0.25, shadowRadius: 0, elevation: 4,
+    },
+    resultBtnPrimaryText: { fontSize: 20, fontWeight: '700' },
+    rematchNote: { fontSize: 13, marginTop: 8 },
+    coinFloat: {
+      position: 'absolute', bottom: '35%', alignSelf: 'center',
+    },
+    coinFloatText: { fontSize: 36, fontWeight: '700' },
+  });
+}

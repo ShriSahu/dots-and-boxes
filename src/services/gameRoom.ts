@@ -110,6 +110,7 @@ export async function joinRoom(
       guest: { uid: guestUid, name: guestName, score: 0 },
       status: 'active',
       updatedAt: serverTimestamp(),
+      turnStartedAt: serverTimestamp(),
     });
 
     return {
@@ -255,7 +256,7 @@ export async function requestRematch(
       tx.set(doc(db, 'rooms', newCode), {
         status: 'active',
         gridSize: data.gridSize,
-        timerSeconds: 0,
+        timerSeconds: data.timerSeconds,
         host:  { uid: newHostUid,  name: newHostName,  score: 0 },
         guest: { uid: newGuestUid, name: newGuestName, score: 0 },
         currentPlayerUid: newHostUid,
@@ -266,6 +267,7 @@ export async function requestRematch(
         updatedAt: serverTimestamp(),
         rematchRequestedBy: null,
         rematchRoomCode: null,
+        turnStartedAt: serverTimestamp(),
       });
       tx.update(ref, { rematchRoomCode: newCode, updatedAt: serverTimestamp() });
       return newCode;

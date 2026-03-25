@@ -30,6 +30,7 @@ export default function GameScreen() {
   const [boardKey, setBoardKey]   = useState(0);
   const toastOpacity  = useRef(new Animated.Value(0)).current;
   const coinAnim      = useRef(new Animated.Value(0)).current;
+  const resultAnim    = useRef(new Animated.Value(0)).current;
   const toastTimer    = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
@@ -97,6 +98,15 @@ export default function GameScreen() {
       } else {
         playSound('draw');
       }
+
+      // Animate result card in
+      resultAnim.setValue(0);
+      Animated.spring(resultAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 80,
+        friction: 9,
+      }).start();
 
       if (config.mode === 'ai') {
         recordStat(winner === 'p1' ? 'w' : winner === 'p2' ? 'l' : 'd');
@@ -247,7 +257,12 @@ export default function GameScreen() {
       {/* ── Game over overlay ── */}
       {result && (
         <Pressable style={styles.overlay}>
-          <View style={styles.resultCard}>
+          <Animated.View style={[styles.resultCard, {
+            opacity: resultAnim,
+            transform: [{
+              scale: resultAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }),
+            }],
+          }]}>
             <Text style={styles.resultEmoji}>
               {result.winner === 'draw' ? '🤝' : '🎉'}
             </Text>
@@ -300,7 +315,7 @@ export default function GameScreen() {
                 <Text style={styles.resultBtnPrimaryText}>Play Again →</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
 
           {config.mode === 'ai' && coinsEarned > 0 && (
             <Animated.View

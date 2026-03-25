@@ -31,6 +31,7 @@ export function useOnlineGame(
 
   const prevMoveCount  = useRef(-1);
   const prevStatus     = useRef<OnlineRoom['status'] | null>(null);
+  const prevBoxesRef   = useRef<number[]>([]);
   const eventsRef      = useRef(events);
   eventsRef.current    = events;
 
@@ -45,12 +46,12 @@ export function useOnlineGame(
   // ── Online turn timer ────────────────────────────────────────────────────
   useEffect(() => {
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-    if (!room?.turnStartedAt || room.status !== 'active') {
+    if (!room?.turnStartedAt || room.status !== 'active' || !room.timerSeconds) {
       setTimerRemaining(0);
       return;
     }
 
-    const timerMax = room.timerSeconds || 15;
+    const timerMax = room.timerSeconds;
     let skipFired = false;  // one-shot guard — prevent double skip on same turn
 
     const tick = () => {
@@ -105,6 +106,23 @@ export function useOnlineGame(
             const line: LineId = { type: lm.type as 'h' | 'v', row: lm.row, col: lm.col };
             setLastLine(line);
             setTimeout(() => setLastLine(null), 260);
+
+            // For OPPONENT moves: diff the boxes array to detect claimed boxes and fire onBoxClaimed
+            if (movedUid !== myUid && prevBoxesRef.current.length > 0) {
+              const prevFlat = prevBoxesRef.current;
+              const newFlat  = r.boxes;
+              const claimedIndices: number[] = [];
+              for (let i = 0; i < newFlat.length; i++) {
+                if (newFlat[i] !== 0 && prevFlat[i] === 0) claimedIndices.push(i);
+              }
+              if (claimedIndices.length > 0) {
+                const cellsPerRow = gridSize - 1;
+                const claimedKeys = claimedIndices.map(
+                  i => `${Math.floor(i / cellsPerRow)}-${i % cellsPerRow}`,
+                );
+                setTimeout(() => eventsRef.current.onBoxClaimed?.(claimedIndices.length, player, claimedKeys, line), 0);
+              }
+            }
           }
         }
 
@@ -113,6 +131,7 @@ export function useOnlineGame(
           setTimeout(() => eventsRef.current.onTurnSwitch?.(), 0);
         }
       }
+      prevBoxesRef.current = [...r.boxes];
       prevMoveCount.current = r.moveCount;
 
       setState({

@@ -115,6 +115,9 @@ export default function HomeScreen() {
     setMatchState('waiting');
 
     const name = p1Name.trim() || 'Player';
+    // Persist name + update Firestore profile so leaderboard shows correct name
+    await savePrefs({ mode, p1Name: name, p2Name, gridSize, difficulty, timerSeconds: timerSecs });
+    await ensureUserProfile(uid, name);
 
     // Join the queue
     await joinQueue(uid, name, gridSize);
@@ -149,7 +152,7 @@ export default function HomeScreen() {
         },
       });
     });
-  }, [uid, p1Name, gridSize]);
+  }, [uid, p1Name, p2Name, gridSize, mode, difficulty, timerSecs]);
 
   const handleCancelMatch = useCallback(async () => {
     if (!uid) return;
@@ -252,8 +255,21 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* ── Names (hidden for online) ── */}
-        {mode !== 'online' && (
+        {/* ── Names ── */}
+        {mode === 'online' ? (
+          <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+            <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>🖊️  Your Name</Text>
+            <TextInput
+              style={[s.input, { borderBottomColor: theme.p1, color: theme.text, fontFamily: theme.fontHandwritten }]}
+              value={p1Name}
+              onChangeText={setP1Name}
+              placeholder="Enter your name…"
+              placeholderTextColor={theme.border}
+              maxLength={16}
+              returnKeyType="done"
+            />
+          </View>
+        ) : (
           <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
             <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>🖊️  Player Names</Text>
             <Text style={[s.inputLabel, { color: theme.p1 }]}>Player 1 (Navy)</Text>
@@ -304,28 +320,28 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* ── Grid size (hidden for online — set in lobby) ── */}
-        {mode !== 'online' && (
-          <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
-            <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>📐  Grid Size</Text>
-            <View style={s.gridRow}>
-              {GRID_SIZES.map((sz, i) => (
-                <TouchableOpacity
-                  key={sz}
-                  style={[s.gridBtn, { borderColor: theme.border }, gridSize === sz && { borderColor: theme.p2, backgroundColor: theme.p2Light }]}
-                  onPress={() => setGridSize(sz)}
-                >
-                  <Text style={[s.gridBtnText, { color: gridSize === sz ? theme.p2 : theme.text, fontFamily: theme.fontSemiBold }]}>
-                    {GRID_LABELS[i]}
-                  </Text>
-                  <Text style={[s.gridBtnSub, { color: gridSize === sz ? theme.p2 : theme.textMuted, fontFamily: theme.fontRegular }]}>
-                    {GRID_SUBS[i]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+        {/* ── Grid size ── */}
+        <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+          <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>
+            {mode === 'online' ? '📐  Grid Size (Quick Match)' : '📐  Grid Size'}
+          </Text>
+          <View style={s.gridRow}>
+            {GRID_SIZES.map((sz, i) => (
+              <TouchableOpacity
+                key={sz}
+                style={[s.gridBtn, { borderColor: theme.border }, gridSize === sz && { borderColor: theme.p2, backgroundColor: theme.p2Light }]}
+                onPress={() => setGridSize(sz)}
+              >
+                <Text style={[s.gridBtnText, { color: gridSize === sz ? theme.p2 : theme.text, fontFamily: theme.fontSemiBold }]}>
+                  {GRID_LABELS[i]}
+                </Text>
+                <Text style={[s.gridBtnSub, { color: gridSize === sz ? theme.p2 : theme.textMuted, fontFamily: theme.fontRegular }]}>
+                  {GRID_SUBS[i]}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        )}
+        </View>
 
         {/* ── Timer (hidden for online) ── */}
         {mode !== 'online' && (
