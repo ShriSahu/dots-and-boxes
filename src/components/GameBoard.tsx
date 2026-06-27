@@ -308,7 +308,7 @@ export default function GameBoard({
         )}
 
       </Svg>
-      </View>   {/* closes the panResponder View */}
+      </View>
     </View>
   );
 }
