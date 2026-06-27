@@ -1,0 +1,2242 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 8,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "app/leaderboard.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 146,
+      "nonEmptyLines": 136,
+      "functions": [
+        {
+          "name": "LeaderboardScreen",
+          "startLine": 12,
+          "endLine": 113,
+          "params": []
+        },
+        {
+          "name": "makeStyles",
+          "startLine": 115,
+          "endLine": 146,
+          "params": [
+            "theme"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LeaderboardScreen",
+          "line": 12,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "useTheme",
+          "lineNumber": 13
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "makeStyles",
+          "lineNumber": 14
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "useState",
+          "lineNumber": 16
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "useState",
+          "lineNumber": 17
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "useState",
+          "lineNumber": 18
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "useEffect",
+          "lineNumber": 20
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "getAnonymousUid().then",
+          "lineNumber": 21
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "getAnonymousUid",
+          "lineNumber": 21
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "getLeaderboard().then(data => {\r\n      setEntries(data);\r\n      setLoading(false);\r\n    }).catch",
+          "lineNumber": 22
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "getLeaderboard().then",
+          "lineNumber": 22
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "getLeaderboard",
+          "lineNumber": 22
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "setEntries",
+          "lineNumber": 23
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "setLoading",
+          "lineNumber": 24
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "setLoading",
+          "lineNumber": 25
+        },
+        {
+          "caller": "renderItem",
+          "callee": "Math.round",
+          "lineNumber": 38
+        },
+        {
+          "caller": "renderItem",
+          "callee": "renderMedal",
+          "lineNumber": 46
+        },
+        {
+          "caller": "LeaderboardScreen",
+          "callee": "router.back",
+          "lineNumber": 72
+        },
+        {
+          "caller": "makeStyles",
+          "callee": "StyleSheet.create",
+          "lineNumber": 116
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "app/lobby.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 369,
+      "nonEmptyLines": 342,
+      "functions": [
+        {
+          "name": "LobbyScreen",
+          "startLine": 19,
+          "endLine": 299,
+          "params": []
+        },
+        {
+          "name": "makeStyles",
+          "startLine": 301,
+          "endLine": 369,
+          "params": [
+            "theme"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LobbyScreen",
+          "line": 19,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "LobbyScreen",
+          "callee": "useTheme",
+          "lineNumber": 20
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "makeStyles",
+          "lineNumber": 21
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 23
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 24
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 25
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 26
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 27
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 28
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 30
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useState",
+          "lineNumber": 31
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useRef",
+          "lineNumber": 32
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useEffect",
+          "lineNumber": 34
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "getAnonymousUid().then",
+          "lineNumber": 35
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "getAnonymousUid",
+          "lineNumber": 35
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "unsubRef.current",
+          "lineNumber": 36
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "useEffect",
+          "lineNumber": 40
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setWaitSeconds",
+          "lineNumber": 42
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setInterval",
+          "lineNumber": 44
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setWaitSeconds",
+          "lineNumber": 46
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "clearInterval",
+          "lineNumber": 48
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "handleCancelWait",
+          "lineNumber": 49
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setError",
+          "lineNumber": 50
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "clearInterval",
+          "lineNumber": 53
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "playerName.trim",
+          "lineNumber": 58
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setLoading",
+          "lineNumber": 59
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setError",
+          "lineNumber": 60
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "ensureUserProfile",
+          "lineNumber": 62
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "createRoom",
+          "lineNumber": 63
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setRoomCode",
+          "lineNumber": 64
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setView",
+          "lineNumber": 65
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "subscribeToRoom",
+          "lineNumber": 67
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "unsubRef.current",
+          "lineNumber": 69
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "router.replace",
+          "lineNumber": 70
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "String",
+          "lineNumber": 76
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setError",
+          "lineNumber": 81
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setView",
+          "lineNumber": 82
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setError",
+          "lineNumber": 86
+        },
+        {
+          "caller": "handleCreate",
+          "callee": "setLoading",
+          "lineNumber": 88
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "joinCode.trim().toUpperCase",
+          "lineNumber": 94
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "joinCode.trim",
+          "lineNumber": 94
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "setError",
+          "lineNumber": 95
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "playerName.trim",
+          "lineNumber": 96
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "setLoading",
+          "lineNumber": 97
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "setError",
+          "lineNumber": 98
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "ensureUserProfile",
+          "lineNumber": 100
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "joinRoom",
+          "lineNumber": 101
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "router.replace",
+          "lineNumber": 102
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "String",
+          "lineNumber": 108
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "setError",
+          "lineNumber": 112
+        },
+        {
+          "caller": "handleJoin",
+          "callee": "setLoading",
+          "lineNumber": 114
+        },
+        {
+          "caller": "handleCancelWait",
+          "callee": "unsubRef.current",
+          "lineNumber": 119
+        },
+        {
+          "caller": "handleCancelWait",
+          "callee": "abandonRoom",
+          "lineNumber": 121
+        },
+        {
+          "caller": "handleCancelWait",
+          "callee": "setView",
+          "lineNumber": 123
+        },
+        {
+          "caller": "handleCancelWait",
+          "callee": "setRoomCode",
+          "lineNumber": 124
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "router.back",
+          "lineNumber": 132
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setView",
+          "lineNumber": 161
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setView",
+          "lineNumber": 172
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "GRID_SIZES.map",
+          "lineNumber": 191
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setGrid",
+          "lineNumber": 199
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setView",
+          "lineNumber": 222
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setError",
+          "lineNumber": 222
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "Share.share",
+          "lineNumber": 241
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "Math.floor",
+          "lineNumber": 249
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "String(waitSeconds % 60).padStart",
+          "lineNumber": 249
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "String",
+          "lineNumber": 249
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setJoinCode",
+          "lineNumber": 268
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "t.toUpperCase",
+          "lineNumber": 268
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setView",
+          "lineNumber": 290
+        },
+        {
+          "caller": "LobbyScreen",
+          "callee": "setError",
+          "lineNumber": 290
+        },
+        {
+          "caller": "makeStyles",
+          "callee": "StyleSheet.create",
+          "lineNumber": 302
+        }
+      ],
+      "metrics": {
+        "importCount": 5,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "app/shop.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 257,
+      "nonEmptyLines": 241,
+      "functions": [
+        {
+          "name": "ShopScreen",
+          "startLine": 18,
+          "endLine": 193,
+          "params": []
+        },
+        {
+          "name": "makeStyles",
+          "startLine": 195,
+          "endLine": 257,
+          "params": [
+            "theme"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ShopScreen",
+          "line": 18,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ShopScreen",
+          "callee": "useTheme",
+          "lineNumber": 19
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "makeStyles",
+          "lineNumber": 20
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "useState",
+          "lineNumber": 22
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "useState",
+          "lineNumber": 23
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "useState",
+          "lineNumber": 24
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "useState",
+          "lineNumber": 25
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "useEffect",
+          "lineNumber": 27
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "(async () => {\r\n      const id = await getAnonymousUid();\r\n      setUid(id);\r\n      const [bal, owned] = await Promise.all([\r\n        loadCoinBalance(id),\r\n        getPurchasedThemes(id),\r\n      ]);\r\n      setCoins(bal);\r\n      setPurchased(owned);\r\n      setLoading(false);\r\n    })",
+          "lineNumber": 28
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "getAnonymousUid",
+          "lineNumber": 29
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "setUid",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "Promise.all",
+          "lineNumber": 31
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "loadCoinBalance",
+          "lineNumber": 32
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "getPurchasedThemes",
+          "lineNumber": 33
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "setCoins",
+          "lineNumber": 35
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "setPurchased",
+          "lineNumber": 36
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "setLoading",
+          "lineNumber": 37
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "purchased.includes",
+          "lineNumber": 42
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "Alert.alert",
+          "lineNumber": 45
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "Alert.alert",
+          "lineNumber": 51
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "purchaseTheme",
+          "lineNumber": 59
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setCoins",
+          "lineNumber": 61
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setPurchased",
+          "lineNumber": 62
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setTheme",
+          "lineNumber": 63
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setActiveTheme",
+          "lineNumber": 64
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "Alert.alert",
+          "lineNumber": 66
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setTheme",
+          "lineNumber": 74
+        },
+        {
+          "caller": "handleSelect",
+          "callee": "setActiveTheme",
+          "lineNumber": 75
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "router.back",
+          "lineNumber": 83
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "THEME_NAMES.map",
+          "lineNumber": 104
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "purchased.includes",
+          "lineNumber": 107
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "handleSelect",
+          "lineNumber": 118
+        },
+        {
+          "caller": "ShopScreen",
+          "callee": "[\r\n            { label: 'Win vs AI',        coins: '+10 🪙' },\r\n            { label: 'Win online',       coins: '+25 🪙' },\r\n            { label: 'Draw',             coins: '+3 🪙'  },\r\n            { label: 'Participate',      coins: '+1 🪙'  },\r\n            { label: 'Daily first game', coins: '+5 🪙'  },\r\n          ].map",
+          "lineNumber": 171
+        },
+        {
+          "caller": "makeStyles",
+          "callee": "StyleSheet.create",
+          "lineNumber": 196
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/coins.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 132,
+      "nonEmptyLines": 120,
+      "functions": [
+        {
+          "name": "ensureUserProfile",
+          "startLine": 8,
+          "endLine": 23,
+          "params": [
+            "uid",
+            "displayName"
+          ]
+        },
+        {
+          "name": "loadCoinBalance",
+          "startLine": 25,
+          "endLine": 28,
+          "params": [
+            "uid"
+          ]
+        },
+        {
+          "name": "subscribeToBalance",
+          "startLine": 30,
+          "endLine": 34,
+          "params": [
+            "uid",
+            "cb"
+          ]
+        },
+        {
+          "name": "awardCoins",
+          "startLine": 36,
+          "endLine": 46,
+          "params": [
+            "uid",
+            "delta",
+            "reason",
+            "roomCode"
+          ]
+        },
+        {
+          "name": "spendCoins",
+          "startLine": 48,
+          "endLine": 60,
+          "params": [
+            "uid",
+            "amount",
+            "reason"
+          ]
+        },
+        {
+          "name": "checkAndAwardDailyBonus",
+          "startLine": 62,
+          "endLine": 79,
+          "params": [
+            "uid"
+          ]
+        },
+        {
+          "name": "recordOnlineResult",
+          "startLine": 82,
+          "endLine": 106,
+          "params": [
+            "uid",
+            "result",
+            "roomCode"
+          ]
+        },
+        {
+          "name": "getPurchasedThemes",
+          "startLine": 108,
+          "endLine": 111,
+          "params": [
+            "uid"
+          ]
+        },
+        {
+          "name": "purchaseTheme",
+          "startLine": 113,
+          "endLine": 123,
+          "params": [
+            "uid",
+            "themeName",
+            "cost"
+          ]
+        },
+        {
+          "name": "getActiveTheme",
+          "startLine": 125,
+          "endLine": 128,
+          "params": [
+            "uid"
+          ]
+        },
+        {
+          "name": "setActiveTheme",
+          "startLine": 130,
+          "endLine": 132,
+          "params": [
+            "uid",
+            "themeName"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ensureUserProfile",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "loadCoinBalance",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "subscribeToBalance",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "awardCoins",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "spendCoins",
+          "line": 48,
+          "isDefault": false
+        },
+        {
+          "name": "checkAndAwardDailyBonus",
+          "line": 62,
+          "isDefault": false
+        },
+        {
+          "name": "recordOnlineResult",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "getPurchasedThemes",
+          "line": 108,
+          "isDefault": false
+        },
+        {
+          "name": "purchaseTheme",
+          "line": 113,
+          "isDefault": false
+        },
+        {
+          "name": "getActiveTheme",
+          "line": 125,
+          "isDefault": false
+        },
+        {
+          "name": "setActiveTheme",
+          "line": 130,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ensureUserProfile",
+          "callee": "doc",
+          "lineNumber": 9
+        },
+        {
+          "caller": "ensureUserProfile",
+          "callee": "getDoc",
+          "lineNumber": 10
+        },
+        {
+          "caller": "ensureUserProfile",
+          "callee": "snap.exists",
+          "lineNumber": 11
+        },
+        {
+          "caller": "ensureUserProfile",
+          "callee": "setDoc",
+          "lineNumber": 12
+        },
+        {
+          "caller": "ensureUserProfile",
+          "callee": "updateDoc",
+          "lineNumber": 21
+        },
+        {
+          "caller": "loadCoinBalance",
+          "callee": "getDoc",
+          "lineNumber": 26
+        },
+        {
+          "caller": "loadCoinBalance",
+          "callee": "doc",
+          "lineNumber": 26
+        },
+        {
+          "caller": "loadCoinBalance",
+          "callee": "snap.exists",
+          "lineNumber": 27
+        },
+        {
+          "caller": "loadCoinBalance",
+          "callee": "snap.data",
+          "lineNumber": 27
+        },
+        {
+          "caller": "subscribeToBalance",
+          "callee": "onSnapshot",
+          "lineNumber": 31
+        },
+        {
+          "caller": "subscribeToBalance",
+          "callee": "doc",
+          "lineNumber": 31
+        },
+        {
+          "caller": "subscribeToBalance",
+          "callee": "cb",
+          "lineNumber": 32
+        },
+        {
+          "caller": "subscribeToBalance",
+          "callee": "snap.exists",
+          "lineNumber": 32
+        },
+        {
+          "caller": "subscribeToBalance",
+          "callee": "snap.data",
+          "lineNumber": 32
+        },
+        {
+          "caller": "awardCoins",
+          "callee": "updateDoc",
+          "lineNumber": 42
+        },
+        {
+          "caller": "awardCoins",
+          "callee": "doc",
+          "lineNumber": 42
+        },
+        {
+          "caller": "awardCoins",
+          "callee": "increment",
+          "lineNumber": 42
+        },
+        {
+          "caller": "awardCoins",
+          "callee": "addDoc",
+          "lineNumber": 43
+        },
+        {
+          "caller": "awardCoins",
+          "callee": "collection",
+          "lineNumber": 43
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "loadCoinBalance",
+          "lineNumber": 53
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "updateDoc",
+          "lineNumber": 55
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "doc",
+          "lineNumber": 55
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "increment",
+          "lineNumber": 55
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "addDoc",
+          "lineNumber": 56
+        },
+        {
+          "caller": "spendCoins",
+          "callee": "collection",
+          "lineNumber": 56
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "getDoc",
+          "lineNumber": 63
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "doc",
+          "lineNumber": 63
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "snap.exists",
+          "lineNumber": 64
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "snap.data",
+          "lineNumber": 65
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "data.lastDailyBonus?.toDate",
+          "lineNumber": 66
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "now.toDateString",
+          "lineNumber": 68
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "last.toDateString",
+          "lineNumber": 68
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "updateDoc",
+          "lineNumber": 69
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "doc",
+          "lineNumber": 69
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "increment",
+          "lineNumber": 71
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "addDoc",
+          "lineNumber": 73
+        },
+        {
+          "caller": "checkAndAwardDailyBonus",
+          "callee": "collection",
+          "lineNumber": 73
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "updateDoc",
+          "lineNumber": 96
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "doc",
+          "lineNumber": 96
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "increment",
+          "lineNumber": 97
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "increment",
+          "lineNumber": 98
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "increment",
+          "lineNumber": 100
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "addDoc",
+          "lineNumber": 102
+        },
+        {
+          "caller": "recordOnlineResult",
+          "callee": "collection",
+          "lineNumber": 102
+        },
+        {
+          "caller": "getPurchasedThemes",
+          "callee": "getDoc",
+          "lineNumber": 109
+        },
+        {
+          "caller": "getPurchasedThemes",
+          "callee": "doc",
+          "lineNumber": 109
+        },
+        {
+          "caller": "getPurchasedThemes",
+          "callee": "snap.exists",
+          "lineNumber": 110
+        },
+        {
+          "caller": "getPurchasedThemes",
+          "callee": "snap.data",
+          "lineNumber": 110
+        },
+        {
+          "caller": "purchaseTheme",
+          "callee": "spendCoins",
+          "lineNumber": 114
+        },
+        {
+          "caller": "purchaseTheme",
+          "callee": "getPurchasedThemes",
+          "lineNumber": 116
+        },
+        {
+          "caller": "purchaseTheme",
+          "callee": "existing.includes",
+          "lineNumber": 117
+        },
+        {
+          "caller": "purchaseTheme",
+          "callee": "updateDoc",
+          "lineNumber": 118
+        },
+        {
+          "caller": "purchaseTheme",
+          "callee": "doc",
+          "lineNumber": 118
+        },
+        {
+          "caller": "getActiveTheme",
+          "callee": "getDoc",
+          "lineNumber": 126
+        },
+        {
+          "caller": "getActiveTheme",
+          "callee": "doc",
+          "lineNumber": 126
+        },
+        {
+          "caller": "getActiveTheme",
+          "callee": "snap.exists",
+          "lineNumber": 127
+        },
+        {
+          "caller": "getActiveTheme",
+          "callee": "snap.data",
+          "lineNumber": 127
+        },
+        {
+          "caller": "setActiveTheme",
+          "callee": "updateDoc",
+          "lineNumber": 131
+        },
+        {
+          "caller": "setActiveTheme",
+          "callee": "doc",
+          "lineNumber": 131
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 11,
+        "functionCount": 11,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/firebase.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 40,
+      "nonEmptyLines": 35,
+      "functions": [
+        {
+          "name": "getAnonymousUid",
+          "startLine": 36,
+          "endLine": 40,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "auth",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "db",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "getAnonymousUid",
+          "line": 36,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "getAnonymousUid",
+          "callee": "signInAnonymously",
+          "lineNumber": 38
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/gameRoom.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 278,
+      "nonEmptyLines": 247,
+      "functions": [
+        {
+          "name": "generateRoomCode",
+          "startLine": 10,
+          "endLine": 15,
+          "params": []
+        },
+        {
+          "name": "flattenHLines",
+          "startLine": 17,
+          "endLine": 19,
+          "params": [
+            "hLines",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "flattenVLines",
+          "startLine": 21,
+          "endLine": 23,
+          "params": [
+            "vLines",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "unflattenBoard",
+          "startLine": 25,
+          "endLine": 46,
+          "params": [
+            "flat",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "emptyBoard",
+          "startLine": 48,
+          "endLine": 56,
+          "params": [
+            "gridSize"
+          ]
+        },
+        {
+          "name": "createRoom",
+          "startLine": 60,
+          "endLine": 93,
+          "params": [
+            "hostUid",
+            "hostName",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "joinRoom",
+          "startLine": 95,
+          "endLine": 122,
+          "params": [
+            "roomCode",
+            "guestUid",
+            "guestName"
+          ]
+        },
+        {
+          "name": "subscribeToRoom",
+          "startLine": 124,
+          "endLine": 131,
+          "params": [
+            "roomCode",
+            "cb"
+          ]
+        },
+        {
+          "name": "applyMove",
+          "startLine": 133,
+          "endLine": 168,
+          "params": [
+            "roomCode",
+            "move",
+            "myUid",
+            "nextPlayerUid",
+            "newHLines",
+            "newVLines",
+            "newBoxes",
+            "hostScore",
+            "guestScore",
+            "isGameOver"
+          ]
+        },
+        {
+          "name": "skipTurn",
+          "startLine": 170,
+          "endLine": 193,
+          "params": [
+            "roomCode",
+            "myUid"
+          ]
+        },
+        {
+          "name": "buildInitialRoomDoc",
+          "startLine": 196,
+          "endLine": 220,
+          "params": [
+            "hostUid",
+            "hostName",
+            "guestUid",
+            "guestName",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "abandonRoom",
+          "startLine": 222,
+          "endLine": 229,
+          "params": [
+            "roomCode"
+          ]
+        },
+        {
+          "name": "requestRematch",
+          "startLine": 231,
+          "endLine": 278,
+          "params": [
+            "roomCode",
+            "myUid",
+            "myName",
+            "isHost",
+            "gridSize"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "generateRoomCode",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "flattenHLines",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "flattenVLines",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "unflattenBoard",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "createRoom",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "joinRoom",
+          "line": 95,
+          "isDefault": false
+        },
+        {
+          "name": "subscribeToRoom",
+          "line": 124,
+          "isDefault": false
+        },
+        {
+          "name": "applyMove",
+          "line": 133,
+          "isDefault": false
+        },
+        {
+          "name": "skipTurn",
+          "line": 170,
+          "isDefault": false
+        },
+        {
+          "name": "buildInitialRoomDoc",
+          "line": 196,
+          "isDefault": false
+        },
+        {
+          "name": "abandonRoom",
+          "line": 222,
+          "isDefault": false
+        },
+        {
+          "name": "requestRematch",
+          "line": 231,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "generateRoomCode",
+          "callee": "Math.floor",
+          "lineNumber": 13
+        },
+        {
+          "caller": "generateRoomCode",
+          "callee": "Math.random",
+          "lineNumber": 13
+        },
+        {
+          "caller": "flattenHLines",
+          "callee": "hLines.flat",
+          "lineNumber": 18
+        },
+        {
+          "caller": "flattenVLines",
+          "callee": "vLines.flat",
+          "lineNumber": 22
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "hLines.push",
+          "lineNumber": 36
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "flat.hLines.slice",
+          "lineNumber": 36
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "vLines.push",
+          "lineNumber": 39
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "flat.vLines.slice",
+          "lineNumber": 39
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "boxes.push",
+          "lineNumber": 42
+        },
+        {
+          "caller": "unflattenBoard",
+          "callee": "flat.boxes.slice",
+          "lineNumber": 42
+        },
+        {
+          "caller": "emptyBoard",
+          "callee": "new Array(dots * cells).fill",
+          "lineNumber": 52
+        },
+        {
+          "caller": "emptyBoard",
+          "callee": "new Array(cells * dots).fill",
+          "lineNumber": 53
+        },
+        {
+          "caller": "emptyBoard",
+          "callee": "new Array(cells * cells).fill",
+          "lineNumber": 54
+        },
+        {
+          "caller": "createRoom",
+          "callee": "generateRoomCode",
+          "lineNumber": 65
+        },
+        {
+          "caller": "createRoom",
+          "callee": "getDoc",
+          "lineNumber": 68
+        },
+        {
+          "caller": "createRoom",
+          "callee": "doc",
+          "lineNumber": 68
+        },
+        {
+          "caller": "createRoom",
+          "callee": "snap.exists",
+          "lineNumber": 69
+        },
+        {
+          "caller": "createRoom",
+          "callee": "generateRoomCode",
+          "lineNumber": 70
+        },
+        {
+          "caller": "createRoom",
+          "callee": "emptyBoard",
+          "lineNumber": 73
+        },
+        {
+          "caller": "createRoom",
+          "callee": "serverTimestamp",
+          "lineNumber": 84
+        },
+        {
+          "caller": "createRoom",
+          "callee": "serverTimestamp",
+          "lineNumber": 85
+        },
+        {
+          "caller": "createRoom",
+          "callee": "setDoc",
+          "lineNumber": 91
+        },
+        {
+          "caller": "createRoom",
+          "callee": "doc",
+          "lineNumber": 91
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "doc",
+          "lineNumber": 100
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 100
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "runTransaction",
+          "lineNumber": 102
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "tx.get",
+          "lineNumber": 103
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "snap.exists",
+          "lineNumber": 104
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "snap.data",
+          "lineNumber": 105
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "tx.update",
+          "lineNumber": 109
+        },
+        {
+          "caller": "joinRoom",
+          "callee": "serverTimestamp",
+          "lineNumber": 112
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "onSnapshot",
+          "lineNumber": 128
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "doc",
+          "lineNumber": 128
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 128
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "snap.exists",
+          "lineNumber": 129
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "cb",
+          "lineNumber": 129
+        },
+        {
+          "caller": "subscribeToRoom",
+          "callee": "snap.data",
+          "lineNumber": 129
+        },
+        {
+          "caller": "applyMove",
+          "callee": "doc",
+          "lineNumber": 145
+        },
+        {
+          "caller": "applyMove",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 145
+        },
+        {
+          "caller": "applyMove",
+          "callee": "runTransaction",
+          "lineNumber": 147
+        },
+        {
+          "caller": "applyMove",
+          "callee": "tx.get",
+          "lineNumber": 148
+        },
+        {
+          "caller": "applyMove",
+          "callee": "snap.exists",
+          "lineNumber": 149
+        },
+        {
+          "caller": "applyMove",
+          "callee": "snap.data",
+          "lineNumber": 150
+        },
+        {
+          "caller": "applyMove",
+          "callee": "tx.update",
+          "lineNumber": 154
+        },
+        {
+          "caller": "applyMove",
+          "callee": "serverTimestamp",
+          "lineNumber": 164
+        },
+        {
+          "caller": "applyMove",
+          "callee": "serverTimestamp",
+          "lineNumber": 165
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "doc",
+          "lineNumber": 174
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 174
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "runTransaction",
+          "lineNumber": 176
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "tx.get",
+          "lineNumber": 177
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "snap.exists",
+          "lineNumber": 178
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "snap.data",
+          "lineNumber": 179
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "tx.update",
+          "lineNumber": 185
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "increment",
+          "lineNumber": 187
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "serverTimestamp",
+          "lineNumber": 189
+        },
+        {
+          "caller": "skipTurn",
+          "callee": "serverTimestamp",
+          "lineNumber": 190
+        },
+        {
+          "caller": "buildInitialRoomDoc",
+          "callee": "emptyBoard",
+          "lineNumber": 203
+        },
+        {
+          "caller": "buildInitialRoomDoc",
+          "callee": "serverTimestamp",
+          "lineNumber": 214
+        },
+        {
+          "caller": "buildInitialRoomDoc",
+          "callee": "serverTimestamp",
+          "lineNumber": 215
+        },
+        {
+          "caller": "buildInitialRoomDoc",
+          "callee": "serverTimestamp",
+          "lineNumber": 218
+        },
+        {
+          "caller": "abandonRoom",
+          "callee": "updateDoc",
+          "lineNumber": 224
+        },
+        {
+          "caller": "abandonRoom",
+          "callee": "doc",
+          "lineNumber": 224
+        },
+        {
+          "caller": "abandonRoom",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 224
+        },
+        {
+          "caller": "abandonRoom",
+          "callee": "serverTimestamp",
+          "lineNumber": 226
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "doc",
+          "lineNumber": 238
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "roomCode.toUpperCase",
+          "lineNumber": 238
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "runTransaction",
+          "lineNumber": 240
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "tx.get",
+          "lineNumber": 241
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "snap.exists",
+          "lineNumber": 242
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "snap.data",
+          "lineNumber": 243
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "generateRoomCode",
+          "lineNumber": 247
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "emptyBoard",
+          "lineNumber": 248
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "tx.set",
+          "lineNumber": 255
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "doc",
+          "lineNumber": 255
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "serverTimestamp",
+          "lineNumber": 265
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "serverTimestamp",
+          "lineNumber": 266
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "tx.update",
+          "lineNumber": 270
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "serverTimestamp",
+          "lineNumber": 270
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "tx.update",
+          "lineNumber": 275
+        },
+        {
+          "caller": "requestRematch",
+          "callee": "serverTimestamp",
+          "lineNumber": 275
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 12,
+        "functionCount": 13,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/leaderboard.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 31,
+      "nonEmptyLines": 29,
+      "functions": [
+        {
+          "name": "getLeaderboard",
+          "startLine": 12,
+          "endLine": 31,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "getLeaderboard",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "getLeaderboard",
+          "callee": "query",
+          "lineNumber": 16
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "collection",
+          "lineNumber": 16
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "orderBy",
+          "lineNumber": 16
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "limit",
+          "lineNumber": 16
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "getDocs",
+          "lineNumber": 17
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "snap.docs\r\n      .map(d => ({\r\n        uid:          d.id,\r\n        displayName:  d.data().displayName ?? 'Player',\r\n        onlineWins:   d.data().onlineWins  ?? 0,\r\n        onlineLosses: d.data().stats?.onlineLosses ?? 0,\r\n        onlineDraws:  d.data().stats?.onlineDraws  ?? 0,\r\n      }))\r\n      .filter",
+          "lineNumber": 18
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "snap.docs\r\n      .map",
+          "lineNumber": 18
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "d.data",
+          "lineNumber": 21
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "d.data",
+          "lineNumber": 22
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "d.data",
+          "lineNumber": 23
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "d.data",
+          "lineNumber": 24
+        },
+        {
+          "caller": "getLeaderboard",
+          "callee": "console.warn",
+          "lineNumber": 28
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/matchmaking.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 137,
+      "nonEmptyLines": 115,
+      "functions": [
+        {
+          "name": "generateMatchCode",
+          "startLine": 16,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "joinQueue",
+          "startLine": 25,
+          "endLine": 40,
+          "params": [
+            "uid",
+            "name",
+            "gridSize"
+          ]
+        },
+        {
+          "name": "cancelQueue",
+          "startLine": 42,
+          "endLine": 46,
+          "params": [
+            "uid"
+          ]
+        },
+        {
+          "name": "subscribeToMyMatch",
+          "startLine": 50,
+          "endLine": 63,
+          "params": [
+            "uid",
+            "onMatched"
+          ]
+        },
+        {
+          "name": "subscribeToWaitingPool",
+          "startLine": 67,
+          "endLine": 88,
+          "params": [
+            "myUid",
+            "onPartnerFound"
+          ]
+        },
+        {
+          "name": "attemptMatch",
+          "startLine": 92,
+          "endLine": 137,
+          "params": [
+            "myUid",
+            "partnerUid"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "generateMatchCode",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "joinQueue",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "cancelQueue",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "subscribeToMyMatch",
+          "line": 50,
+          "isDefault": false
+        },
+        {
+          "name": "subscribeToWaitingPool",
+          "line": 67,
+          "isDefault": false
+        },
+        {
+          "name": "attemptMatch",
+          "line": 92,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "generateMatchCode",
+          "callee": "Math.floor",
+          "lineNumber": 19
+        },
+        {
+          "caller": "generateMatchCode",
+          "callee": "Math.random",
+          "lineNumber": 19
+        },
+        {
+          "caller": "joinQueue",
+          "callee": "setDoc",
+          "lineNumber": 30
+        },
+        {
+          "caller": "joinQueue",
+          "callee": "doc",
+          "lineNumber": 30
+        },
+        {
+          "caller": "joinQueue",
+          "callee": "serverTimestamp",
+          "lineNumber": 34
+        },
+        {
+          "caller": "cancelQueue",
+          "callee": "updateDoc",
+          "lineNumber": 44
+        },
+        {
+          "caller": "cancelQueue",
+          "callee": "doc",
+          "lineNumber": 44
+        },
+        {
+          "caller": "subscribeToMyMatch",
+          "callee": "onSnapshot",
+          "lineNumber": 54
+        },
+        {
+          "caller": "subscribeToMyMatch",
+          "callee": "doc",
+          "lineNumber": 54
+        },
+        {
+          "caller": "subscribeToMyMatch",
+          "callee": "snap.exists",
+          "lineNumber": 55
+        },
+        {
+          "caller": "subscribeToMyMatch",
+          "callee": "snap.data",
+          "lineNumber": 56
+        },
+        {
+          "caller": "subscribeToMyMatch",
+          "callee": "onMatched",
+          "lineNumber": 60
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "query",
+          "lineNumber": 71
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "collection",
+          "lineNumber": 72
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "where",
+          "lineNumber": 73
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "orderBy",
+          "lineNumber": 74
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "limit",
+          "lineNumber": 75
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "onSnapshot",
+          "lineNumber": 78
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "snapshot.docs.map",
+          "lineNumber": 79
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "d.data",
+          "lineNumber": 79
+        },
+        {
+          "caller": "subscribeToWaitingPool",
+          "callee": "onPartnerFound",
+          "lineNumber": 86
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "doc",
+          "lineNumber": 97
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "doc",
+          "lineNumber": 98
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "runTransaction",
+          "lineNumber": 101
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "tx.get",
+          "lineNumber": 102
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "tx.get",
+          "lineNumber": 103
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "mySnap.exists",
+          "lineNumber": 105
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "partnerSnap.exists",
+          "lineNumber": 105
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "mySnap.data",
+          "lineNumber": 107
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "partnerSnap.data",
+          "lineNumber": 108
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "Date.now",
+          "lineNumber": 115
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "myData.joinedAt?.toMillis",
+          "lineNumber": 116
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "partnerData.joinedAt?.toMillis",
+          "lineNumber": 117
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "Math.min",
+          "lineNumber": 123
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "generateMatchCode",
+          "lineNumber": 124
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "buildInitialRoomDoc",
+          "lineNumber": 127
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "tx.set",
+          "lineNumber": 128
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "doc",
+          "lineNumber": 128
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "tx.update",
+          "lineNumber": 131
+        },
+        {
+          "caller": "attemptMatch",
+          "callee": "tx.update",
+          "lineNumber": 132
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 6,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    }
+  ]
+}

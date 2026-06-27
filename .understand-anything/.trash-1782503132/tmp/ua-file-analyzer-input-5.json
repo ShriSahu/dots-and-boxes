@@ -1,0 +1,16 @@
+{
+  "projectRoot": "C:/Shri_Development/dots-and-boxes",
+  "batchFiles": [
+    {"path": "CLAUDE.md", "language": "markdown", "sizeLines": 73, "fileCategory": "docs"},
+    {"path": "ENHANCEMENT_PROMPT.md", "language": "markdown", "sizeLines": 27, "fileCategory": "docs"},
+    {"path": "README.md", "language": "markdown", "sizeLines": 213, "fileCategory": "docs"},
+    {"path": "app.json", "language": "json", "sizeLines": 52, "fileCategory": "config"},
+    {"path": "eas.json", "language": "json", "sizeLines": 29, "fileCategory": "config"},
+    {"path": "index.html", "language": "html", "sizeLines": 1659, "fileCategory": "markup"},
+    {"path": "manifest.json", "language": "json", "sizeLines": 38, "fileCategory": "config"},
+    {"path": "netlify.toml", "language": "toml", "sizeLines": 25, "fileCategory": "config"},
+    {"path": "package.json", "language": "json", "sizeLines": 41, "fileCategory": "config"},
+    {"path": "tsconfig.json", "language": "json", "sizeLines": 12, "fileCategory": "config"}
+  ],
+  "batchImportData": {}
+}

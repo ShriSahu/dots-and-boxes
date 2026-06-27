@@ -1,0 +1,113 @@
+{
+  "nodes": [
+    {
+      "id": "config:.npmrc",
+      "type": "config",
+      "name": ".npmrc",
+      "filePath": ".npmrc",
+      "summary": "npm configuration enabling legacy-peer-deps so installs ignore strict peer-dependency conflicts, accommodating the Firebase v10 / Expo dependency tree.",
+      "tags": ["configuration", "npm", "build-system", "dependencies"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:babel.config.js",
+      "type": "config",
+      "name": "babel.config.js",
+      "filePath": "babel.config.js",
+      "summary": "Babel configuration for the Expo app applying the babel-preset-expo preset and enabling the API cache for faster rebuilds.",
+      "tags": ["configuration", "babel", "build-system", "expo"],
+      "complexity": "simple",
+      "languageNotes": "Uses the function-form config with api.cache(true) for deterministic caching."
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "type": "document",
+      "name": "2026-03-22-phase1-implementation.md",
+      "filePath": "docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "summary": "Detailed Phase 1 implementation plan breaking work into 12 sequenced tasks (types, storage, share button, online timer, touch snapping, tutorial overlay, quick match, Firestore rules) with a final verification and commit summary.",
+      "tags": ["documentation", "implementation-plan", "roadmap", "development"],
+      "complexity": "complex",
+      "languageNotes": "1591-line task-by-task plan with explicit file maps and per-task success criteria."
+    },
+    {
+      "id": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "type": "document",
+      "name": "2026-03-22-phase1-design.md",
+      "filePath": "docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "summary": "Phase 1 design specification covering five features (interactive tutorial, online 15s turn timer, touch snapping precision, share-result button, quick-match matchmaking queue) with constraints, trust models, and Firestore schema/rules.",
+      "tags": ["documentation", "design-spec", "architecture", "requirements"],
+      "complexity": "complex",
+      "languageNotes": "626-line spec organized per-feature with goals, files affected, and success criteria."
+    },
+    {
+      "id": "config:firestore.rules",
+      "type": "config",
+      "name": "firestore.rules",
+      "filePath": "firestore.rules",
+      "summary": "Firestore security rules governing access to rooms, matchmaking, users, and coinTransactions collections: authenticated reads/writes for rooms and matchmaking, owner-scoped user docs, and read-only audit-trail coin transactions.",
+      "tags": ["configuration", "security", "firestore", "access-control", "database"],
+      "complexity": "moderate",
+      "languageNotes": "rules_version 2; matchmaking write rule permits either owner writes or a match-resolution write where status == 'matched'."
+    },
+    {
+      "id": "file:src/constants/theme.ts",
+      "type": "file",
+      "name": "theme.ts",
+      "filePath": "src/constants/theme.ts",
+      "summary": "Default parchment theme tokens (colors, player accents, shadows, handwritten Caveat fonts) consumed by the theme system and board/UI components.",
+      "tags": ["type-definition", "theme", "constants", "design-tokens"],
+      "complexity": "simple",
+      "languageNotes": "Exported as a const assertion (as const) so token keys/values are literal-typed."
+    },
+    {
+      "id": "file:src/types/firebase-shim.d.ts",
+      "type": "file",
+      "name": "firebase-shim.d.ts",
+      "filePath": "src/types/firebase-shim.d.ts",
+      "summary": "TypeScript ambient module declarations re-exporting @firebase/* internals as firebase/app, firebase/auth, and firebase/firestore so TS resolves the v10 web SDK under node moduleResolution.",
+      "tags": ["type-definition", "firebase", "module-declaration", "typescript"],
+      "complexity": "simple",
+      "languageNotes": "Ambient .d.ts using declare module + export * to work around Firebase v10 type resolution."
+    },
+    {
+      "id": "file:sw.js",
+      "type": "file",
+      "name": "sw.js",
+      "filePath": "sw.js",
+      "summary": "Service worker for the standalone index.html PWA implementing precache install, stale-cache cleanup on activate, cache-first fetch for local assets, and network-first for Google Fonts to enable offline play.",
+      "tags": ["service-worker", "pwa", "caching", "offline", "event-handler"],
+      "complexity": "moderate",
+      "languageNotes": "Versioned cache (dotsboxes-v2) with skipWaiting/clients.claim for immediate activation."
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:firestore.rules",
+      "target": "file:src/constants/theme.ts",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "target": "config:firestore.rules",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "target": "config:firestore.rules",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "target": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

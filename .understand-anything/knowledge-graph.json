@@ -1,0 +1,3459 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "dots-and-boxes",
+    "languages": [
+      "typescript",
+      "javascript",
+      "json",
+      "markdown",
+      "html",
+      "toml"
+    ],
+    "frameworks": [
+      "React",
+      "React Native",
+      "Expo",
+      "Expo Router",
+      "Firebase"
+    ],
+    "description": "Dots & Boxes game (React Native + Expo + TypeScript) with local play, AI opponent, real-time online multiplayer via Firebase Firestore, a coin reward system, and an unlockable theme shop. Also ships a standalone single-file web PWA.",
+    "analyzedAt": "2026-06-26T19:40:49.039Z",
+    "gitCommitHash": "076cbeb5c20ca27be06fe35543049c6a912ca43c"
+  },
+  "nodes": [
+    {
+      "id": "file:app/leaderboard.tsx",
+      "type": "file",
+      "name": "leaderboard.tsx",
+      "filePath": "app/leaderboard.tsx",
+      "summary": "Expo Router screen that fetches and renders the global player leaderboard ranked by coin balance, highlighting the current user's row.",
+      "tags": [
+        "component",
+        "screen",
+        "leaderboard",
+        "firebase"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:app/leaderboard.tsx:LeaderboardScreen",
+      "type": "function",
+      "name": "LeaderboardScreen",
+      "filePath": "app/leaderboard.tsx",
+      "lineRange": [
+        12,
+        113
+      ],
+      "summary": "Default-exported screen component that loads leaderboard entries on mount, resolves the current user's UID, and renders ranked rows with loading and empty states.",
+      "tags": [
+        "component",
+        "screen",
+        "data-fetching",
+        "leaderboard"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app/lobby.tsx",
+      "type": "file",
+      "name": "lobby.tsx",
+      "filePath": "app/lobby.tsx",
+      "summary": "Online lobby screen for creating or joining a multiplayer room by code, validating input, and navigating to the online game once a match is established.",
+      "tags": [
+        "component",
+        "screen",
+        "multiplayer",
+        "lobby",
+        "firebase"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/lobby.tsx:LobbyScreen",
+      "type": "function",
+      "name": "LobbyScreen",
+      "filePath": "app/lobby.tsx",
+      "lineRange": [
+        19,
+        299
+      ],
+      "summary": "Default-exported lobby component managing room create/join flows, grid size selection, error handling, and navigation into the online game.",
+      "tags": [
+        "component",
+        "screen",
+        "multiplayer",
+        "lobby"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:app/shop.tsx",
+      "type": "file",
+      "name": "shop.tsx",
+      "filePath": "app/shop.tsx",
+      "summary": "Theme shop screen showing the coin balance and purchasable themes, handling theme purchases and activation via the coins service.",
+      "tags": [
+        "component",
+        "screen",
+        "shop",
+        "monetization",
+        "firebase"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/shop.tsx:ShopScreen",
+      "type": "function",
+      "name": "ShopScreen",
+      "filePath": "app/shop.tsx",
+      "lineRange": [
+        18,
+        193
+      ],
+      "summary": "Default-exported shop component that loads owned themes and balance, processes purchases with coin deduction, and toggles the active theme.",
+      "tags": [
+        "component",
+        "screen",
+        "shop",
+        "purchase-flow"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/coins.ts",
+      "type": "file",
+      "name": "coins.ts",
+      "filePath": "src/services/coins.ts",
+      "summary": "Firestore-backed coin service handling user profile bootstrap, balance read/subscribe, awarding and spending coins, daily bonus, online-result rewards, and theme ownership/activation.",
+      "tags": [
+        "service",
+        "firebase",
+        "coins",
+        "monetization",
+        "data-model"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses Firestore transactions/atomic increments for coin balance mutations to stay consistent across concurrent rewards."
+    },
+    {
+      "id": "function:src/services/coins.ts:ensureUserProfile",
+      "type": "function",
+      "name": "ensureUserProfile",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        8,
+        23
+      ],
+      "summary": "Creates a Firestore user document with default coin balance and metadata if one does not already exist for the given UID.",
+      "tags": [
+        "service",
+        "firebase",
+        "initialization",
+        "user-profile"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/coins.ts:awardCoins",
+      "type": "function",
+      "name": "awardCoins",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        36,
+        46
+      ],
+      "summary": "Atomically increments a user's coin balance by a delta and records a coin transaction with a reason and optional room code.",
+      "tags": [
+        "service",
+        "firebase",
+        "coins",
+        "transaction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/coins.ts:spendCoins",
+      "type": "function",
+      "name": "spendCoins",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        48,
+        60
+      ],
+      "summary": "Deducts coins from a user's balance after validating sufficient funds, recording the spend as a coin transaction.",
+      "tags": [
+        "service",
+        "firebase",
+        "coins",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/coins.ts:checkAndAwardDailyBonus",
+      "type": "function",
+      "name": "checkAndAwardDailyBonus",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        62,
+        79
+      ],
+      "summary": "Checks the last bonus date and awards the daily coin bonus once per day, updating the user's bonus timestamp.",
+      "tags": [
+        "service",
+        "firebase",
+        "coins",
+        "daily-bonus"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/coins.ts:recordOnlineResult",
+      "type": "function",
+      "name": "recordOnlineResult",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        82,
+        106
+      ],
+      "summary": "Awards coins based on an online game outcome (win/draw/participation) and records the result for the player.",
+      "tags": [
+        "service",
+        "firebase",
+        "coins",
+        "rewards"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/coins.ts:purchaseTheme",
+      "type": "function",
+      "name": "purchaseTheme",
+      "filePath": "src/services/coins.ts",
+      "lineRange": [
+        113,
+        123
+      ],
+      "summary": "Spends coins to purchase a theme and adds it to the user's owned themes array in Firestore.",
+      "tags": [
+        "service",
+        "firebase",
+        "purchase",
+        "themes"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/firebase.ts",
+      "type": "file",
+      "name": "firebase.ts",
+      "filePath": "src/services/firebase.ts",
+      "summary": "Initializes the Firebase web SDK app, Firestore, and anonymous auth, exporting the shared instances plus a helper to obtain the current anonymous UID.",
+      "tags": [
+        "service",
+        "firebase",
+        "initialization",
+        "singleton"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses Firebase v10 web SDK in Expo; getReactNativePersistence is loaded via require to avoid a TS module-resolution error."
+    },
+    {
+      "id": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "function",
+      "name": "getAnonymousUid",
+      "filePath": "src/services/firebase.ts",
+      "lineRange": [
+        36,
+        40
+      ],
+      "summary": "Returns the current anonymous user's UID, signing in anonymously first if no session exists.",
+      "tags": [
+        "service",
+        "firebase",
+        "auth",
+        "anonymous"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/gameRoom.ts",
+      "type": "file",
+      "name": "gameRoom.ts",
+      "filePath": "src/services/gameRoom.ts",
+      "summary": "Firestore game-room service managing room lifecycle: code generation, board flatten/unflatten serialization, create/join, move application, turn skipping, abandon, and rematch.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "game-state",
+        "serialization"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Flattens 2D board arrays to 1D for Firestore storage since Firestore cannot store nested arrays."
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:unflattenBoard",
+      "type": "function",
+      "name": "unflattenBoard",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        25,
+        46
+      ],
+      "summary": "Reconstructs the 2D board state (hLines, vLines, boxes) from the flattened Firestore representation for a given grid size.",
+      "tags": [
+        "service",
+        "serialization",
+        "game-state",
+        "deserialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:createRoom",
+      "type": "function",
+      "name": "createRoom",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        60,
+        93
+      ],
+      "summary": "Creates a new multiplayer room document in Firestore with a generated code, host player, grid size, and initial empty board.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "room-creation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:joinRoom",
+      "type": "function",
+      "name": "joinRoom",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        95,
+        122
+      ],
+      "summary": "Joins an existing room by code, validating availability and assigning the guest player to start the game.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:applyMove",
+      "type": "function",
+      "name": "applyMove",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        133,
+        168
+      ],
+      "summary": "Persists a player's move to the room document, updating flattened lines, boxes, scores, next-player turn, and game-over state.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "game-state"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:skipTurn",
+      "type": "function",
+      "name": "skipTurn",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        170,
+        193
+      ],
+      "summary": "Advances the turn to the other player when the current player's timer expires or they pass.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "turn-management"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "function",
+      "name": "buildInitialRoomDoc",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        196,
+        220
+      ],
+      "summary": "Constructs the initial Firestore room document shape with players, empty flattened board, scores, and starting turn.",
+      "tags": [
+        "service",
+        "firebase",
+        "factory",
+        "game-state"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/gameRoom.ts:requestRematch",
+      "type": "function",
+      "name": "requestRematch",
+      "filePath": "src/services/gameRoom.ts",
+      "lineRange": [
+        231,
+        278
+      ],
+      "summary": "Handles rematch requests by resetting the room board and scores when both players agree to play again.",
+      "tags": [
+        "service",
+        "firebase",
+        "multiplayer",
+        "rematch"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/services/leaderboard.ts",
+      "type": "file",
+      "name": "leaderboard.ts",
+      "filePath": "src/services/leaderboard.ts",
+      "summary": "Service that queries Firestore for top users ordered by coin balance and returns a ranked leaderboard list.",
+      "tags": [
+        "service",
+        "firebase",
+        "leaderboard",
+        "query"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/matchmaking.ts",
+      "type": "file",
+      "name": "matchmaking.ts",
+      "filePath": "src/services/matchmaking.ts",
+      "summary": "Quick-match matchmaking service managing a Firestore queue: joining, cancelling, listening for a match, scanning the waiting pool, and atomically pairing two players into a room.",
+      "tags": [
+        "service",
+        "firebase",
+        "matchmaking",
+        "multiplayer",
+        "queue"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses Firestore transactions to atomically pair waiting players and avoid double-matching races."
+    },
+    {
+      "id": "function:src/services/matchmaking.ts:joinQueue",
+      "type": "function",
+      "name": "joinQueue",
+      "filePath": "src/services/matchmaking.ts",
+      "lineRange": [
+        25,
+        40
+      ],
+      "summary": "Adds the player to the matchmaking queue document with name and desired grid size, marking them as waiting.",
+      "tags": [
+        "service",
+        "firebase",
+        "matchmaking",
+        "queue"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/matchmaking.ts:subscribeToMyMatch",
+      "type": "function",
+      "name": "subscribeToMyMatch",
+      "filePath": "src/services/matchmaking.ts",
+      "lineRange": [
+        50,
+        63
+      ],
+      "summary": "Subscribes to the current player's queue document and invokes a callback when they are matched into a room.",
+      "tags": [
+        "service",
+        "firebase",
+        "matchmaking",
+        "realtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/services/matchmaking.ts:subscribeToWaitingPool",
+      "type": "function",
+      "name": "subscribeToWaitingPool",
+      "filePath": "src/services/matchmaking.ts",
+      "lineRange": [
+        67,
+        88
+      ],
+      "summary": "Listens to the pool of waiting players and notifies when a suitable partner becomes available for matching.",
+      "tags": [
+        "service",
+        "firebase",
+        "matchmaking",
+        "realtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/matchmaking.ts:attemptMatch",
+      "type": "function",
+      "name": "attemptMatch",
+      "filePath": "src/services/matchmaking.ts",
+      "lineRange": [
+        92,
+        137
+      ],
+      "summary": "Transactionally pairs the current player with a partner, creating a shared room and marking both queue entries as matched to prevent races.",
+      "tags": [
+        "service",
+        "firebase",
+        "matchmaking",
+        "transaction"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:app/_layout.tsx",
+      "type": "file",
+      "name": "_layout.tsx",
+      "filePath": "app/_layout.tsx",
+      "summary": "Expo Router root layout that loads custom fonts, restores the persisted theme from AsyncStorage, and wraps the app in ThemeContext before rendering the navigation Stack.",
+      "tags": [
+        "entry-point",
+        "layout",
+        "theme",
+        "expo-router"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses expo-font useFonts and SplashScreen gating; theme name hydrated from AsyncStorage before render."
+    },
+    {
+      "id": "function:app/_layout.tsx:RootLayout",
+      "type": "function",
+      "name": "RootLayout",
+      "filePath": "app/_layout.tsx",
+      "lineRange": [
+        21,
+        67
+      ],
+      "summary": "Root component that waits for fonts and the stored theme to load, then provides ThemeContext and renders the Expo Router Stack.",
+      "tags": [
+        "entry-point",
+        "layout",
+        "theme",
+        "provider"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app/game.tsx",
+      "type": "file",
+      "name": "game.tsx",
+      "filePath": "app/game.tsx",
+      "summary": "Local game screen for 2-player and AI modes; drives the useGameEngine hook, renders GameBoard and ScoreBar, plays sound effects, and awards coins and records stats on game end.",
+      "tags": [
+        "screen",
+        "game",
+        "entry-point",
+        "coins"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Large React screen pairing useGameEngine state with side-effects for audio, coin rewards, and stat recording."
+    },
+    {
+      "id": "function:app/game.tsx:GameScreen",
+      "type": "function",
+      "name": "GameScreen",
+      "filePath": "app/game.tsx",
+      "lineRange": [
+        20,
+        358
+      ],
+      "summary": "Local game screen component coordinating the game engine, board rendering, sound effects, coin awards, and win/loss stat recording.",
+      "tags": [
+        "screen",
+        "game",
+        "coins",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/game.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "app/game.tsx",
+      "lineRange": [
+        360,
+        553
+      ],
+      "summary": "Builds the theme-aware StyleSheet for the local game screen from the active theme tokens.",
+      "tags": [
+        "styling",
+        "theme",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app/online-game.tsx",
+      "type": "file",
+      "name": "online-game.tsx",
+      "filePath": "app/online-game.tsx",
+      "summary": "Online multiplayer game screen backed by useOnlineGame (Firestore); renders the shared GameBoard and ScoreBar, disables input when it is not the player's turn, and awards coins on result.",
+      "tags": [
+        "screen",
+        "game",
+        "online",
+        "coins"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Reuses the same GameBoard/ScoreBar as local play; useOnlineGame mirrors useGameEngine's shape for drop-in compatibility."
+    },
+    {
+      "id": "function:app/online-game.tsx:OnlineGameScreen",
+      "type": "function",
+      "name": "OnlineGameScreen",
+      "filePath": "app/online-game.tsx",
+      "lineRange": [
+        19,
+        496
+      ],
+      "summary": "Online game screen component that consumes the Firestore-backed online game hook, gates the board by turn ownership, and handles result coin rewards.",
+      "tags": [
+        "screen",
+        "game",
+        "online",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/GameBoard.tsx",
+      "type": "file",
+      "name": "GameBoard.tsx",
+      "filePath": "src/components/GameBoard.tsx",
+      "summary": "SVG-based dots-and-boxes board component that renders dots, lines, and filled boxes, highlights the last move and new boxes, and emits onLineTap for player input.",
+      "tags": [
+        "component",
+        "game-board",
+        "svg",
+        "rendering"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Renders an interactive board via react-native-svg; supports allowedLines gating and animated highlights."
+    },
+    {
+      "id": "function:src/components/GameBoard.tsx:GameBoard",
+      "type": "function",
+      "name": "GameBoard",
+      "filePath": "src/components/GameBoard.tsx",
+      "lineRange": [
+        18,
+        314
+      ],
+      "summary": "Renders the interactive SVG game board from game state and config, drawing dots, lines, and boxes and invoking onLineTap on line presses.",
+      "tags": [
+        "component",
+        "game-board",
+        "svg",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/ScoreBar.tsx",
+      "type": "file",
+      "name": "ScoreBar.tsx",
+      "filePath": "src/components/ScoreBar.tsx",
+      "summary": "Header bar component showing both players' names and scores, the active turn indicator, AI-thinking state, and a countdown timer when enabled.",
+      "tags": [
+        "component",
+        "ui",
+        "scoreboard",
+        "timer"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/ScoreBar.tsx:ScoreBar",
+      "type": "function",
+      "name": "ScoreBar",
+      "filePath": "src/components/ScoreBar.tsx",
+      "lineRange": [
+        14,
+        145
+      ],
+      "summary": "Renders player scores, the current-turn highlight, AI thinking indicator, and an optional countdown timer bar.",
+      "tags": [
+        "component",
+        "scoreboard",
+        "timer",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/ScoreBar.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "src/components/ScoreBar.tsx",
+      "lineRange": [
+        147,
+        243
+      ],
+      "summary": "Builds the theme-aware StyleSheet for the score bar from the active theme tokens.",
+      "tags": [
+        "styling",
+        "theme",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/hooks/useTheme.ts",
+      "type": "file",
+      "name": "useTheme.ts",
+      "filePath": "src/hooks/useTheme.ts",
+      "summary": "Defines the theme system: ThemeTokens interface, the THEMES token map (parchment/neon/chalkboard/blueprint), THEME_META display metadata, the ThemeContext, and the useTheme hook consumers use to read the active theme.",
+      "tags": [
+        "hook",
+        "theme",
+        "context",
+        "type-definition"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Centralizes design tokens per theme via a Record<ThemeName, ThemeTokens> and exposes them through React context."
+    },
+    {
+      "id": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "function",
+      "name": "useTheme",
+      "filePath": "src/hooks/useTheme.ts",
+      "lineRange": [
+        122,
+        124
+      ],
+      "summary": "React hook returning the current ThemeContext value (active theme tokens and setter) for consuming components.",
+      "tags": [
+        "hook",
+        "theme",
+        "context"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/audio.ts",
+      "type": "file",
+      "name": "audio.ts",
+      "filePath": "src/services/audio.ts",
+      "summary": "Sound-effects service that procedurally synthesizes WAV tones (click, pop, chain, win, draw, timer beep) as base64, loads them via expo-av, and exposes initAudio and playSound for the game screens.",
+      "tags": [
+        "service",
+        "audio",
+        "synthesis",
+        "utility"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Generates PCM WAV data in-memory and encodes to base64 to avoid bundling audio assets."
+    },
+    {
+      "id": "function:src/services/audio.ts:buildWavBase64",
+      "type": "function",
+      "name": "buildWavBase64",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [
+        24,
+        55
+      ],
+      "summary": "Encodes an array of float samples into a base64-encoded WAV file with a proper RIFF/PCM header.",
+      "tags": [
+        "audio",
+        "serialization",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/audio.ts:genWin",
+      "type": "function",
+      "name": "genWin",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [
+        102,
+        121
+      ],
+      "summary": "Procedurally generates the PCM sample buffer for the victory sound effect.",
+      "tags": [
+        "audio",
+        "synthesis",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/audio.ts:initAudio",
+      "type": "function",
+      "name": "initAudio",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [
+        170,
+        196
+      ],
+      "summary": "Initializes the audio mode and pre-generates and loads all sound-effect WAV assets so playSound can fire with low latency.",
+      "tags": [
+        "audio",
+        "initialization",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/ai/aiPlayer.ts",
+      "type": "file",
+      "name": "aiPlayer.ts",
+      "filePath": "src/ai/aiPlayer.ts",
+      "summary": "Pure AI opponent strategy module exposing a single getAIMove entry point with three difficulty tiers (easy random, medium heuristic, hard minimax with alpha-beta pruning and chain avoidance).",
+      "tags": [
+        "service",
+        "ai",
+        "game-logic",
+        "minimax",
+        "pure-function"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Hard tier uses depth-limited minimax with alpha-beta pruning (_mmSearch) over simulated board states; all helpers are side-effect-free."
+    },
+    {
+      "id": "function:src/ai/aiPlayer.ts:getAIMove",
+      "type": "function",
+      "name": "getAIMove",
+      "filePath": "src/ai/aiPlayer.ts",
+      "lineRange": [
+        9,
+        15
+      ],
+      "summary": "Public dispatcher that selects an AI move by routing to the easy, medium, or hard strategy based on the requested difficulty level.",
+      "tags": [
+        "entry-point",
+        "ai",
+        "dispatcher"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "type": "function",
+      "name": "_aiMedium",
+      "filePath": "src/ai/aiPlayer.ts",
+      "lineRange": [
+        28,
+        58
+      ],
+      "summary": "Heuristic AI strategy that prefers box-completing moves and avoids handing the opponent third sides, falling back to random safe moves.",
+      "tags": [
+        "ai",
+        "heuristic",
+        "game-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/ai/aiPlayer.ts:_aiHard",
+      "type": "function",
+      "name": "_aiHard",
+      "filePath": "src/ai/aiPlayer.ts",
+      "lineRange": [
+        61,
+        88
+      ],
+      "summary": "Strongest AI tier that combines immediate box-claim detection with a minimax search to pick chain-aware optimal moves.",
+      "tags": [
+        "ai",
+        "minimax",
+        "game-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/ai/aiPlayer.ts:_mmSearch",
+      "type": "function",
+      "name": "_mmSearch",
+      "filePath": "src/ai/aiPlayer.ts",
+      "lineRange": [
+        104,
+        140
+      ],
+      "summary": "Recursive depth-limited minimax search with alpha-beta pruning that evaluates simulated board states to score candidate AI moves.",
+      "tags": [
+        "ai",
+        "minimax",
+        "recursion",
+        "alpha-beta"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/ai/aiPlayer.ts:_mmStep",
+      "type": "function",
+      "name": "_mmStep",
+      "filePath": "src/ai/aiPlayer.ts",
+      "lineRange": [
+        92,
+        102
+      ],
+      "summary": "Applies a single line to a cloned game state during minimax, returning the next state and how many boxes the move completed.",
+      "tags": [
+        "ai",
+        "simulation",
+        "game-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/hooks/useGameEngine.ts",
+      "type": "file",
+      "name": "useGameEngine.ts",
+      "filePath": "src/hooks/useGameEngine.ts",
+      "summary": "React hook driving the local (2-player and vs-AI) game: manages board state, turn switching, scoring, undo history, per-turn timer, AI move scheduling, and emits gameplay events to the UI.",
+      "tags": [
+        "hook",
+        "game-logic",
+        "state-management",
+        "event-handler",
+        "timer"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Returns the same shape as useOnlineGame so GameBoard/ScoreBar work unchanged; uses useRef-held callbacks and setTimeout/setInterval for animation and timer scheduling."
+    },
+    {
+      "id": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "type": "function",
+      "name": "useGameEngine",
+      "filePath": "src/hooks/useGameEngine.ts",
+      "lineRange": [
+        20,
+        218
+      ],
+      "summary": "Core local-game hook handling drawLine, box claiming, turn rotation, undo, reset, AI auto-play effect, and the countdown timer with auto-skip on timeout.",
+      "tags": [
+        "hook",
+        "game-logic",
+        "state-management",
+        "timer"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/hooks/useOnlineGame.ts",
+      "type": "file",
+      "name": "useOnlineGame.ts",
+      "filePath": "src/hooks/useOnlineGame.ts",
+      "summary": "React hook backing online multiplayer games via Firestore: subscribes to the room document, reconstructs board state from flattened arrays, submits moves, handles turn timer/auto-skip, abandonment, and rematch.",
+      "tags": [
+        "hook",
+        "game-logic",
+        "firestore",
+        "real-time",
+        "event-handler"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Mirrors the return shape of useGameEngine for UI interchangeability; converts between flattened Firestore arrays and 2D board state via gameRoom helpers."
+    },
+    {
+      "id": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "type": "function",
+      "name": "useOnlineGame",
+      "filePath": "src/hooks/useOnlineGame.ts",
+      "lineRange": [
+        18,
+        235
+      ],
+      "summary": "Online-game hook that subscribes to a Firestore room, derives local game state from remote snapshots, submits validated moves with optimistic box claiming, and manages the fairness timer and rematch flow.",
+      "tags": [
+        "hook",
+        "game-logic",
+        "firestore",
+        "real-time"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/types/game.types.ts",
+      "type": "file",
+      "name": "game.types.ts",
+      "filePath": "src/types/game.types.ts",
+      "summary": "Central type hub declaring all shared game domain types (GameState, GameMode, Line, Player, board owner arrays, config and event interfaces) consumed across hooks, components, services, and screens.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "barrel"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Type-only module with no runtime exports; serves as the single source of truth for the game's domain model."
+    },
+    {
+      "id": "file:src/utils/gameHelpers.ts",
+      "type": "file",
+      "name": "gameHelpers.ts",
+      "filePath": "src/utils/gameHelpers.ts",
+      "summary": "Pure game-logic utilities: builds initial board state, detects completed boxes, enumerates available lines, counts box sides, simulates line application, and snapshots state for undo.",
+      "tags": [
+        "utility",
+        "game-logic",
+        "pure-function",
+        "serialization"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "All functions are pure and immutable (map/spread clones), enabling safe reuse by both the local engine and the AI's simulation search."
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:buildInitialState",
+      "type": "function",
+      "name": "buildInitialState",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        3,
+        17
+      ],
+      "summary": "Constructs a fresh GameState for a given grid size with empty line, owner, and box matrices and a starting player.",
+      "tags": [
+        "utility",
+        "factory",
+        "game-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "function",
+      "name": "getCompletedBoxes",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        19,
+        45
+      ],
+      "summary": "Determines which boxes adjacent to a newly drawn line have just been fully enclosed, returning their coordinates.",
+      "tags": [
+        "utility",
+        "game-logic",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "function",
+      "name": "getAllAvailableLines",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        56,
+        66
+      ],
+      "summary": "Enumerates every line position on the grid and filters out those already drawn, yielding the set of legal moves.",
+      "tags": [
+        "utility",
+        "game-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:simApplyLine",
+      "type": "function",
+      "name": "simApplyLine",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        80,
+        89
+      ],
+      "summary": "Returns a new GameState with the given line drawn, used for non-destructive move simulation by the AI.",
+      "tags": [
+        "utility",
+        "simulation",
+        "pure-function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:takeSnapshot",
+      "type": "function",
+      "name": "takeSnapshot",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        91,
+        101
+      ],
+      "summary": "Deep-clones the mutable parts of game state into an undo snapshot for the engine's history stack.",
+      "tags": [
+        "utility",
+        "serialization",
+        "game-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/utils/gameHelpers.ts:countSidesOfBox",
+      "type": "function",
+      "name": "countSidesOfBox",
+      "filePath": "src/utils/gameHelpers.ts",
+      "lineRange": [
+        68,
+        77
+      ],
+      "summary": "Counts how many of the four sides of the box at (r, c) are currently drawn, used by heuristics to detect near-complete boxes.",
+      "tags": [
+        "utility",
+        "game-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:app/index.tsx",
+      "type": "file",
+      "name": "index.tsx",
+      "filePath": "app/index.tsx",
+      "summary": "Home/settings screen and app entry point: configures game mode, grid size, player names, timer and difficulty, displays stats and coin balance, drives the Quick Match matchmaking flow, and routes into local/AI/online games.",
+      "tags": [
+        "entry-point",
+        "component",
+        "service",
+        "matchmaking",
+        "settings"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Large Expo Router screen combining many useState/useRef hooks, animated daily-bonus sequence, and a multi-step matchmaking state machine with Firestore subscriptions tracked via refs."
+    },
+    {
+      "id": "function:app/index.tsx:HomeScreen",
+      "type": "function",
+      "name": "HomeScreen",
+      "filePath": "app/index.tsx",
+      "lineRange": [
+        68,
+        623
+      ],
+      "summary": "Default-exported home screen component that loads prefs/stats, authenticates anonymously, subscribes to coin balance, runs the Quick Match queue/match flow, and navigates to game screens.",
+      "tags": [
+        "component",
+        "entry-point",
+        "matchmaking",
+        "event-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/index.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "app/index.tsx",
+      "lineRange": [
+        625,
+        815
+      ],
+      "summary": "Builds the themed StyleSheet for the home screen from the active theme tokens.",
+      "tags": [
+        "styling",
+        "theme",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:app/index.tsx:getDailyChallenge",
+      "type": "function",
+      "name": "getDailyChallenge",
+      "filePath": "app/index.tsx",
+      "lineRange": [
+        55,
+        66
+      ],
+      "summary": "Computes a deterministic daily-challenge preset based on the current day-of-year.",
+      "tags": [
+        "utility",
+        "daily-challenge"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/TutorialOverlay.tsx",
+      "type": "file",
+      "name": "TutorialOverlay.tsx",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "summary": "Multi-step interactive tutorial overlay that walks new players through dots & boxes rules using a live GameBoard preview, persisting the seen flag on completion.",
+      "tags": [
+        "component",
+        "tutorial",
+        "onboarding",
+        "event-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:TutorialOverlay",
+      "type": "function",
+      "name": "TutorialOverlay",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [
+        100,
+        189
+      ],
+      "summary": "Default-exported overlay component managing step navigation, rendering a sample board per step, and calling onDone (and persisting tutorial-seen) when finished.",
+      "tags": [
+        "component",
+        "tutorial",
+        "onboarding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:emptyState",
+      "type": "function",
+      "name": "emptyState",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [
+        12,
+        25
+      ],
+      "summary": "Constructs an empty game-state object of a given grid size used as the base for tutorial step previews.",
+      "tags": [
+        "utility",
+        "factory",
+        "game-state"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [
+        191,
+        227
+      ],
+      "summary": "Builds the themed StyleSheet for the tutorial overlay from active theme tokens.",
+      "tags": [
+        "styling",
+        "theme",
+        "factory"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/utils/storage.ts",
+      "type": "file",
+      "name": "storage.ts",
+      "filePath": "src/utils/storage.ts",
+      "summary": "AsyncStorage-backed persistence layer for local preferences (mode, grid, names, timer, difficulty), win/loss stats, tutorial-seen flag, and sound preference.",
+      "tags": [
+        "utility",
+        "service",
+        "persistence",
+        "serialization"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses AsyncStorage multiGet/multiSet batch APIs and validates loaded values against allowed enums to guard against corrupt persisted data."
+    },
+    {
+      "id": "function:src/utils/storage.ts:loadPrefs",
+      "type": "function",
+      "name": "loadPrefs",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [
+        47,
+        66
+      ],
+      "summary": "Batch-reads persisted preferences via multiGet and returns a validated partial config, coercing numbers and rejecting out-of-range enum values.",
+      "tags": [
+        "utility",
+        "persistence",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:loadStats",
+      "type": "function",
+      "name": "loadStats",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [
+        68,
+        86
+      ],
+      "summary": "Loads and parses persisted win/loss/draw stats, tolerating both JSON and legacy plain-integer formats.",
+      "tags": [
+        "utility",
+        "persistence",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:recordStat",
+      "type": "function",
+      "name": "recordStat",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [
+        88,
+        110
+      ],
+      "summary": "Reads current stats, increments the counter for a given result, and persists the updated stats back to AsyncStorage.",
+      "tags": [
+        "utility",
+        "persistence",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:savePrefs",
+      "type": "function",
+      "name": "savePrefs",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [
+        34,
+        45
+      ],
+      "summary": "Persists the provided game configuration to AsyncStorage as a batch of key/value pairs.",
+      "tags": [
+        "utility",
+        "persistence"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Claude Code guidance document describing the dual-game architecture (standalone web PWA plus Expo/React Native mobile app), data flow, state layers, Firebase setup, and TypeScript configuration quirks.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "guidelines"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:ENHANCEMENT_PROMPT.md",
+      "type": "document",
+      "name": "ENHANCEMENT_PROMPT.md",
+      "filePath": "ENHANCEMENT_PROMPT.md",
+      "summary": "Feature specification prompt detailing the online multiplayer and coin system enhancements, naming the exact files/services/hooks to create (lobby, useOnlineGame, firebase, gameRoom, coins, shop) and the constraints to preserve existing local play.",
+      "tags": [
+        "documentation",
+        "specification",
+        "requirements"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project overview README with 20 sections covering features, game modes, tech stack, quick-start instructions, project structure, Firebase setup, game rules, AI strategy tiers, and production build steps.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "overview"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:app.json",
+      "type": "config",
+      "name": "app.json",
+      "filePath": "app.json",
+      "summary": "Expo application configuration defining app name, slug, icons, splash screen, platform settings, and plugins for the React Native mobile build.",
+      "tags": [
+        "configuration",
+        "expo",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:eas.json",
+      "type": "config",
+      "name": "eas.json",
+      "filePath": "eas.json",
+      "summary": "EAS Build configuration defining build profiles (development, preview, production) and submit settings for producing iOS and Android binaries via Expo Application Services.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "deployment",
+        "ci-cd"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "index.html",
+      "summary": "Standalone single-file web PWA implementation of Dots & Boxes with all HTML, CSS, and JavaScript game logic inlined; runs directly in a browser with no build step or dependencies.",
+      "tags": [
+        "entry-point",
+        "game-logic",
+        "pwa",
+        "markup",
+        "self-contained"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Self-contained single-file app: inline <style> and <script> hold the full game (board rendering, turn/score logic, AI) with zero external dependencies."
+    },
+    {
+      "id": "config:manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "manifest.json",
+      "summary": "PWA web app manifest declaring name, icons, theme/background colors, display mode, and orientation so the standalone web game can be installed to a home screen.",
+      "tags": [
+        "configuration",
+        "pwa",
+        "manifest",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:netlify.toml",
+      "type": "config",
+      "name": "netlify.toml",
+      "filePath": "netlify.toml",
+      "summary": "Netlify deployment configuration defining the build/publish settings and custom HTTP response headers (caching, security) for hosting the standalone web PWA.",
+      "tags": [
+        "configuration",
+        "deployment",
+        "hosting"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "npm manifest for the Expo/React Native app declaring start/android/ios/web scripts and runtime dependencies including Expo, Expo Router, Firebase, and AsyncStorage.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependencies",
+        "expo"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript compiler configuration extending the Expo base config with the @/* path alias to src/* and node moduleResolution required for Firebase v10 web SDK type resolution.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build-system"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Pins moduleResolution to node (not bundler) so Firebase v10 web SDK types resolve under the Expo base config."
+    },
+    {
+      "id": "config:.npmrc",
+      "type": "config",
+      "name": ".npmrc",
+      "filePath": ".npmrc",
+      "summary": "npm configuration enabling legacy-peer-deps so installs ignore strict peer-dependency conflicts, accommodating the Firebase v10 / Expo dependency tree.",
+      "tags": [
+        "configuration",
+        "npm",
+        "build-system",
+        "dependencies"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:babel.config.js",
+      "type": "config",
+      "name": "babel.config.js",
+      "filePath": "babel.config.js",
+      "summary": "Babel configuration for the Expo app applying the babel-preset-expo preset and enabling the API cache for faster rebuilds.",
+      "tags": [
+        "configuration",
+        "babel",
+        "build-system",
+        "expo"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses the function-form config with api.cache(true) for deterministic caching."
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "type": "document",
+      "name": "2026-03-22-phase1-implementation.md",
+      "filePath": "docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "summary": "Detailed Phase 1 implementation plan breaking work into 12 sequenced tasks (types, storage, share button, online timer, touch snapping, tutorial overlay, quick match, Firestore rules) with a final verification and commit summary.",
+      "tags": [
+        "documentation",
+        "implementation-plan",
+        "roadmap",
+        "development"
+      ],
+      "complexity": "complex",
+      "languageNotes": "1591-line task-by-task plan with explicit file maps and per-task success criteria."
+    },
+    {
+      "id": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "type": "document",
+      "name": "2026-03-22-phase1-design.md",
+      "filePath": "docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "summary": "Phase 1 design specification covering five features (interactive tutorial, online 15s turn timer, touch snapping precision, share-result button, quick-match matchmaking queue) with constraints, trust models, and Firestore schema/rules.",
+      "tags": [
+        "documentation",
+        "design-spec",
+        "architecture",
+        "requirements"
+      ],
+      "complexity": "complex",
+      "languageNotes": "626-line spec organized per-feature with goals, files affected, and success criteria."
+    },
+    {
+      "id": "config:firestore.rules",
+      "type": "config",
+      "name": "firestore.rules",
+      "filePath": "firestore.rules",
+      "summary": "Firestore security rules governing access to rooms, matchmaking, users, and coinTransactions collections: authenticated reads/writes for rooms and matchmaking, owner-scoped user docs, and read-only audit-trail coin transactions.",
+      "tags": [
+        "configuration",
+        "security",
+        "firestore",
+        "access-control",
+        "database"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "rules_version 2; matchmaking write rule permits either owner writes or a match-resolution write where status == 'matched'."
+    },
+    {
+      "id": "file:src/constants/theme.ts",
+      "type": "file",
+      "name": "theme.ts",
+      "filePath": "src/constants/theme.ts",
+      "summary": "Default parchment theme tokens (colors, player accents, shadows, handwritten Caveat fonts) consumed by the theme system and board/UI components.",
+      "tags": [
+        "type-definition",
+        "theme",
+        "constants",
+        "design-tokens"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Exported as a const assertion (as const) so token keys/values are literal-typed."
+    },
+    {
+      "id": "file:src/types/firebase-shim.d.ts",
+      "type": "file",
+      "name": "firebase-shim.d.ts",
+      "filePath": "src/types/firebase-shim.d.ts",
+      "summary": "TypeScript ambient module declarations re-exporting @firebase/* internals as firebase/app, firebase/auth, and firebase/firestore so TS resolves the v10 web SDK under node moduleResolution.",
+      "tags": [
+        "type-definition",
+        "firebase",
+        "module-declaration",
+        "typescript"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Ambient .d.ts using declare module + export * to work around Firebase v10 type resolution."
+    },
+    {
+      "id": "file:sw.js",
+      "type": "file",
+      "name": "sw.js",
+      "filePath": "sw.js",
+      "summary": "Service worker for the standalone index.html PWA implementing precache install, stale-cache cleanup on activate, cache-first fetch for local assets, and network-first for Google Fonts to enable offline play.",
+      "tags": [
+        "service-worker",
+        "pwa",
+        "caching",
+        "offline",
+        "event-handler"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Versioned cache (dotsboxes-v2) with skipWaiting/clients.claim for immediate activation."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:app/leaderboard.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/leaderboard.tsx",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/leaderboard.tsx",
+      "target": "file:src/services/leaderboard.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/leaderboard.tsx",
+      "target": "function:app/leaderboard.tsx:LeaderboardScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/leaderboard.tsx",
+      "target": "function:app/leaderboard.tsx:LeaderboardScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/leaderboard.tsx:LeaderboardScreen",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "file:src/services/coins.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "file:src/services/gameRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "function:app/lobby.tsx:LobbyScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/lobby.tsx",
+      "target": "function:app/lobby.tsx:LobbyScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/lobby.tsx:LobbyScreen",
+      "target": "function:src/services/gameRoom.ts:createRoom",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/lobby.tsx:LobbyScreen",
+      "target": "function:src/services/gameRoom.ts:joinRoom",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/lobby.tsx:LobbyScreen",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "file:src/services/coins.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "function:app/shop.tsx:ShopScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/shop.tsx",
+      "target": "function:app/shop.tsx:ShopScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/shop.tsx:ShopScreen",
+      "target": "function:src/services/coins.ts:purchaseTheme",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/shop.tsx:ShopScreen",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:ensureUserProfile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:ensureUserProfile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:awardCoins",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:awardCoins",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:spendCoins",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:spendCoins",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:checkAndAwardDailyBonus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:checkAndAwardDailyBonus",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:recordOnlineResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:recordOnlineResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:purchaseTheme",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/coins.ts",
+      "target": "function:src/services/coins.ts:purchaseTheme",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/coins.ts:recordOnlineResult",
+      "target": "function:src/services/coins.ts:awardCoins",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/coins.ts:purchaseTheme",
+      "target": "function:src/services/coins.ts:spendCoins",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/firebase.ts",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/firebase.ts",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:unflattenBoard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:unflattenBoard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:createRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:createRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:joinRoom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:joinRoom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:applyMove",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:applyMove",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:skipTurn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:skipTurn",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:requestRematch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/gameRoom.ts",
+      "target": "function:src/services/gameRoom.ts:requestRematch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/gameRoom.ts:createRoom",
+      "target": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/gameRoom.ts:joinRoom",
+      "target": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/leaderboard.ts",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "file:src/services/gameRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:joinQueue",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:joinQueue",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:subscribeToMyMatch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:subscribeToMyMatch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:subscribeToWaitingPool",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:subscribeToWaitingPool",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:attemptMatch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/matchmaking.ts",
+      "target": "function:src/services/matchmaking.ts:attemptMatch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/matchmaking.ts:attemptMatch",
+      "target": "function:src/services/gameRoom.ts:buildInitialRoomDoc",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/_layout.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/_layout.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/_layout.tsx",
+      "target": "function:app/_layout.tsx:RootLayout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/_layout.tsx",
+      "target": "function:app/_layout.tsx:RootLayout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/_layout.tsx:RootLayout",
+      "target": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/components/GameBoard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/components/ScoreBar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/hooks/useGameEngine.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/services/audio.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/services/coins.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "file:src/utils/storage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "function:app/game.tsx:GameScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "function:app/game.tsx:GameScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/game.tsx",
+      "target": "function:app/game.tsx:makeStyles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:app/game.tsx:GameScreen",
+      "target": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/components/GameBoard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/components/ScoreBar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/hooks/useOnlineGame.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/services/audio.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/services/coins.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "function:app/online-game.tsx:OnlineGameScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/online-game.tsx",
+      "target": "function:app/online-game.tsx:OnlineGameScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/online-game.tsx:OnlineGameScreen",
+      "target": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/GameBoard.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/GameBoard.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/GameBoard.tsx",
+      "target": "function:src/components/GameBoard.tsx:GameBoard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/GameBoard.tsx",
+      "target": "function:src/components/GameBoard.tsx:GameBoard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/components/GameBoard.tsx:GameBoard",
+      "target": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/ScoreBar.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ScoreBar.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ScoreBar.tsx",
+      "target": "function:src/components/ScoreBar.tsx:ScoreBar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/ScoreBar.tsx",
+      "target": "function:src/components/ScoreBar.tsx:ScoreBar",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/ScoreBar.tsx",
+      "target": "function:src/components/ScoreBar.tsx:makeStyles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "function:src/components/ScoreBar.tsx:ScoreBar",
+      "target": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/hooks/useTheme.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useTheme.ts",
+      "target": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useTheme.ts",
+      "target": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/services/audio.ts",
+      "target": "function:src/services/audio.ts:buildWavBase64",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/audio.ts",
+      "target": "function:src/services/audio.ts:genWin",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/audio.ts",
+      "target": "function:src/services/audio.ts:initAudio",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/services/audio.ts",
+      "target": "function:src/services/audio.ts:initAudio",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/services/audio.ts:initAudio",
+      "target": "function:src/services/audio.ts:buildWavBase64",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "file:src/utils/gameHelpers.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useGameEngine.ts",
+      "target": "file:src/ai/aiPlayer.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useGameEngine.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useGameEngine.ts",
+      "target": "file:src/utils/gameHelpers.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useOnlineGame.ts",
+      "target": "file:src/services/gameRoom.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useOnlineGame.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/hooks/useOnlineGame.ts",
+      "target": "file:src/utils/gameHelpers.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:getAIMove",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:_aiHard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:_mmSearch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:_mmStep",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/ai/aiPlayer.ts",
+      "target": "function:src/ai/aiPlayer.ts:getAIMove",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/hooks/useGameEngine.ts",
+      "target": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useGameEngine.ts",
+      "target": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/hooks/useOnlineGame.ts",
+      "target": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/hooks/useOnlineGame.ts",
+      "target": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:buildInitialState",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:simApplyLine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:takeSnapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:countSidesOfBox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:buildInitialState",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:simApplyLine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:takeSnapshot",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/gameHelpers.ts",
+      "target": "function:src/utils/gameHelpers.ts:countSidesOfBox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiHard",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiHard",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiHard",
+      "target": "function:src/utils/gameHelpers.ts:simApplyLine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiHard",
+      "target": "function:src/utils/gameHelpers.ts:countSidesOfBox",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "target": "function:src/utils/gameHelpers.ts:simApplyLine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_aiMedium",
+      "target": "function:src/utils/gameHelpers.ts:countSidesOfBox",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_mmStep",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/ai/aiPlayer.ts:_mmSearch",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "target": "function:src/ai/aiPlayer.ts:getAIMove",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "target": "function:src/utils/gameHelpers.ts:buildInitialState",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "target": "function:src/utils/gameHelpers.ts:takeSnapshot",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useGameEngine.ts:useGameEngine",
+      "target": "function:src/utils/gameHelpers.ts:getAllAvailableLines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/utils/gameHelpers.ts:buildInitialState",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/utils/gameHelpers.ts:getCompletedBoxes",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/services/gameRoom.ts:applyMove",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/services/gameRoom.ts:unflattenBoard",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/services/gameRoom.ts:skipTurn",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "function:src/services/gameRoom.ts:requestRematch",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/components/TutorialOverlay.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/services/coins.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/services/firebase.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/services/matchmaking.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "file:src/utils/storage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "file:src/components/GameBoard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "file:src/hooks/useTheme.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "file:src/utils/storage.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "file:src/types/game.types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "function:app/index.tsx:HomeScreen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "function:app/index.tsx:makeStyles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "function:app/index.tsx:getDailyChallenge",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:app/index.tsx",
+      "target": "function:app/index.tsx:HomeScreen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "function:src/components/TutorialOverlay.tsx:TutorialOverlay",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "function:src/components/TutorialOverlay.tsx:emptyState",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "function:src/components/TutorialOverlay.tsx:makeStyles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/TutorialOverlay.tsx",
+      "target": "function:src/components/TutorialOverlay.tsx:TutorialOverlay",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:loadPrefs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:loadStats",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:recordStat",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:savePrefs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:loadPrefs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:loadStats",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:recordStat",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/utils/storage.ts",
+      "target": "function:src/utils/storage.ts:savePrefs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/utils/storage.ts:loadPrefs",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/utils/storage.ts:loadStats",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/utils/storage.ts:savePrefs",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/coins.ts:ensureUserProfile",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/coins.ts:checkAndAwardDailyBonus",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/firebase.ts:getAnonymousUid",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/matchmaking.ts:joinQueue",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/matchmaking.ts:subscribeToWaitingPool",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/matchmaking.ts:attemptMatch",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "function:src/services/matchmaking.ts:subscribeToMyMatch",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/utils/storage.ts:recordStat",
+      "target": "function:src/utils/storage.ts:loadStats",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:index.html",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:index.html",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "config:package.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:app.json",
+      "target": "config:package.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:eas.json",
+      "target": "config:app.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:netlify.toml",
+      "target": "file:index.html",
+      "type": "deploys",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "config:manifest.json",
+      "target": "file:index.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:ENHANCEMENT_PROMPT.md",
+      "target": "document:README.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:firestore.rules",
+      "target": "file:src/constants/theme.ts",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "target": "config:firestore.rules",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "target": "config:firestore.rules",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "target": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "function:app/leaderboard.tsx:LeaderboardScreen",
+      "target": "file:src/services/leaderboard.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:app/shop.tsx:ShopScreen",
+      "target": "file:src/services/coins.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:app/game.tsx:GameScreen",
+      "target": "file:src/services/audio.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:app/online-game.tsx:OnlineGameScreen",
+      "target": "file:src/services/audio.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:src/hooks/useOnlineGame.ts:useOnlineGame",
+      "target": "file:src/services/gameRoom.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "file:src/services/coins.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:app/index.tsx:HomeScreen",
+      "target": "file:src/services/matchmaking.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "function:src/components/TutorialOverlay.tsx:TutorialOverlay",
+      "target": "file:src/utils/storage.ts",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:ui-navigation",
+      "name": "UI & Navigation",
+      "description": "Expo Router screens (home, local/online game, lobby, shop, leaderboard) and presentational components (GameBoard, ScoreBar, TutorialOverlay) that render the game and drive navigation.",
+      "nodeIds": [
+        "file:app/leaderboard.tsx",
+        "file:app/lobby.tsx",
+        "file:app/shop.tsx",
+        "file:app/_layout.tsx",
+        "file:app/game.tsx",
+        "file:app/online-game.tsx",
+        "file:app/index.tsx",
+        "file:src/components/GameBoard.tsx",
+        "file:src/components/ScoreBar.tsx",
+        "file:src/components/TutorialOverlay.tsx"
+      ]
+    },
+    {
+      "id": "layer:state",
+      "name": "State & Game Logic Hooks",
+      "description": "React hooks that hold game and theme state; useGameEngine and useOnlineGame expose an identical interface so screens and board components work for both local and Firestore-backed online play.",
+      "nodeIds": [
+        "file:src/hooks/useTheme.ts",
+        "file:src/hooks/useGameEngine.ts",
+        "file:src/hooks/useOnlineGame.ts"
+      ]
+    },
+    {
+      "id": "layer:service",
+      "name": "Backend Services",
+      "description": "Firebase integration layer wrapping anonymous auth, Firestore room/matchmaking/leaderboard operations, coin transactions, and audio, plus the Firestore security rules that govern backend access.",
+      "nodeIds": [
+        "file:src/services/coins.ts",
+        "file:src/services/firebase.ts",
+        "file:src/services/gameRoom.ts",
+        "file:src/services/leaderboard.ts",
+        "file:src/services/matchmaking.ts",
+        "file:src/services/audio.ts",
+        "config:firestore.rules"
+      ]
+    },
+    {
+      "id": "layer:domain",
+      "name": "Domain Logic & Utilities",
+      "description": "Pure, side-effect-free logic: the 3-tier AI opponent, game rule helpers, and AsyncStorage-backed local preference and stats persistence.",
+      "nodeIds": [
+        "file:src/ai/aiPlayer.ts",
+        "file:src/utils/gameHelpers.ts",
+        "file:src/utils/storage.ts"
+      ]
+    },
+    {
+      "id": "layer:types",
+      "name": "Shared Types & Constants",
+      "description": "Foundational shared definitions imported across the app: the central game type hub, default parchment theme tokens, and the Firebase module shim used for TypeScript resolution.",
+      "nodeIds": [
+        "file:src/types/game.types.ts",
+        "file:src/constants/theme.ts",
+        "file:src/types/firebase-shim.d.ts"
+      ]
+    },
+    {
+      "id": "layer:web-pwa",
+      "name": "Standalone Web PWA",
+      "description": "Self-contained single-file browser game (index.html) with its service worker and PWA manifest, independent of the Expo mobile build.",
+      "nodeIds": [
+        "file:index.html",
+        "file:sw.js",
+        "config:manifest.json"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration & Build",
+      "description": "Project, build, and deployment configuration for the Expo app and web hosting: app.json, eas.json, netlify.toml, package.json, tsconfig.json, babel.config.js, and .npmrc.",
+      "nodeIds": [
+        "config:app.json",
+        "config:eas.json",
+        "config:netlify.toml",
+        "config:package.json",
+        "config:tsconfig.json",
+        "config:.npmrc",
+        "config:babel.config.js"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project guidance and design records: README, CLAUDE.md architecture notes, the enhancement prompt, and the superpowers phase-1 plan and design specs.",
+      "nodeIds": [
+        "document:README.md",
+        "document:CLAUDE.md",
+        "document:ENHANCEMENT_PROMPT.md",
+        "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+        "document:docs/superpowers/specs/2026-03-22-phase1-design.md"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Overview",
+      "description": "Start with the README to learn what this project is: a classic Dots & Boxes game built with React Native + Expo + TypeScript, offering local 2-player play, a 3-tier AI opponent, real-time online multiplayer over Firebase Firestore, a coin reward system, and an unlockable theme shop. Its 20 sections cover features, tech stack, project structure, Firebase setup, and the AI difficulty tiers, giving you the roadmap for the rest of this tour. Pay attention to the key design constraint it calls out: useOnlineGame returns the same shape as useGameEngine so the rendering components work unchanged for both modes.",
+      "nodeIds": [
+        "document:README.md",
+        "document:CLAUDE.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "App Entry & Theme Bootstrap",
+      "description": "The Expo Router root layout is the very first thing that runs: it loads the custom handwritten fonts, restores the persisted theme from AsyncStorage, and wraps the entire app in a ThemeContext before rendering the navigation Stack. Because Expo Router uses file-based routing, _layout.tsx implicitly hands control to app/index.tsx (the home screen) once setup completes. This is where the project's global concerns — fonts and theming — are established before any screen renders.",
+      "nodeIds": [
+        "file:app/_layout.tsx"
+      ],
+      "languageLesson": "Expo Router uses file-based routing: files in the app/ directory become routes, and a special _layout.tsx file wraps all sibling routes — the React Native equivalent of a layout component that persists across navigation."
+    },
+    {
+      "order": 3,
+      "title": "Home & Settings Screen",
+      "description": "app/index.tsx is the home screen and the BFS root of the codebase — it has the broadest reach, pulling in the most modules. From here players choose game mode (2-player, vs AI, online), grid size, names, timer, and difficulty; it also shows stats and the coin balance, and drives the Quick Match matchmaking flow before routing into the appropriate game screen. Building on the theme context from Step 2, this screen is the hub that branches into every feature the README described.",
+      "nodeIds": [
+        "file:app/index.tsx",
+        "file:src/components/TutorialOverlay.tsx"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Shared Types Foundation",
+      "description": "game.types.ts is the single most depended-upon file in the project (highest fan-in by far), making it the vocabulary the entire app speaks. It declares GameState, GameMode (including 'online'), Line, Player, board owner arrays, and the config and event interfaces consumed by hooks, components, services, and screens alike. Understanding these types now makes every later step easier, because they are the contract that lets local and online play share the same components.",
+      "nodeIds": [
+        "file:src/types/game.types.ts",
+        "file:src/types/firebase-shim.d.ts"
+      ],
+      "languageLesson": "TypeScript discriminated unions (e.g. a GameMode tagging GameState) let the compiler narrow behavior per mode, while the firebase-shim.d.ts ambient declaration file re-declares firebase/* modules so TS can resolve the v10 web SDK under node moduleResolution."
+    },
+    {
+      "order": 5,
+      "title": "Pure Game Logic & AI",
+      "description": "The domain layer is pure and side-effect free, which makes it the most testable and reusable part of the codebase. gameHelpers.ts builds the initial board, detects completed boxes, enumerates available lines, simulates a move, and snapshots state for undo — the rules of Dots & Boxes expressed as plain functions. aiPlayer.ts builds directly on those helpers, exposing a single getAIMove with three tiers: easy (random), medium (heuristic), and hard (minimax with alpha-beta pruning and chain avoidance).",
+      "nodeIds": [
+        "file:src/utils/gameHelpers.ts",
+        "file:src/ai/aiPlayer.ts"
+      ],
+      "languageLesson": "Keeping game rules and AI as pure functions (no React, no Firebase) means the same logic powers local play, AI play, and could be tested in isolation — a clean separation of domain logic from I/O."
+    },
+    {
+      "order": 6,
+      "title": "The Shared Game-Engine Contract",
+      "description": "This is the architectural keystone the README highlighted. useGameEngine.ts drives local 2-player and vs-AI games — board state, turn switching, scoring, undo, per-turn timer, and AI move scheduling — consuming the pure logic from Step 5. useOnlineGame.ts does the same job over Firestore (subscribing to a room document and reconstructing board state) yet deliberately returns the exact same shape. Because the two hooks are interface-compatible, the rendering components in Step 7 work unchanged for both modes.",
+      "nodeIds": [
+        "file:src/hooks/useGameEngine.ts",
+        "file:src/hooks/useOnlineGame.ts"
+      ],
+      "languageLesson": "Two hooks exposing an identical return shape is a form of duck-typed polymorphism: the consuming components depend on the shape, not the implementation, so swapping local for online play requires zero component changes."
+    },
+    {
+      "order": 7,
+      "title": "Rendering: Board & Score Bar",
+      "description": "These presentational components consume the hook contract from Step 6 and never care whether the data is local or online. GameBoard.tsx is an SVG-based board that draws dots, lines, and filled boxes, highlights the last move and newly captured boxes, and emits onLineTap for input. ScoreBar.tsx is the header showing both players' names and scores, the active-turn indicator, the AI-thinking state, and a countdown timer when enabled. Together they are the visual surface every game mode shares.",
+      "nodeIds": [
+        "file:src/components/GameBoard.tsx",
+        "file:src/components/ScoreBar.tsx",
+        "file:src/constants/theme.ts"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Local & Online Game Screens",
+      "description": "Now the pieces come together at the screen level. game.tsx wires useGameEngine to GameBoard and ScoreBar for local and AI play, plays sound effects, and awards coins and records stats on game end. online-game.tsx does the parallel job with useOnlineGame, disabling input when it is not the player's turn and awarding coins on result. Seeing both screens side by side makes the shared-contract payoff concrete: nearly identical screens, different data sources.",
+      "nodeIds": [
+        "file:app/game.tsx",
+        "file:app/online-game.tsx",
+        "file:src/services/audio.ts"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Firebase Service Foundation",
+      "description": "firebase.ts is the third-highest fan-in file and the gateway to all backend features: it initializes the Firebase web SDK app, Firestore, and anonymous auth, exporting shared instances plus getAnonymousUid(). gameRoom.ts builds on it to manage the online room lifecycle — code generation, board flatten/unflatten serialization, create/join, move application, turn skipping, abandon, and rematch — which is exactly what useOnlineGame from Step 6 subscribes to. This layer is where the real-time multiplayer the README promised actually lives.",
+      "nodeIds": [
+        "file:src/services/firebase.ts",
+        "file:src/services/gameRoom.ts"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Lobby & Matchmaking",
+      "description": "lobby.tsx is the entry into online play: it lets players create or join a room by 6-character code, validates input, and navigates into online-game.tsx once a match exists. matchmaking.ts powers the Quick Match flow surfaced on the home screen (Step 3), managing a Firestore queue — joining, cancelling, listening for a match, scanning the waiting pool, and atomically pairing two players into a room via a transaction. Building on the room service from Step 9, this step closes the loop on how two strangers end up in the same game.",
+      "nodeIds": [
+        "file:app/lobby.tsx",
+        "file:src/services/matchmaking.ts"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Coins, Shop & Leaderboard",
+      "description": "This is the economy layer the README's reward table described. coins.ts (second-highest fan-in among services) handles user profile bootstrap, balance read/subscribe, awarding and spending coins, the daily bonus, online-result rewards, and theme ownership/activation. shop.tsx spends coins to purchase and activate themes, while leaderboard.ts queries Firestore for the top users by coin balance and leaderboard.tsx renders that ranking, highlighting the current user. Together they turn winning games into progression.",
+      "nodeIds": [
+        "file:src/services/coins.ts",
+        "file:app/shop.tsx",
+        "file:src/services/leaderboard.ts",
+        "file:app/leaderboard.tsx"
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Theme System & Local Storage",
+      "description": "These two foundations underpin personalization and persistence. useTheme.ts (second-highest fan-in overall) defines the ThemeTokens interface, the THEMES token map (parchment, neon, chalkboard, blueprint), display metadata, and the ThemeContext that Step 2 populated — every component reads the active theme through its useTheme hook. storage.ts is the AsyncStorage-backed layer that persists local preferences, win/loss stats, the tutorial-seen flag, and the sound preference, complementing the Firestore-backed coin and theme state.",
+      "nodeIds": [
+        "file:src/hooks/useTheme.ts",
+        "file:src/utils/storage.ts"
+      ]
+    },
+    {
+      "order": 13,
+      "title": "Firestore Security Rules",
+      "description": "firestore.rules is the trust boundary protecting everything in the service layer (Steps 9-11). It governs access to the rooms, matchmaking, users, and coinTransactions collections: authenticated reads/writes for rooms and matchmaking, owner-scoped user documents, and read-only audit-trail coin transactions so balances can't be forged client-side. This is how the backend stays safe even though all game logic runs on untrusted clients.",
+      "nodeIds": [
+        "config:firestore.rules"
+      ],
+      "languageLesson": "Firestore security rules run server-side on every read/write: making coinTransactions read-only from clients turns the ledger into a tamper-proof audit trail, since balances are derived from server-controlled writes rather than client claims."
+    },
+    {
+      "order": 14,
+      "title": "Standalone Web PWA",
+      "description": "Separate from the Expo app, index.html is a self-contained single-file implementation of Dots & Boxes with all HTML, CSS, and JavaScript inlined — no build step, no dependencies, runs directly in a browser. sw.js is its service worker (precache on install, cache cleanup on activate, cache-first for local assets, network-first for Google Fonts) and manifest.json declares the PWA metadata so it can install to a home screen. This is the lightweight, dependency-free counterpart to the full mobile app.",
+      "nodeIds": [
+        "file:index.html",
+        "file:sw.js",
+        "config:manifest.json"
+      ],
+      "languageLesson": "A service worker is a background script that intercepts network requests, enabling offline play via caching strategies — cache-first for your own assets (instant, offline-safe) versus network-first for third-party resources (always fresh when online)."
+    },
+    {
+      "order": 15,
+      "title": "Build & Deployment Config",
+      "description": "The capstone covers how the project is configured and shipped. package.json declares the start/android/ios/web scripts and runtime dependencies (Expo, Expo Router, Firebase, AsyncStorage); tsconfig.json sets the @/* path alias and the node moduleResolution that Firebase v10 needs; app.json and eas.json configure the Expo app and EAS production builds; while netlify.toml handles hosting the standalone web PWA from Step 14. These files tie together everything you have seen into runnable, deployable artifacts.",
+      "nodeIds": [
+        "config:package.json",
+        "config:tsconfig.json",
+        "config:app.json",
+        "config:eas.json",
+        "config:netlify.toml"
+      ]
+    }
+  ]
+}

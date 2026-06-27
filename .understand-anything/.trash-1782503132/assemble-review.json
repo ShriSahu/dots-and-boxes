@@ -1,0 +1,16 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 8,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "Fixed section is reasonable: 96 in -> 96 out nodes, 232 -> 223 edges with 9 calls edges dropped. No upstream ID-correction or complexity-skew concerns surfaced in the report.",
+    "Graph integrity verified: all 96 nodes have valid id fields, all node types are valid (file/function/document/config), all complexity values are valid (simple/moderate/complex). No unknown types or complexity values to remap.",
+    "Recovered 8 of the 9 dropped calls edges by redirecting targets from missing helper-function nodes to their file-level service/util nodes (audio.ts playSound, coins.ts getPurchasedThemes/subscribeToBalance, gameRoom.ts subscribeToRoom/abandonRoom, matchmaking.ts cancelQueue, leaderboard.ts getLeaderboard, storage.ts setTutorialSeen). These represent real module-level dependencies. Restored as type=calls, direction=forward, weight=0.6.",
+    "The 9th dropped edge (useOnlineGame -> gameRoom.ts abandonRoom) collapsed onto the same file-level edge as the subscribeToRoom call, so it was deduplicated, yielding 8 unique restored edges. The cross-module dependency it represented is preserved.",
+    "Cross-batch import check: all 64 import relationships in the importMap (scan-result.json) already have corresponding imports edges in the assembled graph. 0 cross-batch edges needed to be added. This matches the merge script report (importMap already complete).",
+    "All caller function nodes and all target file-level nodes for the recovered edges were confirmed to exist in the merged node set before restoration."
+  ]
+}

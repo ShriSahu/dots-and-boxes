@@ -1,0 +1,2098 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 7,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "app/_layout.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 67,
+      "nonEmptyLines": 57,
+      "functions": [
+        {
+          "name": "RootLayout",
+          "startLine": 21,
+          "endLine": 67,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "RootLayout",
+          "line": 21,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "RootLayout",
+          "callee": "useFonts",
+          "lineNumber": 22
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "useState",
+          "lineNumber": 28
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "useState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "useEffect",
+          "lineNumber": 31
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "AsyncStorage.getItem(THEME_KEY).then",
+          "lineNumber": 32
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "AsyncStorage.getItem",
+          "lineNumber": 32
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "setThemeNameState",
+          "lineNumber": 33
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "setThemeLoaded",
+          "lineNumber": 34
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "useEffect",
+          "lineNumber": 38
+        },
+        {
+          "caller": "RootLayout",
+          "callee": "SplashScreen.hideAsync",
+          "lineNumber": 39
+        },
+        {
+          "caller": "setTheme",
+          "callee": "setThemeNameState",
+          "lineNumber": 43
+        },
+        {
+          "caller": "setTheme",
+          "callee": "AsyncStorage.setItem",
+          "lineNumber": 44
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "app/game.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 553,
+      "nonEmptyLines": 512,
+      "functions": [
+        {
+          "name": "GameScreen",
+          "startLine": 20,
+          "endLine": 358,
+          "params": []
+        },
+        {
+          "name": "makeStyles",
+          "startLine": 360,
+          "endLine": 553,
+          "params": [
+            "theme"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "GameScreen",
+          "line": 20,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "GameScreen",
+          "callee": "useLocalSearchParams",
+          "lineNumber": 21
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "JSON.parse",
+          "lineNumber": 22
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useTheme",
+          "lineNumber": 23
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useWindowDimensions",
+          "lineNumber": 24
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useState",
+          "lineNumber": 26
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useState",
+          "lineNumber": 27
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useState",
+          "lineNumber": 28
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useState",
+          "lineNumber": 29
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useState",
+          "lineNumber": 30
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 31
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 32
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 33
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 34
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 35
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useRef",
+          "lineNumber": 36
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "makeStyles",
+          "lineNumber": 38
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useEffect",
+          "lineNumber": 41
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "initAudio",
+          "lineNumber": 42
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useCallback",
+          "lineNumber": 46
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "clearTimeout",
+          "lineNumber": 47
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setToast",
+          "lineNumber": 48
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "toastOpacity.setValue",
+          "lineNumber": 49
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.sequence([\r\n      Animated.timing(toastOpacity, { toValue: 1, duration: 180, useNativeDriver: true }),\r\n      Animated.delay(1400),\r\n      Animated.timing(toastOpacity, { toValue: 0, duration: 280, useNativeDriver: true }),\r\n    ]).start",
+          "lineNumber": 50
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.sequence",
+          "lineNumber": 50
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 51
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.delay",
+          "lineNumber": 52
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 53
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 55
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setToast",
+          "lineNumber": 55
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useGameEngine",
+          "lineNumber": 61
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "playSound",
+          "lineNumber": 63
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Haptics.impactAsync",
+          "lineNumber": 64
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "showToast",
+          "lineNumber": 67
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setNewBoxes",
+          "lineNumber": 69
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 70
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setNewBoxes",
+          "lineNumber": 70
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "showToast",
+          "lineNumber": 76
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "showToast",
+          "lineNumber": 80
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Math.floor",
+          "lineNumber": 87
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useEffect",
+          "lineNumber": 104
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setResult",
+          "lineNumber": 111
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "playSound",
+          "lineNumber": 114
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 115
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "confettiRef.current?.start",
+          "lineNumber": 115
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "playSound",
+          "lineNumber": 117
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "recordStat",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "setCoinsEarned",
+          "lineNumber": 130
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "getAnonymousUid().then",
+          "lineNumber": 131
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "getAnonymousUid",
+          "lineNumber": 131
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "awardCoins",
+          "lineNumber": 131
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "coinAnim.setValue",
+          "lineNumber": 133
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.sequence([\r\n            Animated.timing(coinAnim, { toValue: 1, duration: 800, useNativeDriver: true }),\r\n            Animated.delay(600),\r\n            Animated.timing(coinAnim, { toValue: 2, duration: 400, useNativeDriver: true }),\r\n          ]).start",
+          "lineNumber": 134
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.sequence",
+          "lineNumber": 134
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 135
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.delay",
+          "lineNumber": 136
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 137
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Haptics.notificationAsync",
+          "lineNumber": 141
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useEffect",
+          "lineNumber": 150
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "playSound",
+          "lineNumber": 152
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "Haptics.selectionAsync",
+          "lineNumber": 160
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "playSound",
+          "lineNumber": 161
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "drawLine",
+          "lineNumber": 162
+        },
+        {
+          "caller": "handleNewGame",
+          "callee": "setResult",
+          "lineNumber": 166
+        },
+        {
+          "caller": "handleNewGame",
+          "callee": "setNewBoxes",
+          "lineNumber": 167
+        },
+        {
+          "caller": "handleNewGame",
+          "callee": "setBoardKey",
+          "lineNumber": 168
+        },
+        {
+          "caller": "handleNewGame",
+          "callee": "resetGame",
+          "lineNumber": 169
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "useCallback",
+          "lineNumber": 172
+        },
+        {
+          "caller": "trunc",
+          "callee": "s.slice",
+          "lineNumber": 174
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "trunc",
+          "lineNumber": 175
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "trunc",
+          "lineNumber": 176
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "Share.share",
+          "lineNumber": 187
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "coinAnim.interpolate",
+          "lineNumber": 194
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "coinAnim.interpolate",
+          "lineNumber": 198
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "router.back",
+          "lineNumber": 208
+        },
+        {
+          "caller": "GameScreen",
+          "callee": "router.back",
+          "lineNumber": 315
+        },
+        {
+          "caller": "makeStyles",
+          "callee": "StyleSheet.create",
+          "lineNumber": 361
+        }
+      ],
+      "metrics": {
+        "importCount": 9,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "app/online-game.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 575,
+      "nonEmptyLines": 522,
+      "functions": [
+        {
+          "name": "OnlineGameScreen",
+          "startLine": 19,
+          "endLine": 496,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "OnlineGameScreen",
+          "line": 19,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useTheme",
+          "lineNumber": 20
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useWindowDimensions",
+          "lineNumber": 21
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useLocalSearchParams",
+          "lineNumber": 22
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "parseInt",
+          "lineNumber": 32
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 34
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 35
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 36
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 37
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 38
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 39
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useState",
+          "lineNumber": 40
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 42
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 43
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 44
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 45
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 46
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 47
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 48
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useRef",
+          "lineNumber": 49
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Date.now",
+          "lineNumber": 49
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 52
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "initAudio",
+          "lineNumber": 53
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useCallback",
+          "lineNumber": 56
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "clearTimeout",
+          "lineNumber": 57
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setToast",
+          "lineNumber": 58
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "toastOpacity.setValue",
+          "lineNumber": 59
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.sequence([\r\n      Animated.timing(toastOpacity, { toValue: 1, duration: 180, useNativeDriver: true }),\r\n      Animated.delay(1400),\r\n      Animated.timing(toastOpacity, { toValue: 0, duration: 280, useNativeDriver: true }),\r\n    ]).start",
+          "lineNumber": 60
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.sequence",
+          "lineNumber": 60
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 61
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.delay",
+          "lineNumber": 62
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 63
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 65
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setToast",
+          "lineNumber": 65
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useOnlineGame",
+          "lineNumber": 70
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "playSound",
+          "lineNumber": 72
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Haptics.impactAsync",
+          "lineNumber": 73
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "showToast",
+          "lineNumber": 76
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setNewBoxes",
+          "lineNumber": 77
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 78
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setNewBoxes",
+          "lineNumber": 78
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "showToast",
+          "lineNumber": 84
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Haptics.notificationAsync",
+          "lineNumber": 87
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setDisconnected",
+          "lineNumber": 88
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "showToast",
+          "lineNumber": 91
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 106
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "playSound",
+          "lineNumber": 112
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 118
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setResult",
+          "lineNumber": 126
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Haptics.notificationAsync",
+          "lineNumber": 127
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "playSound",
+          "lineNumber": 131
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "playSound",
+          "lineNumber": 133
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setTimeout",
+          "lineNumber": 138
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "confettiRef.current?.start",
+          "lineNumber": 138
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "recordOnlineResult(myUid, outcomeResult, roomCode).then",
+          "lineNumber": 148
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "recordOnlineResult",
+          "lineNumber": 148
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setCoinsEarned",
+          "lineNumber": 149
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "coinAnim.setValue",
+          "lineNumber": 150
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.sequence([\r\n            Animated.timing(coinAnim, { toValue: 1, duration: 800, useNativeDriver: true }),\r\n            Animated.delay(600),\r\n            Animated.timing(coinAnim, { toValue: 2, duration: 400, useNativeDriver: true }),\r\n          ]).start",
+          "lineNumber": 151
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.sequence",
+          "lineNumber": 151
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 152
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.delay",
+          "lineNumber": 153
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Animated.timing",
+          "lineNumber": 154
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 163
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "router.replace",
+          "lineNumber": 165
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "String",
+          "lineNumber": 171
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 178
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Date.now",
+          "lineNumber": 179
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useEffect",
+          "lineNumber": 183
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Date.now",
+          "lineNumber": 187
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setAfkWarning",
+          "lineNumber": 188
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setInterval",
+          "lineNumber": 191
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Date.now",
+          "lineNumber": 192
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "clearInterval",
+          "lineNumber": 194
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "abandon",
+          "lineNumber": 195
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "router.back",
+          "lineNumber": 196
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "setAfkWarning",
+          "lineNumber": 198
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "clearInterval",
+          "lineNumber": 201
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "Haptics.selectionAsync",
+          "lineNumber": 206
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "playSound",
+          "lineNumber": 207
+        },
+        {
+          "caller": "handleLineTap",
+          "callee": "drawLine",
+          "lineNumber": 208
+        },
+        {
+          "caller": "handleRematch",
+          "callee": "setRematchWaiting",
+          "lineNumber": 212
+        },
+        {
+          "caller": "handleRematch",
+          "callee": "requestRematch",
+          "lineNumber": 213
+        },
+        {
+          "caller": "handleLeave",
+          "callee": "abandon",
+          "lineNumber": 217
+        },
+        {
+          "caller": "handleLeave",
+          "callee": "router.back",
+          "lineNumber": 218
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "useCallback",
+          "lineNumber": 221
+        },
+        {
+          "caller": "trunc",
+          "callee": "s.slice",
+          "lineNumber": 223
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "trunc",
+          "lineNumber": 224
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "trunc",
+          "lineNumber": 225
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "Share.share",
+          "lineNumber": 236
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "coinAnim.interpolate",
+          "lineNumber": 242
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "coinAnim.interpolate",
+          "lineNumber": 246
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "router.back",
+          "lineNumber": 379
+        },
+        {
+          "caller": "OnlineGameScreen",
+          "callee": "router.back",
+          "lineNumber": 432
+        }
+      ],
+      "metrics": {
+        "importCount": 7,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/GameBoard.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 314,
+      "nonEmptyLines": 284,
+      "functions": [
+        {
+          "name": "GameBoard",
+          "startLine": 18,
+          "endLine": 314,
+          "params": [
+            "{\r\n  state, config, onLineTap, disabled, lastLine, newBoxes = [], boardKey, allowedLines,\r\n}"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "GameBoard",
+          "line": 18,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "GameBoard",
+          "callee": "useTheme",
+          "lineNumber": 21
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useWindowDimensions",
+          "lineNumber": 22
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.min",
+          "lineNumber": 27
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.floor",
+          "lineNumber": 28
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.round",
+          "lineNumber": 29
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.max",
+          "lineNumber": 31
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.max",
+          "lineNumber": 32
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useState",
+          "lineNumber": 36
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 37
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setFlashLine",
+          "lineNumber": 39
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setTimeout",
+          "lineNumber": 40
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setFlashLine",
+          "lineNumber": 40
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "clearTimeout",
+          "lineNumber": 41
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useState",
+          "lineNumber": 45
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 46
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setFlashBoxes",
+          "lineNumber": 48
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setTimeout",
+          "lineNumber": 49
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setFlashBoxes",
+          "lineNumber": 49
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "clearTimeout",
+          "lineNumber": 50
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.round",
+          "lineNumber": 65
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.floor",
+          "lineNumber": 66
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 69
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 70
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useState",
+          "lineNumber": 71
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useCallback",
+          "lineNumber": 73
+        },
+        {
+          "caller": "checkLine",
+          "callee": "Math.sqrt",
+          "lineNumber": 83
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 93
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 94
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "checkLine",
+          "lineNumber": 95
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 101
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 102
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "checkLine",
+          "lineNumber": 103
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 109
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 110
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 111
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 112
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 113
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 116
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 117
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 118
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useEffect",
+          "lineNumber": 119
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "useRef",
+          "lineNumber": 121
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "PanResponder.create",
+          "lineNumber": 122
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "findNearestRef.current",
+          "lineNumber": 130
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "allowedRef.current.has",
+          "lineNumber": 133
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setPreviewLine",
+          "lineNumber": 135
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "findNearestRef.current",
+          "lineNumber": 144
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "allowedRef.current.has",
+          "lineNumber": 147
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setPreviewLine",
+          "lineNumber": 149
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setPreviewLine",
+          "lineNumber": 154
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "onLineTapRef.current",
+          "lineNumber": 160
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setPreviewLine",
+          "lineNumber": 163
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "setPreviewLine",
+          "lineNumber": 168
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "boardViewRef.current?.measure",
+          "lineNumber": 179
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 187
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.round",
+          "lineNumber": 199
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.round",
+          "lineNumber": 200
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 206
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 207
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 210
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "flashBoxes.has",
+          "lineNumber": 212
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "(owner === 1 ? config.p1Name : config.p2Name)[0].toUpperCase",
+          "lineNumber": 213
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Math.round",
+          "lineNumber": 226
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "playerColor",
+          "lineNumber": 229
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 241
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 242
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 245
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 245
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "isFlash",
+          "lineNumber": 246
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "playerColor",
+          "lineNumber": 251
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 260
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 261
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 264
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 264
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "isFlash",
+          "lineNumber": 265
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "playerColor",
+          "lineNumber": 270
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "(() => {\r\n          const pl = previewLine;\r\n          const isH = pl.type === 'h';\r\n          const a = dotPos(pl.row, pl.col);\r\n          const b = isH ? dotPos(pl.row, pl.col + 1) : dotPos(pl.row + 1, pl.col);\r\n          const currentColor = state.currentPlayer === 1 ? theme.p1 : theme.p2;\r\n          return (\r\n            <Line\r\n              key=\"preview\"\r\n              x1={a.x} y1={a.y} x2={b.x} y2={b.y}\r\n              stroke={currentColor}\r\n              strokeWidth={lineW}\r\n              strokeLinecap=\"round\"\r\n              opacity={0.4}\r\n            />\r\n          );\r\n        })",
+          "lineNumber": 279
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 282
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 283
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 283
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 298
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "Array.from",
+          "lineNumber": 299
+        },
+        {
+          "caller": "GameBoard",
+          "callee": "dotPos",
+          "lineNumber": 300
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/components/ScoreBar.tsx",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 243,
+      "nonEmptyLines": 229,
+      "functions": [
+        {
+          "name": "ScoreBar",
+          "startLine": 14,
+          "endLine": 145,
+          "params": [
+            "{\n  state, config, isAIThinking, timerRemaining, timerMax,\n}"
+          ]
+        },
+        {
+          "name": "makeStyles",
+          "startLine": 147,
+          "endLine": 243,
+          "params": [
+            "theme"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ScoreBar",
+          "line": 14,
+          "isDefault": true
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ScoreBar",
+          "callee": "useTheme",
+          "lineNumber": 17
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "makeStyles",
+          "lineNumber": 18
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useRef",
+          "lineNumber": 25
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useRef",
+          "lineNumber": 26
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useRef",
+          "lineNumber": 27
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useRef",
+          "lineNumber": 28
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useEffect",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.sequence([\r\n        Animated.timing(p1Scale, { toValue: 1.3, duration: 100, useNativeDriver: true }),\r\n        Animated.timing(p1Scale, { toValue: 1,   duration: 120, useNativeDriver: true }),\r\n      ]).start",
+          "lineNumber": 33
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.sequence",
+          "lineNumber": 33
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.timing",
+          "lineNumber": 34
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.timing",
+          "lineNumber": 35
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "useEffect",
+          "lineNumber": 40
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.sequence([\r\n        Animated.timing(p2Scale, { toValue: 1.3, duration: 100, useNativeDriver: true }),\r\n        Animated.timing(p2Scale, { toValue: 1,   duration: 120, useNativeDriver: true }),\r\n      ]).start",
+          "lineNumber": 43
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.sequence",
+          "lineNumber": 43
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.timing",
+          "lineNumber": 44
+        },
+        {
+          "caller": "ScoreBar",
+          "callee": "Animated.timing",
+          "lineNumber": 45
+        },
+        {
+          "caller": "makeStyles",
+          "callee": "StyleSheet.create",
+          "lineNumber": 148
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/hooks/useTheme.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 124,
+      "nonEmptyLines": 118,
+      "functions": [
+        {
+          "name": "useTheme",
+          "startLine": 122,
+          "endLine": 124,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "THEMES",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "THEME_META",
+          "line": 103,
+          "isDefault": false
+        },
+        {
+          "name": "ThemeContext",
+          "line": 116,
+          "isDefault": false
+        },
+        {
+          "name": "useTheme",
+          "line": 122,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "useTheme",
+          "callee": "useContext",
+          "lineNumber": 123
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 4,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/services/audio.ts",
+      "language": "typescript",
+      "fileCategory": "code",
+      "totalLines": 208,
+      "nonEmptyLines": 186,
+      "functions": [
+        {
+          "name": "buildWavBase64",
+          "startLine": 24,
+          "endLine": 55,
+          "params": [
+            "samples"
+          ]
+        },
+        {
+          "name": "genClick",
+          "startLine": 60,
+          "endLine": 68,
+          "params": []
+        },
+        {
+          "name": "genPop",
+          "startLine": 71,
+          "endLine": 82,
+          "params": []
+        },
+        {
+          "name": "genChain",
+          "startLine": 85,
+          "endLine": 99,
+          "params": []
+        },
+        {
+          "name": "genWin",
+          "startLine": 102,
+          "endLine": 121,
+          "params": []
+        },
+        {
+          "name": "genDraw",
+          "startLine": 124,
+          "endLine": 137,
+          "params": []
+        },
+        {
+          "name": "genTimerBeep",
+          "startLine": 140,
+          "endLine": 149,
+          "params": []
+        },
+        {
+          "name": "writeAndLoad",
+          "startLine": 159,
+          "endLine": 167,
+          "params": [
+            "name",
+            "samples"
+          ]
+        },
+        {
+          "name": "initAudio",
+          "startLine": 170,
+          "endLine": 196,
+          "params": []
+        },
+        {
+          "name": "playSound",
+          "startLine": 199,
+          "endLine": 208,
+          "params": [
+            "name"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "initAudio",
+          "line": 170,
+          "isDefault": false
+        },
+        {
+          "name": "playSound",
+          "line": 199,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ws",
+          "callee": "v.setUint8",
+          "lineNumber": 30
+        },
+        {
+          "caller": "ws",
+          "callee": "s.charCodeAt",
+          "lineNumber": 30
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "ws",
+          "lineNumber": 33
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint32",
+          "lineNumber": 34
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "ws",
+          "lineNumber": 35
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "ws",
+          "lineNumber": 36
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint32",
+          "lineNumber": 37
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint16",
+          "lineNumber": 38
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint16",
+          "lineNumber": 39
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint32",
+          "lineNumber": 40
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint32",
+          "lineNumber": 41
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint16",
+          "lineNumber": 42
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint16",
+          "lineNumber": 43
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "ws",
+          "lineNumber": 44
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setUint32",
+          "lineNumber": 45
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "v.setInt16",
+          "lineNumber": 48
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "Math.max",
+          "lineNumber": 48
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "Math.min",
+          "lineNumber": 48
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "String.fromCharCode",
+          "lineNumber": 53
+        },
+        {
+          "caller": "buildWavBase64",
+          "callee": "btoa",
+          "lineNumber": 54
+        },
+        {
+          "caller": "genClick",
+          "callee": "Math.floor",
+          "lineNumber": 61
+        },
+        {
+          "caller": "genClick",
+          "callee": "Math.sin",
+          "lineNumber": 65
+        },
+        {
+          "caller": "genClick",
+          "callee": "Math.exp",
+          "lineNumber": 65
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.floor",
+          "lineNumber": 72
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.exp",
+          "lineNumber": 76
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.exp",
+          "lineNumber": 77
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.random",
+          "lineNumber": 78
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.exp",
+          "lineNumber": 78
+        },
+        {
+          "caller": "genPop",
+          "callee": "Math.sin",
+          "lineNumber": 79
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.floor",
+          "lineNumber": 86
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.exp",
+          "lineNumber": 90
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.exp",
+          "lineNumber": 91
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.sin",
+          "lineNumber": 93
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.sin",
+          "lineNumber": 94
+        },
+        {
+          "caller": "genChain",
+          "callee": "Math.random",
+          "lineNumber": 95
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.floor",
+          "lineNumber": 105
+        },
+        {
+          "caller": "genWin",
+          "callee": "notes.forEach",
+          "lineNumber": 108
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.floor",
+          "lineNumber": 109
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.floor",
+          "lineNumber": 110
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.exp",
+          "lineNumber": 113
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.sin",
+          "lineNumber": 115
+        },
+        {
+          "caller": "genWin",
+          "callee": "Math.sin",
+          "lineNumber": 116
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.floor",
+          "lineNumber": 125
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.floor",
+          "lineNumber": 126
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.min",
+          "lineNumber": 132
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.exp",
+          "lineNumber": 132
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.exp",
+          "lineNumber": 133
+        },
+        {
+          "caller": "genDraw",
+          "callee": "Math.sin",
+          "lineNumber": 134
+        },
+        {
+          "caller": "genTimerBeep",
+          "callee": "Math.floor",
+          "lineNumber": 141
+        },
+        {
+          "caller": "genTimerBeep",
+          "callee": "Math.sin",
+          "lineNumber": 145
+        },
+        {
+          "caller": "genTimerBeep",
+          "callee": "Math.sin",
+          "lineNumber": 146
+        },
+        {
+          "caller": "writeAndLoad",
+          "callee": "buildWavBase64",
+          "lineNumber": 160
+        },
+        {
+          "caller": "writeAndLoad",
+          "callee": "FileSystem.writeAsStringAsync",
+          "lineNumber": 162
+        },
+        {
+          "caller": "writeAndLoad",
+          "callee": "Audio.Sound.createAsync",
+          "lineNumber": 165
+        },
+        {
+          "caller": "writeAndLoad",
+          "callee": "cache.set",
+          "lineNumber": 166
+        },
+        {
+          "caller": "initAudio",
+          "callee": "(async () => {\r\n    try {\r\n      await Audio.setAudioModeAsync({\r\n        playsInSilentModeIOS:    true,\r\n        staysActiveInBackground: false,\r\n      });\r\n      await Promise.all([\r\n        writeAndLoad('click',     genClick()),\r\n        writeAndLoad('pop',       genPop()),\r\n        writeAndLoad('chain',     genChain()),\r\n        writeAndLoad('win',       genWin()),\r\n        writeAndLoad('draw',      genDraw()),\r\n        writeAndLoad('timerBeep', genTimerBeep()),\r\n      ]);\r\n      initDone = true;\r\n    } catch (e) {\r\n      // Audio unavailable (simulator mute, etc.) — silently degrade\r\n      console.warn('[audio] init failed:', e);\r\n    }\r\n  })",
+          "lineNumber": 175
+        },
+        {
+          "caller": "initAudio",
+          "callee": "Audio.setAudioModeAsync",
+          "lineNumber": 177
+        },
+        {
+          "caller": "initAudio",
+          "callee": "Promise.all",
+          "lineNumber": 181
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 182
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genClick",
+          "lineNumber": 182
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 183
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genPop",
+          "lineNumber": 183
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 184
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genChain",
+          "lineNumber": 184
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 185
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genWin",
+          "lineNumber": 185
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 186
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genDraw",
+          "lineNumber": 186
+        },
+        {
+          "caller": "initAudio",
+          "callee": "writeAndLoad",
+          "lineNumber": 187
+        },
+        {
+          "caller": "initAudio",
+          "callee": "genTimerBeep",
+          "lineNumber": 187
+        },
+        {
+          "caller": "initAudio",
+          "callee": "console.warn",
+          "lineNumber": 192
+        },
+        {
+          "caller": "playSound",
+          "callee": "cache.get",
+          "lineNumber": 200
+        },
+        {
+          "caller": "playSound",
+          "callee": "s.setPositionAsync",
+          "lineNumber": 203
+        },
+        {
+          "caller": "playSound",
+          "callee": "s.playAsync",
+          "lineNumber": 204
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 10,
+        "classCount": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "ui-navigation": [
+    "file:app/leaderboard.tsx",
+    "file:app/lobby.tsx",
+    "file:app/shop.tsx",
+    "file:app/_layout.tsx",
+    "file:app/game.tsx",
+    "file:app/online-game.tsx",
+    "file:src/components/GameBoard.tsx",
+    "file:src/components/ScoreBar.tsx",
+    "file:app/index.tsx",
+    "file:src/components/TutorialOverlay.tsx"
+  ],
+  "backend-services": [
+    "file:src/services/coins.ts",
+    "file:src/services/firebase.ts",
+    "file:src/services/gameRoom.ts",
+    "file:src/services/leaderboard.ts",
+    "file:src/services/matchmaking.ts",
+    "file:src/services/audio.ts",
+    "config:firestore.rules"
+  ],
+  "state-logic": [
+    "file:src/hooks/useTheme.ts",
+    "file:src/hooks/useGameEngine.ts",
+    "file:src/hooks/useOnlineGame.ts"
+  ],
+  "domain-logic": [
+    "file:src/ai/aiPlayer.ts",
+    "file:src/utils/gameHelpers.ts",
+    "file:src/utils/storage.ts"
+  ],
+  "shared-types": [
+    "file:src/types/game.types.ts",
+    "file:src/constants/theme.ts",
+    "file:src/types/firebase-shim.d.ts"
+  ],
+  "documentation": [
+    "document:CLAUDE.md",
+    "document:ENHANCEMENT_PROMPT.md",
+    "document:README.md",
+    "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+    "document:docs/superpowers/specs/2026-03-22-phase1-design.md"
+  ],
+  "config-build": [
+    "config:app.json",
+    "config:eas.json",
+    "config:netlify.toml",
+    "config:package.json",
+    "config:tsconfig.json",
+    "config:.npmrc",
+    "config:babel.config.js"
+  ],
+  "web-pwa": [
+    "file:index.html",
+    "config:manifest.json",
+    "file:sw.js"
+  ]
+}

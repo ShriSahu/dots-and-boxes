@@ -1,0 +1,11 @@
+{
+  "projectRoot": "C:/Shri_Development/dots-and-boxes",
+  "batchFiles": [
+    {"path": "src/ai/aiPlayer.ts", "language": "typescript", "sizeLines": 140, "fileCategory": "code"},
+    {"path": "src/hooks/useGameEngine.ts", "language": "typescript", "sizeLines": 218, "fileCategory": "code"},
+    {"path": "src/hooks/useOnlineGame.ts", "language": "typescript", "sizeLines": 235, "fileCategory": "code"},
+    {"path": "src/types/game.types.ts", "language": "typescript", "sizeLines": 109, "fileCategory": "code"},
+    {"path": "src/utils/gameHelpers.ts", "language": "typescript", "sizeLines": 101, "fileCategory": "code"}
+  ],
+  "batchImportData": {"src/ai/aiPlayer.ts":["src/types/game.types.ts","src/utils/gameHelpers.ts"],"src/hooks/useGameEngine.ts":["src/ai/aiPlayer.ts","src/types/game.types.ts","src/utils/gameHelpers.ts"],"src/hooks/useOnlineGame.ts":["src/services/gameRoom.ts","src/types/game.types.ts","src/utils/gameHelpers.ts"],"src/types/game.types.ts":[],"src/utils/gameHelpers.ts":["src/types/game.types.ts"]}
+}

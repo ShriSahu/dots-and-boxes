@@ -1,0 +1,135 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 41,
+    "filesWithImports": 20,
+    "totalEdges": 64
+  },
+  "importMap": {
+    ".npmrc": [],
+    "app.json": [],
+    "app/_layout.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/types/game.types.ts"
+    ],
+    "app/game.tsx": [
+      "src/components/GameBoard.tsx",
+      "src/components/ScoreBar.tsx",
+      "src/hooks/useGameEngine.ts",
+      "src/hooks/useTheme.ts",
+      "src/services/audio.ts",
+      "src/services/coins.ts",
+      "src/services/firebase.ts",
+      "src/types/game.types.ts",
+      "src/utils/storage.ts"
+    ],
+    "app/index.tsx": [
+      "src/components/TutorialOverlay.tsx",
+      "src/hooks/useTheme.ts",
+      "src/services/coins.ts",
+      "src/services/firebase.ts",
+      "src/services/matchmaking.ts",
+      "src/types/game.types.ts",
+      "src/utils/storage.ts"
+    ],
+    "app/leaderboard.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/services/firebase.ts",
+      "src/services/leaderboard.ts"
+    ],
+    "app/lobby.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/services/coins.ts",
+      "src/services/firebase.ts",
+      "src/services/gameRoom.ts",
+      "src/types/game.types.ts"
+    ],
+    "app/online-game.tsx": [
+      "src/components/GameBoard.tsx",
+      "src/components/ScoreBar.tsx",
+      "src/hooks/useOnlineGame.ts",
+      "src/hooks/useTheme.ts",
+      "src/services/audio.ts",
+      "src/services/coins.ts",
+      "src/types/game.types.ts"
+    ],
+    "app/shop.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/services/coins.ts",
+      "src/services/firebase.ts",
+      "src/types/game.types.ts"
+    ],
+    "babel.config.js": [],
+    "CLAUDE.md": [],
+    "docs/superpowers/plans/2026-03-22-phase1-implementation.md": [],
+    "docs/superpowers/specs/2026-03-22-phase1-design.md": [],
+    "eas.json": [],
+    "ENHANCEMENT_PROMPT.md": [],
+    "firestore.rules": [],
+    "index.html": [],
+    "manifest.json": [],
+    "netlify.toml": [],
+    "package.json": [],
+    "README.md": [],
+    "src/ai/aiPlayer.ts": [
+      "src/types/game.types.ts",
+      "src/utils/gameHelpers.ts"
+    ],
+    "src/components/GameBoard.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/types/game.types.ts"
+    ],
+    "src/components/ScoreBar.tsx": [
+      "src/hooks/useTheme.ts",
+      "src/types/game.types.ts"
+    ],
+    "src/components/TutorialOverlay.tsx": [
+      "src/components/GameBoard.tsx",
+      "src/hooks/useTheme.ts",
+      "src/types/game.types.ts",
+      "src/utils/storage.ts"
+    ],
+    "src/constants/theme.ts": [],
+    "src/hooks/useGameEngine.ts": [
+      "src/ai/aiPlayer.ts",
+      "src/types/game.types.ts",
+      "src/utils/gameHelpers.ts"
+    ],
+    "src/hooks/useOnlineGame.ts": [
+      "src/services/gameRoom.ts",
+      "src/types/game.types.ts",
+      "src/utils/gameHelpers.ts"
+    ],
+    "src/hooks/useTheme.ts": [
+      "src/types/game.types.ts"
+    ],
+    "src/services/audio.ts": [],
+    "src/services/coins.ts": [
+      "src/services/firebase.ts",
+      "src/types/game.types.ts"
+    ],
+    "src/services/firebase.ts": [],
+    "src/services/gameRoom.ts": [
+      "src/services/firebase.ts",
+      "src/types/game.types.ts"
+    ],
+    "src/services/leaderboard.ts": [
+      "src/services/firebase.ts"
+    ],
+    "src/services/matchmaking.ts": [
+      "src/services/firebase.ts",
+      "src/services/gameRoom.ts",
+      "src/types/game.types.ts"
+    ],
+    "src/types/firebase-shim.d.ts": [],
+    "src/types/game.types.ts": [],
+    "src/utils/gameHelpers.ts": [
+      "src/types/game.types.ts"
+    ],
+    "src/utils/storage.ts": [
+      "src/types/game.types.ts"
+    ],
+    "sw.js": [],
+    "tsconfig.json": []
+  }
+}

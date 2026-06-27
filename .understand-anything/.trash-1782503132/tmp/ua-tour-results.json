@@ -1,0 +1,590 @@
+{
+  "scriptCompleted": true,
+  "entryPointCandidates": [
+    {
+      "id": "file:app/index.tsx",
+      "score": 6,
+      "name": "index.tsx",
+      "summary": "Home/settings screen and app entry point: configures game mode, grid size, player names, timer and difficulty, displays stats and coin balance, drives the Quick Match matchmaking flow, and routes into local/AI/online games."
+    },
+    {
+      "id": "file:app/_layout.tsx",
+      "score": 5,
+      "name": "_layout.tsx",
+      "summary": "Expo Router root layout that loads custom fonts, restores the persisted theme from AsyncStorage, and wraps the app in ThemeContext before rendering the navigation Stack."
+    },
+    {
+      "id": "document:README.md",
+      "score": 5,
+      "name": "README.md",
+      "summary": "Project overview README with 20 sections covering features, game modes, tech stack, quick-start instructions, project structure, Firebase setup, game rules, AI strategy tiers, and production build steps."
+    },
+    {
+      "id": "file:app/lobby.tsx",
+      "score": 3,
+      "name": "lobby.tsx",
+      "summary": "Online lobby screen for creating or joining a multiplayer room by code, validating input, and navigating to the online game once a match is established."
+    },
+    {
+      "id": "file:app/game.tsx",
+      "score": 3,
+      "name": "game.tsx",
+      "summary": "Local game screen for 2-player and AI modes; drives the useGameEngine hook, renders GameBoard and ScoreBar, plays sound effects, and awards coins and records stats on game end."
+    }
+  ],
+  "fanInRanking": [
+    {
+      "id": "file:src/types/game.types.ts",
+      "fanIn": 18,
+      "name": "game.types.ts"
+    },
+    {
+      "id": "file:src/hooks/useTheme.ts",
+      "fanIn": 10,
+      "name": "useTheme.ts"
+    },
+    {
+      "id": "file:src/services/firebase.ts",
+      "fanIn": 9,
+      "name": "firebase.ts"
+    },
+    {
+      "id": "file:src/services/coins.ts",
+      "fanIn": 5,
+      "name": "coins.ts"
+    },
+    {
+      "id": "file:index.html",
+      "fanIn": 4,
+      "name": "index.html"
+    },
+    {
+      "id": "file:src/services/gameRoom.ts",
+      "fanIn": 3,
+      "name": "gameRoom.ts"
+    },
+    {
+      "id": "file:src/components/GameBoard.tsx",
+      "fanIn": 3,
+      "name": "GameBoard.tsx"
+    },
+    {
+      "id": "file:src/utils/gameHelpers.ts",
+      "fanIn": 3,
+      "name": "gameHelpers.ts"
+    },
+    {
+      "id": "file:src/utils/storage.ts",
+      "fanIn": 3,
+      "name": "storage.ts"
+    },
+    {
+      "id": "file:src/components/ScoreBar.tsx",
+      "fanIn": 2,
+      "name": "ScoreBar.tsx"
+    },
+    {
+      "id": "file:src/services/audio.ts",
+      "fanIn": 2,
+      "name": "audio.ts"
+    },
+    {
+      "id": "config:package.json",
+      "fanIn": 2,
+      "name": "package.json"
+    },
+    {
+      "id": "config:firestore.rules",
+      "fanIn": 2,
+      "name": "firestore.rules"
+    },
+    {
+      "id": "file:src/services/leaderboard.ts",
+      "fanIn": 1,
+      "name": "leaderboard.ts"
+    },
+    {
+      "id": "file:src/services/matchmaking.ts",
+      "fanIn": 1,
+      "name": "matchmaking.ts"
+    },
+    {
+      "id": "file:src/ai/aiPlayer.ts",
+      "fanIn": 1,
+      "name": "aiPlayer.ts"
+    },
+    {
+      "id": "file:src/hooks/useGameEngine.ts",
+      "fanIn": 1,
+      "name": "useGameEngine.ts"
+    },
+    {
+      "id": "file:src/hooks/useOnlineGame.ts",
+      "fanIn": 1,
+      "name": "useOnlineGame.ts"
+    },
+    {
+      "id": "file:src/components/TutorialOverlay.tsx",
+      "fanIn": 1,
+      "name": "TutorialOverlay.tsx"
+    },
+    {
+      "id": "document:README.md",
+      "fanIn": 1,
+      "name": "README.md"
+    }
+  ],
+  "fanOutRanking": [
+    {
+      "id": "file:app/game.tsx",
+      "fanOut": 9,
+      "name": "game.tsx"
+    },
+    {
+      "id": "file:app/online-game.tsx",
+      "fanOut": 7,
+      "name": "online-game.tsx"
+    },
+    {
+      "id": "file:app/index.tsx",
+      "fanOut": 7,
+      "name": "index.tsx"
+    },
+    {
+      "id": "file:app/lobby.tsx",
+      "fanOut": 5,
+      "name": "lobby.tsx"
+    },
+    {
+      "id": "file:app/shop.tsx",
+      "fanOut": 4,
+      "name": "shop.tsx"
+    },
+    {
+      "id": "file:src/components/TutorialOverlay.tsx",
+      "fanOut": 4,
+      "name": "TutorialOverlay.tsx"
+    },
+    {
+      "id": "file:app/leaderboard.tsx",
+      "fanOut": 3,
+      "name": "leaderboard.tsx"
+    },
+    {
+      "id": "file:src/services/matchmaking.ts",
+      "fanOut": 3,
+      "name": "matchmaking.ts"
+    },
+    {
+      "id": "file:src/hooks/useGameEngine.ts",
+      "fanOut": 3,
+      "name": "useGameEngine.ts"
+    },
+    {
+      "id": "file:src/hooks/useOnlineGame.ts",
+      "fanOut": 3,
+      "name": "useOnlineGame.ts"
+    },
+    {
+      "id": "file:src/services/coins.ts",
+      "fanOut": 2,
+      "name": "coins.ts"
+    },
+    {
+      "id": "file:src/services/gameRoom.ts",
+      "fanOut": 2,
+      "name": "gameRoom.ts"
+    },
+    {
+      "id": "file:app/_layout.tsx",
+      "fanOut": 2,
+      "name": "_layout.tsx"
+    },
+    {
+      "id": "file:src/components/GameBoard.tsx",
+      "fanOut": 2,
+      "name": "GameBoard.tsx"
+    },
+    {
+      "id": "file:src/components/ScoreBar.tsx",
+      "fanOut": 2,
+      "name": "ScoreBar.tsx"
+    },
+    {
+      "id": "file:src/ai/aiPlayer.ts",
+      "fanOut": 2,
+      "name": "aiPlayer.ts"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "fanOut": 2,
+      "name": "2026-03-22-phase1-implementation.md"
+    },
+    {
+      "id": "file:src/services/leaderboard.ts",
+      "fanOut": 1,
+      "name": "leaderboard.ts"
+    },
+    {
+      "id": "file:src/hooks/useTheme.ts",
+      "fanOut": 1,
+      "name": "useTheme.ts"
+    },
+    {
+      "id": "file:src/utils/gameHelpers.ts",
+      "fanOut": 1,
+      "name": "gameHelpers.ts"
+    }
+  ],
+  "bfsTraversal": {
+    "startNode": "file:app/index.tsx",
+    "order": [
+      "file:app/index.tsx",
+      "file:src/components/TutorialOverlay.tsx",
+      "file:src/hooks/useTheme.ts",
+      "file:src/services/coins.ts",
+      "file:src/services/firebase.ts",
+      "file:src/services/matchmaking.ts",
+      "file:src/types/game.types.ts",
+      "file:src/utils/storage.ts",
+      "file:src/components/GameBoard.tsx",
+      "file:src/services/gameRoom.ts"
+    ],
+    "depthMap": {
+      "file:app/index.tsx": 0,
+      "file:src/components/TutorialOverlay.tsx": 1,
+      "file:src/hooks/useTheme.ts": 1,
+      "file:src/services/coins.ts": 1,
+      "file:src/services/firebase.ts": 1,
+      "file:src/services/matchmaking.ts": 1,
+      "file:src/types/game.types.ts": 1,
+      "file:src/utils/storage.ts": 1,
+      "file:src/components/GameBoard.tsx": 2,
+      "file:src/services/gameRoom.ts": 2
+    },
+    "byDepth": {
+      "0": [
+        "file:app/index.tsx"
+      ],
+      "1": [
+        "file:src/components/TutorialOverlay.tsx",
+        "file:src/hooks/useTheme.ts",
+        "file:src/services/coins.ts",
+        "file:src/services/firebase.ts",
+        "file:src/services/matchmaking.ts",
+        "file:src/types/game.types.ts",
+        "file:src/utils/storage.ts"
+      ],
+      "2": [
+        "file:src/components/GameBoard.tsx",
+        "file:src/services/gameRoom.ts"
+      ]
+    }
+  },
+  "nonCodeFiles": {
+    "documentation": [
+      {
+        "id": "document:CLAUDE.md",
+        "name": "CLAUDE.md",
+        "type": "document",
+        "summary": "Claude Code guidance document describing the dual-game architecture (standalone web PWA plus Expo/React Native mobile app), data flow, state layers, Firebase setup, and TypeScript configuration quirks."
+      },
+      {
+        "id": "document:ENHANCEMENT_PROMPT.md",
+        "name": "ENHANCEMENT_PROMPT.md",
+        "type": "document",
+        "summary": "Feature specification prompt detailing the online multiplayer and coin system enhancements, naming the exact files/services/hooks to create (lobby, useOnlineGame, firebase, gameRoom, coins, shop) and the constraints to preserve existing local play."
+      },
+      {
+        "id": "document:README.md",
+        "name": "README.md",
+        "type": "document",
+        "summary": "Project overview README with 20 sections covering features, game modes, tech stack, quick-start instructions, project structure, Firebase setup, game rules, AI strategy tiers, and production build steps."
+      },
+      {
+        "id": "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+        "name": "2026-03-22-phase1-implementation.md",
+        "type": "document",
+        "summary": "Detailed Phase 1 implementation plan breaking work into 12 sequenced tasks (types, storage, share button, online timer, touch snapping, tutorial overlay, quick match, Firestore rules) with a final verification and commit summary."
+      },
+      {
+        "id": "document:docs/superpowers/specs/2026-03-22-phase1-design.md",
+        "name": "2026-03-22-phase1-design.md",
+        "type": "document",
+        "summary": "Phase 1 design specification covering five features (interactive tutorial, online 15s turn timer, touch snapping precision, share-result button, quick-match matchmaking queue) with constraints, trust models, and Firestore schema/rules."
+      }
+    ],
+    "infrastructure": [],
+    "data": [],
+    "config": [
+      {
+        "id": "config:app.json",
+        "name": "app.json",
+        "type": "config",
+        "summary": "Expo application configuration defining app name, slug, icons, splash screen, platform settings, and plugins for the React Native mobile build."
+      },
+      {
+        "id": "config:eas.json",
+        "name": "eas.json",
+        "type": "config",
+        "summary": "EAS Build configuration defining build profiles (development, preview, production) and submit settings for producing iOS and Android binaries via Expo Application Services."
+      },
+      {
+        "id": "config:manifest.json",
+        "name": "manifest.json",
+        "type": "config",
+        "summary": "PWA web app manifest declaring name, icons, theme/background colors, display mode, and orientation so the standalone web game can be installed to a home screen."
+      },
+      {
+        "id": "config:netlify.toml",
+        "name": "netlify.toml",
+        "type": "config",
+        "summary": "Netlify deployment configuration defining the build/publish settings and custom HTTP response headers (caching, security) for hosting the standalone web PWA."
+      },
+      {
+        "id": "config:package.json",
+        "name": "package.json",
+        "type": "config",
+        "summary": "npm manifest for the Expo/React Native app declaring start/android/ios/web scripts and runtime dependencies including Expo, Expo Router, Firebase, and AsyncStorage."
+      },
+      {
+        "id": "config:tsconfig.json",
+        "name": "tsconfig.json",
+        "type": "config",
+        "summary": "TypeScript compiler configuration extending the Expo base config with the @/* path alias to src/* and node moduleResolution required for Firebase v10 web SDK type resolution."
+      },
+      {
+        "id": "config:.npmrc",
+        "name": ".npmrc",
+        "type": "config",
+        "summary": "npm configuration enabling legacy-peer-deps so installs ignore strict peer-dependency conflicts, accommodating the Firebase v10 / Expo dependency tree."
+      },
+      {
+        "id": "config:babel.config.js",
+        "name": "babel.config.js",
+        "type": "config",
+        "summary": "Babel configuration for the Expo app applying the babel-preset-expo preset and enabling the API cache for faster rebuilds."
+      },
+      {
+        "id": "config:firestore.rules",
+        "name": "firestore.rules",
+        "type": "config",
+        "summary": "Firestore security rules governing access to rooms, matchmaking, users, and coinTransactions collections: authenticated reads/writes for rooms and matchmaking, owner-scoped user docs, and read-only audit-trail coin transactions."
+      }
+    ]
+  },
+  "clusters": [],
+  "layers": {
+    "count": 0,
+    "list": []
+  },
+  "nodeSummaryIndex": {
+    "file:app/leaderboard.tsx": {
+      "name": "leaderboard.tsx",
+      "type": "file",
+      "summary": "Expo Router screen that fetches and renders the global player leaderboard ranked by coin balance, highlighting the current user's row."
+    },
+    "file:app/lobby.tsx": {
+      "name": "lobby.tsx",
+      "type": "file",
+      "summary": "Online lobby screen for creating or joining a multiplayer room by code, validating input, and navigating to the online game once a match is established."
+    },
+    "file:app/shop.tsx": {
+      "name": "shop.tsx",
+      "type": "file",
+      "summary": "Theme shop screen showing the coin balance and purchasable themes, handling theme purchases and activation via the coins service."
+    },
+    "file:src/services/coins.ts": {
+      "name": "coins.ts",
+      "type": "file",
+      "summary": "Firestore-backed coin service handling user profile bootstrap, balance read/subscribe, awarding and spending coins, daily bonus, online-result rewards, and theme ownership/activation."
+    },
+    "file:src/services/firebase.ts": {
+      "name": "firebase.ts",
+      "type": "file",
+      "summary": "Initializes the Firebase web SDK app, Firestore, and anonymous auth, exporting the shared instances plus a helper to obtain the current anonymous UID."
+    },
+    "file:src/services/gameRoom.ts": {
+      "name": "gameRoom.ts",
+      "type": "file",
+      "summary": "Firestore game-room service managing room lifecycle: code generation, board flatten/unflatten serialization, create/join, move application, turn skipping, abandon, and rematch."
+    },
+    "file:src/services/leaderboard.ts": {
+      "name": "leaderboard.ts",
+      "type": "file",
+      "summary": "Service that queries Firestore for top users ordered by coin balance and returns a ranked leaderboard list."
+    },
+    "file:src/services/matchmaking.ts": {
+      "name": "matchmaking.ts",
+      "type": "file",
+      "summary": "Quick-match matchmaking service managing a Firestore queue: joining, cancelling, listening for a match, scanning the waiting pool, and atomically pairing two players into a room."
+    },
+    "file:app/_layout.tsx": {
+      "name": "_layout.tsx",
+      "type": "file",
+      "summary": "Expo Router root layout that loads custom fonts, restores the persisted theme from AsyncStorage, and wraps the app in ThemeContext before rendering the navigation Stack."
+    },
+    "file:app/game.tsx": {
+      "name": "game.tsx",
+      "type": "file",
+      "summary": "Local game screen for 2-player and AI modes; drives the useGameEngine hook, renders GameBoard and ScoreBar, plays sound effects, and awards coins and records stats on game end."
+    },
+    "file:app/online-game.tsx": {
+      "name": "online-game.tsx",
+      "type": "file",
+      "summary": "Online multiplayer game screen backed by useOnlineGame (Firestore); renders the shared GameBoard and ScoreBar, disables input when it is not the player's turn, and awards coins on result."
+    },
+    "file:src/components/GameBoard.tsx": {
+      "name": "GameBoard.tsx",
+      "type": "file",
+      "summary": "SVG-based dots-and-boxes board component that renders dots, lines, and filled boxes, highlights the last move and new boxes, and emits onLineTap for player input."
+    },
+    "file:src/components/ScoreBar.tsx": {
+      "name": "ScoreBar.tsx",
+      "type": "file",
+      "summary": "Header bar component showing both players' names and scores, the active turn indicator, AI-thinking state, and a countdown timer when enabled."
+    },
+    "file:src/hooks/useTheme.ts": {
+      "name": "useTheme.ts",
+      "type": "file",
+      "summary": "Defines the theme system: ThemeTokens interface, the THEMES token map (parchment/neon/chalkboard/blueprint), THEME_META display metadata, the ThemeContext, and the useTheme hook consumers use to read the active theme."
+    },
+    "file:src/services/audio.ts": {
+      "name": "audio.ts",
+      "type": "file",
+      "summary": "Sound-effects service that procedurally synthesizes WAV tones (click, pop, chain, win, draw, timer beep) as base64, loads them via expo-av, and exposes initAudio and playSound for the game screens."
+    },
+    "file:src/ai/aiPlayer.ts": {
+      "name": "aiPlayer.ts",
+      "type": "file",
+      "summary": "Pure AI opponent strategy module exposing a single getAIMove entry point with three difficulty tiers (easy random, medium heuristic, hard minimax with alpha-beta pruning and chain avoidance)."
+    },
+    "file:src/hooks/useGameEngine.ts": {
+      "name": "useGameEngine.ts",
+      "type": "file",
+      "summary": "React hook driving the local (2-player and vs-AI) game: manages board state, turn switching, scoring, undo history, per-turn timer, AI move scheduling, and emits gameplay events to the UI."
+    },
+    "file:src/hooks/useOnlineGame.ts": {
+      "name": "useOnlineGame.ts",
+      "type": "file",
+      "summary": "React hook backing online multiplayer games via Firestore: subscribes to the room document, reconstructs board state from flattened arrays, submits moves, handles turn timer/auto-skip, abandonment, and rematch."
+    },
+    "file:src/types/game.types.ts": {
+      "name": "game.types.ts",
+      "type": "file",
+      "summary": "Central type hub declaring all shared game domain types (GameState, GameMode, Line, Player, board owner arrays, config and event interfaces) consumed across hooks, components, services, and screens."
+    },
+    "file:src/utils/gameHelpers.ts": {
+      "name": "gameHelpers.ts",
+      "type": "file",
+      "summary": "Pure game-logic utilities: builds initial board state, detects completed boxes, enumerates available lines, counts box sides, simulates line application, and snapshots state for undo."
+    },
+    "file:app/index.tsx": {
+      "name": "index.tsx",
+      "type": "file",
+      "summary": "Home/settings screen and app entry point: configures game mode, grid size, player names, timer and difficulty, displays stats and coin balance, drives the Quick Match matchmaking flow, and routes into local/AI/online games."
+    },
+    "file:src/components/TutorialOverlay.tsx": {
+      "name": "TutorialOverlay.tsx",
+      "type": "file",
+      "summary": "Multi-step interactive tutorial overlay that walks new players through dots & boxes rules using a live GameBoard preview, persisting the seen flag on completion."
+    },
+    "file:src/utils/storage.ts": {
+      "name": "storage.ts",
+      "type": "file",
+      "summary": "AsyncStorage-backed persistence layer for local preferences (mode, grid, names, timer, difficulty), win/loss stats, tutorial-seen flag, and sound preference."
+    },
+    "document:CLAUDE.md": {
+      "name": "CLAUDE.md",
+      "type": "document",
+      "summary": "Claude Code guidance document describing the dual-game architecture (standalone web PWA plus Expo/React Native mobile app), data flow, state layers, Firebase setup, and TypeScript configuration quirks."
+    },
+    "document:ENHANCEMENT_PROMPT.md": {
+      "name": "ENHANCEMENT_PROMPT.md",
+      "type": "document",
+      "summary": "Feature specification prompt detailing the online multiplayer and coin system enhancements, naming the exact files/services/hooks to create (lobby, useOnlineGame, firebase, gameRoom, coins, shop) and the constraints to preserve existing local play."
+    },
+    "document:README.md": {
+      "name": "README.md",
+      "type": "document",
+      "summary": "Project overview README with 20 sections covering features, game modes, tech stack, quick-start instructions, project structure, Firebase setup, game rules, AI strategy tiers, and production build steps."
+    },
+    "config:app.json": {
+      "name": "app.json",
+      "type": "config",
+      "summary": "Expo application configuration defining app name, slug, icons, splash screen, platform settings, and plugins for the React Native mobile build."
+    },
+    "config:eas.json": {
+      "name": "eas.json",
+      "type": "config",
+      "summary": "EAS Build configuration defining build profiles (development, preview, production) and submit settings for producing iOS and Android binaries via Expo Application Services."
+    },
+    "file:index.html": {
+      "name": "index.html",
+      "type": "file",
+      "summary": "Standalone single-file web PWA implementation of Dots & Boxes with all HTML, CSS, and JavaScript game logic inlined; runs directly in a browser with no build step or dependencies."
+    },
+    "config:manifest.json": {
+      "name": "manifest.json",
+      "type": "config",
+      "summary": "PWA web app manifest declaring name, icons, theme/background colors, display mode, and orientation so the standalone web game can be installed to a home screen."
+    },
+    "config:netlify.toml": {
+      "name": "netlify.toml",
+      "type": "config",
+      "summary": "Netlify deployment configuration defining the build/publish settings and custom HTTP response headers (caching, security) for hosting the standalone web PWA."
+    },
+    "config:package.json": {
+      "name": "package.json",
+      "type": "config",
+      "summary": "npm manifest for the Expo/React Native app declaring start/android/ios/web scripts and runtime dependencies including Expo, Expo Router, Firebase, and AsyncStorage."
+    },
+    "config:tsconfig.json": {
+      "name": "tsconfig.json",
+      "type": "config",
+      "summary": "TypeScript compiler configuration extending the Expo base config with the @/* path alias to src/* and node moduleResolution required for Firebase v10 web SDK type resolution."
+    },
+    "config:.npmrc": {
+      "name": ".npmrc",
+      "type": "config",
+      "summary": "npm configuration enabling legacy-peer-deps so installs ignore strict peer-dependency conflicts, accommodating the Firebase v10 / Expo dependency tree."
+    },
+    "config:babel.config.js": {
+      "name": "babel.config.js",
+      "type": "config",
+      "summary": "Babel configuration for the Expo app applying the babel-preset-expo preset and enabling the API cache for faster rebuilds."
+    },
+    "document:docs/superpowers/plans/2026-03-22-phase1-implementation.md": {
+      "name": "2026-03-22-phase1-implementation.md",
+      "type": "document",
+      "summary": "Detailed Phase 1 implementation plan breaking work into 12 sequenced tasks (types, storage, share button, online timer, touch snapping, tutorial overlay, quick match, Firestore rules) with a final verification and commit summary."
+    },
+    "document:docs/superpowers/specs/2026-03-22-phase1-design.md": {
+      "name": "2026-03-22-phase1-design.md",
+      "type": "document",
+      "summary": "Phase 1 design specification covering five features (interactive tutorial, online 15s turn timer, touch snapping precision, share-result button, quick-match matchmaking queue) with constraints, trust models, and Firestore schema/rules."
+    },
+    "config:firestore.rules": {
+      "name": "firestore.rules",
+      "type": "config",
+      "summary": "Firestore security rules governing access to rooms, matchmaking, users, and coinTransactions collections: authenticated reads/writes for rooms and matchmaking, owner-scoped user docs, and read-only audit-trail coin transactions."
+    },
+    "file:src/constants/theme.ts": {
+      "name": "theme.ts",
+      "type": "file",
+      "summary": "Default parchment theme tokens (colors, player accents, shadows, handwritten Caveat fonts) consumed by the theme system and board/UI components."
+    },
+    "file:src/types/firebase-shim.d.ts": {
+      "name": "firebase-shim.d.ts",
+      "type": "file",
+      "summary": "TypeScript ambient module declarations re-exporting @firebase/* internals as firebase/app, firebase/auth, and firebase/firestore so TS resolves the v10 web SDK under node moduleResolution."
+    },
+    "file:sw.js": {
+      "name": "sw.js",
+      "type": "file",
+      "summary": "Service worker for the standalone index.html PWA implementing precache install, stale-cache cleanup on activate, cache-first fetch for local assets, and network-first for Google Fonts to enable offline play."
+    }
+  },
+  "totalNodes": 41,
+  "totalEdges": 76
+}

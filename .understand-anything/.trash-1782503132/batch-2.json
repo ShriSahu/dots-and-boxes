@@ -1,0 +1,240 @@
+{
+  "nodes": [
+    {
+      "id": "file:app/_layout.tsx",
+      "type": "file",
+      "name": "_layout.tsx",
+      "filePath": "app/_layout.tsx",
+      "summary": "Expo Router root layout that loads custom fonts, restores the persisted theme from AsyncStorage, and wraps the app in ThemeContext before rendering the navigation Stack.",
+      "tags": ["entry-point", "layout", "theme", "expo-router"],
+      "complexity": "moderate",
+      "languageNotes": "Uses expo-font useFonts and SplashScreen gating; theme name hydrated from AsyncStorage before render."
+    },
+    {
+      "id": "function:app/_layout.tsx:RootLayout",
+      "type": "function",
+      "name": "RootLayout",
+      "filePath": "app/_layout.tsx",
+      "lineRange": [21, 67],
+      "summary": "Root component that waits for fonts and the stored theme to load, then provides ThemeContext and renders the Expo Router Stack.",
+      "tags": ["entry-point", "layout", "theme", "provider"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app/game.tsx",
+      "type": "file",
+      "name": "game.tsx",
+      "filePath": "app/game.tsx",
+      "summary": "Local game screen for 2-player and AI modes; drives the useGameEngine hook, renders GameBoard and ScoreBar, plays sound effects, and awards coins and records stats on game end.",
+      "tags": ["screen", "game", "entry-point", "coins"],
+      "complexity": "complex",
+      "languageNotes": "Large React screen pairing useGameEngine state with side-effects for audio, coin rewards, and stat recording."
+    },
+    {
+      "id": "function:app/game.tsx:GameScreen",
+      "type": "function",
+      "name": "GameScreen",
+      "filePath": "app/game.tsx",
+      "lineRange": [20, 358],
+      "summary": "Local game screen component coordinating the game engine, board rendering, sound effects, coin awards, and win/loss stat recording.",
+      "tags": ["screen", "game", "coins", "event-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/game.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "app/game.tsx",
+      "lineRange": [360, 553],
+      "summary": "Builds the theme-aware StyleSheet for the local game screen from the active theme tokens.",
+      "tags": ["styling", "theme", "factory"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:app/online-game.tsx",
+      "type": "file",
+      "name": "online-game.tsx",
+      "filePath": "app/online-game.tsx",
+      "summary": "Online multiplayer game screen backed by useOnlineGame (Firestore); renders the shared GameBoard and ScoreBar, disables input when it is not the player's turn, and awards coins on result.",
+      "tags": ["screen", "game", "online", "coins"],
+      "complexity": "complex",
+      "languageNotes": "Reuses the same GameBoard/ScoreBar as local play; useOnlineGame mirrors useGameEngine's shape for drop-in compatibility."
+    },
+    {
+      "id": "function:app/online-game.tsx:OnlineGameScreen",
+      "type": "function",
+      "name": "OnlineGameScreen",
+      "filePath": "app/online-game.tsx",
+      "lineRange": [19, 496],
+      "summary": "Online game screen component that consumes the Firestore-backed online game hook, gates the board by turn ownership, and handles result coin rewards.",
+      "tags": ["screen", "game", "online", "event-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/GameBoard.tsx",
+      "type": "file",
+      "name": "GameBoard.tsx",
+      "filePath": "src/components/GameBoard.tsx",
+      "summary": "SVG-based dots-and-boxes board component that renders dots, lines, and filled boxes, highlights the last move and new boxes, and emits onLineTap for player input.",
+      "tags": ["component", "game-board", "svg", "rendering"],
+      "complexity": "complex",
+      "languageNotes": "Renders an interactive board via react-native-svg; supports allowedLines gating and animated highlights."
+    },
+    {
+      "id": "function:src/components/GameBoard.tsx:GameBoard",
+      "type": "function",
+      "name": "GameBoard",
+      "filePath": "src/components/GameBoard.tsx",
+      "lineRange": [18, 314],
+      "summary": "Renders the interactive SVG game board from game state and config, drawing dots, lines, and boxes and invoking onLineTap on line presses.",
+      "tags": ["component", "game-board", "svg", "event-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/ScoreBar.tsx",
+      "type": "file",
+      "name": "ScoreBar.tsx",
+      "filePath": "src/components/ScoreBar.tsx",
+      "summary": "Header bar component showing both players' names and scores, the active turn indicator, AI-thinking state, and a countdown timer when enabled.",
+      "tags": ["component", "ui", "scoreboard", "timer"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/ScoreBar.tsx:ScoreBar",
+      "type": "function",
+      "name": "ScoreBar",
+      "filePath": "src/components/ScoreBar.tsx",
+      "lineRange": [14, 145],
+      "summary": "Renders player scores, the current-turn highlight, AI thinking indicator, and an optional countdown timer bar.",
+      "tags": ["component", "scoreboard", "timer", "ui"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/ScoreBar.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "src/components/ScoreBar.tsx",
+      "lineRange": [147, 243],
+      "summary": "Builds the theme-aware StyleSheet for the score bar from the active theme tokens.",
+      "tags": ["styling", "theme", "factory"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/hooks/useTheme.ts",
+      "type": "file",
+      "name": "useTheme.ts",
+      "filePath": "src/hooks/useTheme.ts",
+      "summary": "Defines the theme system: ThemeTokens interface, the THEMES token map (parchment/neon/chalkboard/blueprint), THEME_META display metadata, the ThemeContext, and the useTheme hook consumers use to read the active theme.",
+      "tags": ["hook", "theme", "context", "type-definition"],
+      "complexity": "moderate",
+      "languageNotes": "Centralizes design tokens per theme via a Record<ThemeName, ThemeTokens> and exposes them through React context."
+    },
+    {
+      "id": "function:src/hooks/useTheme.ts:useTheme",
+      "type": "function",
+      "name": "useTheme",
+      "filePath": "src/hooks/useTheme.ts",
+      "lineRange": [122, 124],
+      "summary": "React hook returning the current ThemeContext value (active theme tokens and setter) for consuming components.",
+      "tags": ["hook", "theme", "context"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/services/audio.ts",
+      "type": "file",
+      "name": "audio.ts",
+      "filePath": "src/services/audio.ts",
+      "summary": "Sound-effects service that procedurally synthesizes WAV tones (click, pop, chain, win, draw, timer beep) as base64, loads them via expo-av, and exposes initAudio and playSound for the game screens.",
+      "tags": ["service", "audio", "synthesis", "utility"],
+      "complexity": "complex",
+      "languageNotes": "Generates PCM WAV data in-memory and encodes to base64 to avoid bundling audio assets."
+    },
+    {
+      "id": "function:src/services/audio.ts:buildWavBase64",
+      "type": "function",
+      "name": "buildWavBase64",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [24, 55],
+      "summary": "Encodes an array of float samples into a base64-encoded WAV file with a proper RIFF/PCM header.",
+      "tags": ["audio", "serialization", "utility"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/audio.ts:genWin",
+      "type": "function",
+      "name": "genWin",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [102, 121],
+      "summary": "Procedurally generates the PCM sample buffer for the victory sound effect.",
+      "tags": ["audio", "synthesis", "utility"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/services/audio.ts:initAudio",
+      "type": "function",
+      "name": "initAudio",
+      "filePath": "src/services/audio.ts",
+      "lineRange": [170, 196],
+      "summary": "Initializes the audio mode and pre-generates and loads all sound-effect WAV assets so playSound can fire with low latency.",
+      "tags": ["audio", "initialization", "service"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {"source": "file:app/_layout.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/_layout.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/_layout.tsx", "target": "function:app/_layout.tsx:RootLayout", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/_layout.tsx", "target": "function:app/_layout.tsx:RootLayout", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/_layout.tsx:RootLayout", "target": "function:src/hooks/useTheme.ts:useTheme", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:app/game.tsx", "target": "file:src/components/GameBoard.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/components/ScoreBar.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/hooks/useGameEngine.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/services/audio.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/services/coins.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/services/firebase.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "file:src/utils/storage.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/game.tsx", "target": "function:app/game.tsx:GameScreen", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/game.tsx", "target": "function:app/game.tsx:GameScreen", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:app/game.tsx", "target": "function:app/game.tsx:makeStyles", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "function:app/game.tsx:GameScreen", "target": "function:src/hooks/useGameEngine.ts:useGameEngine", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/game.tsx:GameScreen", "target": "function:src/services/audio.ts:playSound", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:app/online-game.tsx", "target": "file:src/components/GameBoard.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/components/ScoreBar.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/hooks/useOnlineGame.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/services/audio.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/services/coins.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/online-game.tsx", "target": "function:app/online-game.tsx:OnlineGameScreen", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/online-game.tsx", "target": "function:app/online-game.tsx:OnlineGameScreen", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/online-game.tsx:OnlineGameScreen", "target": "function:src/hooks/useOnlineGame.ts:useOnlineGame", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/online-game.tsx:OnlineGameScreen", "target": "function:src/services/audio.ts:playSound", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/components/GameBoard.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/GameBoard.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/GameBoard.tsx", "target": "function:src/components/GameBoard.tsx:GameBoard", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/components/GameBoard.tsx", "target": "function:src/components/GameBoard.tsx:GameBoard", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "function:src/components/GameBoard.tsx:GameBoard", "target": "function:src/hooks/useTheme.ts:useTheme", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/components/ScoreBar.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/ScoreBar.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/ScoreBar.tsx", "target": "function:src/components/ScoreBar.tsx:ScoreBar", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/components/ScoreBar.tsx", "target": "function:src/components/ScoreBar.tsx:ScoreBar", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/components/ScoreBar.tsx", "target": "function:src/components/ScoreBar.tsx:makeStyles", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "function:src/components/ScoreBar.tsx:ScoreBar", "target": "function:src/hooks/useTheme.ts:useTheme", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/hooks/useTheme.ts", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/hooks/useTheme.ts", "target": "function:src/hooks/useTheme.ts:useTheme", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/hooks/useTheme.ts", "target": "function:src/hooks/useTheme.ts:useTheme", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/services/audio.ts", "target": "function:src/services/audio.ts:buildWavBase64", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/services/audio.ts", "target": "function:src/services/audio.ts:genWin", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/services/audio.ts", "target": "function:src/services/audio.ts:initAudio", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/services/audio.ts", "target": "function:src/services/audio.ts:initAudio", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "function:src/services/audio.ts:initAudio", "target": "function:src/services/audio.ts:buildWavBase64", "type": "calls", "direction": "forward", "weight": 0.8}
+  ]
+}

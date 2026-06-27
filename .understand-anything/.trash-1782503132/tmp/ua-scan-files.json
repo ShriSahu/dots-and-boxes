@@ -1,0 +1,273 @@
+{
+  "scriptCompleted": true,
+  "files": [
+    {
+      "path": ".npmrc",
+      "language": "unknown",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app.json",
+      "language": "json",
+      "sizeLines": 52,
+      "fileCategory": "config"
+    },
+    {
+      "path": "app/_layout.tsx",
+      "language": "typescript",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/game.tsx",
+      "language": "typescript",
+      "sizeLines": 553,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/index.tsx",
+      "language": "typescript",
+      "sizeLines": 815,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/leaderboard.tsx",
+      "language": "typescript",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/lobby.tsx",
+      "language": "typescript",
+      "sizeLines": 369,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/online-game.tsx",
+      "language": "typescript",
+      "sizeLines": 575,
+      "fileCategory": "code"
+    },
+    {
+      "path": "app/shop.tsx",
+      "language": "typescript",
+      "sizeLines": 257,
+      "fileCategory": "code"
+    },
+    {
+      "path": "babel.config.js",
+      "language": "javascript",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "sizeLines": 73,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-03-22-phase1-implementation.md",
+      "language": "markdown",
+      "sizeLines": 1591,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-03-22-phase1-design.md",
+      "language": "markdown",
+      "sizeLines": 626,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "eas.json",
+      "language": "json",
+      "sizeLines": 29,
+      "fileCategory": "config"
+    },
+    {
+      "path": "ENHANCEMENT_PROMPT.md",
+      "language": "markdown",
+      "sizeLines": 27,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "firestore.rules",
+      "language": "rules",
+      "sizeLines": 41,
+      "fileCategory": "code"
+    },
+    {
+      "path": "index.html",
+      "language": "html",
+      "sizeLines": 1659,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "manifest.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "netlify.toml",
+      "language": "toml",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": "package.json",
+      "language": "json",
+      "sizeLines": 41,
+      "fileCategory": "config"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 213,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "src/ai/aiPlayer.ts",
+      "language": "typescript",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/GameBoard.tsx",
+      "language": "typescript",
+      "sizeLines": 314,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/ScoreBar.tsx",
+      "language": "typescript",
+      "sizeLines": 243,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/TutorialOverlay.tsx",
+      "language": "typescript",
+      "sizeLines": 227,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/constants/theme.ts",
+      "language": "typescript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/hooks/useGameEngine.ts",
+      "language": "typescript",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/hooks/useOnlineGame.ts",
+      "language": "typescript",
+      "sizeLines": 235,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/hooks/useTheme.ts",
+      "language": "typescript",
+      "sizeLines": 124,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/audio.ts",
+      "language": "typescript",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/coins.ts",
+      "language": "typescript",
+      "sizeLines": 132,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/firebase.ts",
+      "language": "typescript",
+      "sizeLines": 40,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/gameRoom.ts",
+      "language": "typescript",
+      "sizeLines": 278,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/leaderboard.ts",
+      "language": "typescript",
+      "sizeLines": 31,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/services/matchmaking.ts",
+      "language": "typescript",
+      "sizeLines": 137,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/types/firebase-shim.d.ts",
+      "language": "typescript",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/types/game.types.ts",
+      "language": "typescript",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/utils/gameHelpers.ts",
+      "language": "typescript",
+      "sizeLines": 101,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/utils/storage.ts",
+      "language": "typescript",
+      "sizeLines": 127,
+      "fileCategory": "code"
+    },
+    {
+      "path": "sw.js",
+      "language": "javascript",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tsconfig.json",
+      "language": "json",
+      "sizeLines": 12,
+      "fileCategory": "config"
+    }
+  ],
+  "totalFiles": 41,
+  "filteredByIgnore": 53,
+  "estimatedComplexity": "moderate",
+  "stats": {
+    "filesScanned": 41,
+    "byCategory": {
+      "code": 29,
+      "config": 6,
+      "docs": 5,
+      "markup": 1
+    },
+    "byLanguage": {
+      "unknown": 1,
+      "json": 5,
+      "typescript": 25,
+      "javascript": 2,
+      "markdown": 5,
+      "rules": 1,
+      "html": 1,
+      "toml": 1
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "projectRoot": "C:/Shri_Development/dots-and-boxes",
+  "batchFiles": [
+    {"path": "app/_layout.tsx", "language": "typescript", "sizeLines": 67, "fileCategory": "code"},
+    {"path": "app/game.tsx", "language": "typescript", "sizeLines": 553, "fileCategory": "code"},
+    {"path": "app/online-game.tsx", "language": "typescript", "sizeLines": 575, "fileCategory": "code"},
+    {"path": "src/components/GameBoard.tsx", "language": "typescript", "sizeLines": 314, "fileCategory": "code"},
+    {"path": "src/components/ScoreBar.tsx", "language": "typescript", "sizeLines": 243, "fileCategory": "code"},
+    {"path": "src/hooks/useTheme.ts", "language": "typescript", "sizeLines": 124, "fileCategory": "code"},
+    {"path": "src/services/audio.ts", "language": "typescript", "sizeLines": 208, "fileCategory": "code"}
+  ],
+  "batchImportData": {"app/_layout.tsx":["src/hooks/useTheme.ts","src/types/game.types.ts"],"app/game.tsx":["src/components/GameBoard.tsx","src/components/ScoreBar.tsx","src/hooks/useGameEngine.ts","src/hooks/useTheme.ts","src/services/audio.ts","src/services/coins.ts","src/services/firebase.ts","src/types/game.types.ts","src/utils/storage.ts"],"app/online-game.tsx":["src/components/GameBoard.tsx","src/components/ScoreBar.tsx","src/hooks/useOnlineGame.ts","src/hooks/useTheme.ts","src/services/audio.ts","src/services/coins.ts","src/types/game.types.ts"],"src/components/GameBoard.tsx":["src/hooks/useTheme.ts","src/types/game.types.ts"],"src/components/ScoreBar.tsx":["src/hooks/useTheme.ts","src/types/game.types.ts"],"src/hooks/useTheme.ts":["src/types/game.types.ts"],"src/services/audio.ts":[]}
+}

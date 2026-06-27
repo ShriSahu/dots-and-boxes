@@ -1,0 +1,184 @@
+{
+  "nodes": [
+    {
+      "id": "file:app/index.tsx",
+      "type": "file",
+      "name": "index.tsx",
+      "filePath": "app/index.tsx",
+      "summary": "Home/settings screen and app entry point: configures game mode, grid size, player names, timer and difficulty, displays stats and coin balance, drives the Quick Match matchmaking flow, and routes into local/AI/online games.",
+      "tags": ["entry-point", "component", "service", "matchmaking", "settings"],
+      "complexity": "complex",
+      "languageNotes": "Large Expo Router screen combining many useState/useRef hooks, animated daily-bonus sequence, and a multi-step matchmaking state machine with Firestore subscriptions tracked via refs."
+    },
+    {
+      "id": "function:app/index.tsx:HomeScreen",
+      "type": "function",
+      "name": "HomeScreen",
+      "filePath": "app/index.tsx",
+      "lineRange": [68, 623],
+      "summary": "Default-exported home screen component that loads prefs/stats, authenticates anonymously, subscribes to coin balance, runs the Quick Match queue/match flow, and navigates to game screens.",
+      "tags": ["component", "entry-point", "matchmaking", "event-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:app/index.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "app/index.tsx",
+      "lineRange": [625, 815],
+      "summary": "Builds the themed StyleSheet for the home screen from the active theme tokens.",
+      "tags": ["styling", "theme", "factory"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:app/index.tsx:getDailyChallenge",
+      "type": "function",
+      "name": "getDailyChallenge",
+      "filePath": "app/index.tsx",
+      "lineRange": [55, 66],
+      "summary": "Computes a deterministic daily-challenge preset based on the current day-of-year.",
+      "tags": ["utility", "daily-challenge"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/TutorialOverlay.tsx",
+      "type": "file",
+      "name": "TutorialOverlay.tsx",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "summary": "Multi-step interactive tutorial overlay that walks new players through dots & boxes rules using a live GameBoard preview, persisting the seen flag on completion.",
+      "tags": ["component", "tutorial", "onboarding", "event-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:TutorialOverlay",
+      "type": "function",
+      "name": "TutorialOverlay",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [100, 189],
+      "summary": "Default-exported overlay component managing step navigation, rendering a sample board per step, and calling onDone (and persisting tutorial-seen) when finished.",
+      "tags": ["component", "tutorial", "onboarding"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:emptyState",
+      "type": "function",
+      "name": "emptyState",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [12, 25],
+      "summary": "Constructs an empty game-state object of a given grid size used as the base for tutorial step previews.",
+      "tags": ["utility", "factory", "game-state"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/TutorialOverlay.tsx:makeStyles",
+      "type": "function",
+      "name": "makeStyles",
+      "filePath": "src/components/TutorialOverlay.tsx",
+      "lineRange": [191, 227],
+      "summary": "Builds the themed StyleSheet for the tutorial overlay from active theme tokens.",
+      "tags": ["styling", "theme", "factory"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/utils/storage.ts",
+      "type": "file",
+      "name": "storage.ts",
+      "filePath": "src/utils/storage.ts",
+      "summary": "AsyncStorage-backed persistence layer for local preferences (mode, grid, names, timer, difficulty), win/loss stats, tutorial-seen flag, and sound preference.",
+      "tags": ["utility", "service", "persistence", "serialization"],
+      "complexity": "moderate",
+      "languageNotes": "Uses AsyncStorage multiGet/multiSet batch APIs and validates loaded values against allowed enums to guard against corrupt persisted data."
+    },
+    {
+      "id": "function:src/utils/storage.ts:loadPrefs",
+      "type": "function",
+      "name": "loadPrefs",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [47, 66],
+      "summary": "Batch-reads persisted preferences via multiGet and returns a validated partial config, coercing numbers and rejecting out-of-range enum values.",
+      "tags": ["utility", "persistence", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:loadStats",
+      "type": "function",
+      "name": "loadStats",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [68, 86],
+      "summary": "Loads and parses persisted win/loss/draw stats, tolerating both JSON and legacy plain-integer formats.",
+      "tags": ["utility", "persistence", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:recordStat",
+      "type": "function",
+      "name": "recordStat",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [88, 110],
+      "summary": "Reads current stats, increments the counter for a given result, and persists the updated stats back to AsyncStorage.",
+      "tags": ["utility", "persistence", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/utils/storage.ts:savePrefs",
+      "type": "function",
+      "name": "savePrefs",
+      "filePath": "src/utils/storage.ts",
+      "lineRange": [34, 45],
+      "summary": "Persists the provided game configuration to AsyncStorage as a batch of key/value pairs.",
+      "tags": ["utility", "persistence"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {"source": "file:app/index.tsx", "target": "file:src/components/TutorialOverlay.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/services/coins.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/services/firebase.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/services/matchmaking.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:app/index.tsx", "target": "file:src/utils/storage.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "file:src/components/GameBoard.tsx", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "file:src/hooks/useTheme.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "file:src/utils/storage.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+
+    {"source": "file:src/utils/storage.ts", "target": "file:src/types/game.types.ts", "type": "imports", "direction": "forward", "weight": 0.7},
+
+    {"source": "file:app/index.tsx", "target": "function:app/index.tsx:HomeScreen", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/index.tsx", "target": "function:app/index.tsx:makeStyles", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/index.tsx", "target": "function:app/index.tsx:getDailyChallenge", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:app/index.tsx", "target": "function:app/index.tsx:HomeScreen", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "function:src/components/TutorialOverlay.tsx:TutorialOverlay", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "function:src/components/TutorialOverlay.tsx:emptyState", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "function:src/components/TutorialOverlay.tsx:makeStyles", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/components/TutorialOverlay.tsx", "target": "function:src/components/TutorialOverlay.tsx:TutorialOverlay", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:loadPrefs", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:loadStats", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:recordStat", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:savePrefs", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:loadPrefs", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:loadStats", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:recordStat", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/utils/storage.ts", "target": "function:src/utils/storage.ts:savePrefs", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/utils/storage.ts:loadPrefs", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/utils/storage.ts:loadStats", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/utils/storage.ts:savePrefs", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/coins.ts:subscribeToBalance", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/coins.ts:ensureUserProfile", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/coins.ts:checkAndAwardDailyBonus", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/firebase.ts:getAnonymousUid", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/matchmaking.ts:joinQueue", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/matchmaking.ts:cancelQueue", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/matchmaking.ts:subscribeToWaitingPool", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/matchmaking.ts:attemptMatch", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:app/index.tsx:HomeScreen", "target": "function:src/services/matchmaking.ts:subscribeToMyMatch", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "function:src/components/TutorialOverlay.tsx:TutorialOverlay", "target": "function:src/utils/storage.ts:setTutorialSeen", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:src/utils/storage.ts:recordStat", "target": "function:src/utils/storage.ts:loadStats", "type": "calls", "direction": "forward", "weight": 0.8}
+  ]
+}
