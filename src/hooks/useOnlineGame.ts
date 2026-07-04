@@ -45,12 +45,15 @@ export function useOnlineGame(
   // ── Online turn timer ────────────────────────────────────────────────────
   useEffect(() => {
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-    if (!room?.turnStartedAt || room.status !== 'active') {
+    // timerSeconds === 0 means the room was created without a turn timer —
+    // must not silently fall back to a default, or turns will auto-skip
+    // with no visible countdown (the display uses the same 0-means-off rule).
+    if (!room?.turnStartedAt || room.status !== 'active' || !room.timerSeconds) {
       setTimerRemaining(0);
       return;
     }
 
-    const timerMax = room.timerSeconds || 15;
+    const timerMax = room.timerSeconds;
     let skipFired = false;  // one-shot guard — prevent double skip on same turn
 
     const tick = () => {
@@ -149,10 +152,11 @@ export function useOnlineGame(
     if (isSubmitting) return;
 
     setIsSubmitting(true);
+    const roomAtTap = room; // stable snapshot for this move, in case `room` updates mid-flight
     try {
       const { hLines, vLines, boxes } = unflattenBoard(
-        { hLines: room.hLines, vLines: room.vLines, boxes: room.boxes },
-        room.gridSize,
+        { hLines: roomAtTap.hLines, vLines: roomAtTap.vLines, boxes: roomAtTap.boxes },
+        roomAtTap.gridSize,
       );
 
       const newHLines = hLines.map(r => [...r]);
@@ -161,23 +165,45 @@ export function useOnlineGame(
       else                   newVLines[line.row][line.col] = true;
 
       const tempState = { hLines: newHLines, vLines: newVLines, boxes };
-      const completed = getCompletedBoxes(tempState, line, room.gridSize);
+      const completed = getCompletedBoxes(tempState, line, roomAtTap.gridSize);
 
       const newBoxes  = boxes.map(r => [...r]) as BoxOwner[][];
       const myPlayer: Player = isHost ? 1 : 2;
       completed.forEach(([r, c]) => { newBoxes[r][c] = myPlayer; });
 
-      const myScore    = (isHost ? room.host.score : room.guest.score) + completed.length;
-      const oppScore   = isHost ? room.guest.score : room.host.score;
-      const totalBoxes = (room.gridSize - 1) ** 2;
+      const myScore    = (isHost ? roomAtTap.host.score : roomAtTap.guest.score) + completed.length;
+      const oppScore   = isHost ? roomAtTap.guest.score : roomAtTap.host.score;
+      const totalBoxes = (roomAtTap.gridSize - 1) ** 2;
       const isGameOver = (myScore + oppScore) === totalBoxes;
 
       const nextUid = completed.length > 0
         ? myUid
-        : (isHost ? room.guest.uid! : room.host.uid);
+        : (isHost ? roomAtTap.guest.uid! : roomAtTap.host.uid);
 
       const hostScore  = isHost ? myScore  : oppScore;
       const guestScore = isHost ? oppScore : myScore;
+
+      // Optimistic local update — apply the line/box/score change immediately
+      // instead of waiting on the Firestore round-trip, so the tap feels instant.
+      // The next onSnapshot from Firestore will reconcile with the authoritative
+      // state (recomputed the same way, so it should be a no-op visually).
+      if (line.type === 'h') lineOwnersRef.current.hLineOwners[line.row][line.col] = myPlayer;
+      else                   lineOwnersRef.current.vLineOwners[line.row][line.col] = myPlayer;
+
+      setLastLine(line);
+      setTimeout(() => setLastLine(null), 260);
+
+      setState({
+        hLines: newHLines,
+        vLines: newVLines,
+        hLineOwners: lineOwnersRef.current.hLineOwners.map(r => [...r]) as BoxOwner[][],
+        vLineOwners: lineOwnersRef.current.vLineOwners.map(r => [...r]) as BoxOwner[][],
+        boxes: newBoxes,
+        currentPlayer: nextUid === roomAtTap.host.uid ? 1 : 2,
+        scores: { p1: hostScore, p2: guestScore },
+        isGameOver,
+        history: [],
+      });
 
       if (completed.length > 0) {
         const completedKeys = completed.map(([r, c]) => `${r}-${c}`);
@@ -190,7 +216,24 @@ export function useOnlineGame(
         hostScore, guestScore, isGameOver,
       );
     } catch (_) {
-      // Ignore turn conflict errors (stale tap)
+      // Move was rejected (stale tap / turn conflict) — the optimistic update
+      // above is now wrong. Revert to the last known-good server state; if the
+      // opponent's move already landed, the next snapshot will fix it anyway.
+      const { hLines, vLines, boxes } = unflattenBoard(
+        { hLines: roomAtTap.hLines, vLines: roomAtTap.vLines, boxes: roomAtTap.boxes },
+        roomAtTap.gridSize,
+      );
+      setState({
+        hLines,
+        vLines,
+        hLineOwners: lineOwnersRef.current.hLineOwners.map(r => [...r]) as BoxOwner[][],
+        vLineOwners: lineOwnersRef.current.vLineOwners.map(r => [...r]) as BoxOwner[][],
+        boxes: boxes as BoxOwner[][],
+        currentPlayer: roomAtTap.currentPlayerUid === roomAtTap.host.uid ? 1 : 2,
+        scores: { p1: roomAtTap.host.score, p2: roomAtTap.guest.score },
+        isGameOver: roomAtTap.status === 'finished',
+        history: [],
+      });
     } finally {
       setIsSubmitting(false);
     }
