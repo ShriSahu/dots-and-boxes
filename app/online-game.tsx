@@ -66,6 +66,11 @@ export default function OnlineGameScreen() {
     });
   }, [toastOpacity]);
 
+  // Seat-correct colors: p1/host is always theme.p1, p2/guest is always theme.p2,
+  // regardless of which seat the local player occupies.
+  const myColor = isHost ? theme.p1 : theme.p2;
+  const myLight = isHost ? theme.p1Light : theme.p2Light;
+
   const { room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine, abandon, requestRematch, timerRemaining } =
     useOnlineGame(roomCode, myUid, isHost, gridSize, {
       onBoxClaimed: (count, player, boxKeys, line) => {
@@ -78,9 +83,9 @@ export default function OnlineGameScreen() {
         setTimeout(() => setNewBoxes([]), 700);
       },
       onTurnSwitch: () => {
-        const nextName  = room?.currentPlayerUid === myUid ? myName : opponentName;
-        const nextColor = room?.currentPlayerUid === (isHost ? room?.host.uid : room?.guest.uid)
-          ? theme.p1 : theme.p2;
+        const nextIsMe  = room?.currentPlayerUid === myUid;
+        const nextName  = nextIsMe ? myName : opponentName;
+        const nextColor = room?.currentPlayerUid === room?.host.uid ? theme.p1 : theme.p2;
         showToast(`${nextName}'s turn`, nextColor);
       },
       onOpponentDisconnected: () => {
@@ -291,10 +296,10 @@ export default function OnlineGameScreen() {
         </View>
 
         <View style={[styles.iconBtn, {
-          backgroundColor: isMyTurn ? theme.p1Light : theme.bgCard,
-          borderColor: isMyTurn ? theme.p1 : theme.border,
+          backgroundColor: isMyTurn ? myLight : theme.bgCard,
+          borderColor: isMyTurn ? myColor : theme.border,
         }]}>
-          <Text style={[styles.iconBtnText, { color: isMyTurn ? theme.p1 : theme.textMuted }]}>
+          <Text style={[styles.iconBtnText, { color: isMyTurn ? myColor : theme.textMuted }]}>
             {isMyTurn ? '●' : '○'}
           </Text>
         </View>
@@ -303,11 +308,11 @@ export default function OnlineGameScreen() {
       {/* ── Turn indicator ── */}
       {!state.isGameOver && (
         <View style={[styles.turnBanner, {
-          backgroundColor: isMyTurn ? theme.p1Light : theme.bgCard,
-          borderColor: isMyTurn ? theme.p1 : theme.border,
+          backgroundColor: isMyTurn ? myLight : theme.bgCard,
+          borderColor: isMyTurn ? myColor : theme.border,
         }]}>
           <Text style={[styles.turnBannerText, {
-            color: isMyTurn ? theme.p1 : theme.textMuted,
+            color: isMyTurn ? myColor : theme.textMuted,
             fontFamily: theme.fontSemiBold,
           }]}>
             {isMyTurn ? '▶ Your turn' : `${opponentName} is thinking…`}
