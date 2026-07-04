@@ -1,9 +1,0 @@
-{
-  "projectRoot": "C:/Shri_Development/dots-and-boxes",
-  "batchFiles": [
-    {"path": "app/index.tsx", "language": "typescript", "sizeLines": 815, "fileCategory": "code"},
-    {"path": "src/components/TutorialOverlay.tsx", "language": "typescript", "sizeLines": 227, "fileCategory": "code"},
-    {"path": "src/utils/storage.ts", "language": "typescript", "sizeLines": 127, "fileCategory": "code"}
-  ],
-  "batchImportData": {"app/index.tsx":["src/components/TutorialOverlay.tsx","src/hooks/useTheme.ts","src/services/coins.ts","src/services/firebase.ts","src/services/matchmaking.ts","src/types/game.types.ts","src/utils/storage.ts"],"src/components/TutorialOverlay.tsx":["src/components/GameBoard.tsx","src/hooks/useTheme.ts","src/types/game.types.ts","src/utils/storage.ts"],"src/utils/storage.ts":["src/types/game.types.ts"]}
-}
