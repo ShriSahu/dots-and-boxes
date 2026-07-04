@@ -9,12 +9,14 @@ import { useTheme } from '../src/hooks/useTheme';
 import { getAnonymousUid } from '../src/services/firebase';
 import { ensureUserProfile } from '../src/services/coins';
 import { createRoom, joinRoom, subscribeToRoom, abandonRoom } from '../src/services/gameRoom';
-import type { GridSize, OnlineRoom } from '../src/types/game.types';
+import type { GridSize, OnlineRoom, TimerOption } from '../src/types/game.types';
 
 type LobbyView = 'menu' | 'create-settings' | 'waiting' | 'join-input';
 
 const GRID_SIZES: GridSize[] = [3, 4, 5, 6];
 const GRID_LABELS = ['3×3', '4×4', '5×5', '6×6'];
+const TIMER_OPTS: TimerOption[] = [0, 10, 15, 30];
+const TIMER_LABELS = ['Off', '10s', '15s', '30s'];
 
 export default function LobbyScreen() {
   const { theme } = useTheme();
@@ -23,6 +25,7 @@ export default function LobbyScreen() {
   const [view, setView]           = useState<LobbyView>('menu');
   const [playerName, setName]     = useState('');
   const [gridSize, setGrid]       = useState<GridSize>(4);
+  const [timerSecs, setTimerSecs] = useState<TimerOption>(0);
   const [joinCode, setJoinCode]   = useState('');
   const [roomCode, setRoomCode]   = useState('');
   const [myUid, setMyUid]         = useState('');
@@ -60,7 +63,7 @@ export default function LobbyScreen() {
     setError('');
     try {
       await ensureUserProfile(myUid, name);
-      const code = await createRoom(myUid, name, gridSize);
+      const code = await createRoom(myUid, name, gridSize, timerSecs);
       setRoomCode(code);
       setView('waiting');
 
@@ -200,6 +203,27 @@ export default function LobbyScreen() {
                   >
                     <Text style={[s.gridBtnText, { color: gridSize === g ? theme.p1 : theme.text }]}>
                       {GRID_LABELS[i]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+              <Text style={[s.cardTitle, { color: theme.textMuted }]}>Turn Timer</Text>
+              <View style={s.gridRow}>
+                {TIMER_OPTS.map((t, i) => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[
+                      s.gridBtn,
+                      { borderColor: theme.border },
+                      timerSecs === t && { borderColor: theme.p1, backgroundColor: theme.p1Light },
+                    ]}
+                    onPress={() => setTimerSecs(t)}
+                  >
+                    <Text style={[s.gridBtnText, { color: timerSecs === t ? theme.p1 : theme.text }]}>
+                      {TIMER_LABELS[i]}
                     </Text>
                   </TouchableOpacity>
                 ))}

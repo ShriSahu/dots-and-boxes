@@ -61,6 +61,7 @@ export async function createRoom(
   hostUid: string,
   hostName: string,
   gridSize: GridSize,
+  timerSeconds: TimerOption = 0,
 ): Promise<string> {
   let roomCode = generateRoomCode();
   // Ensure uniqueness (max 5 tries)
@@ -74,7 +75,7 @@ export async function createRoom(
   const room: Omit<OnlineRoom, 'roomCode'> = {
     status: 'waiting',
     gridSize,
-    timerSeconds: 0,
+    timerSeconds,
     host: { uid: hostUid, name: hostName, score: 0 },
     guest: { uid: null, name: null, score: 0 },
     currentPlayerUid: hostUid,

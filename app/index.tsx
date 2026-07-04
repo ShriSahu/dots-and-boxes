@@ -6,7 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
-import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTutorialSeen } from '../src/utils/storage';
+import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTutorialSeen, loadSoundPref, saveSoundPref } from '../src/utils/storage';
+import { setSoundEnabled } from '../src/services/audio';
 import TutorialOverlay from '../src/components/TutorialOverlay';
 import { getAnonymousUid } from '../src/services/firebase';
 import { ensureUserProfile, subscribeToBalance, checkAndAwardDailyBonus } from '../src/services/coins';
@@ -82,6 +83,7 @@ export default function HomeScreen() {
   const bonusAnim = useRef(new Animated.Value(0)).current;
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeenState] = useState(false);
+  const [soundOn, setSoundOn] = useState(true);
   const dailyChallengeCard = getDailyChallenge();
 
   type MatchState = 'idle' | 'waiting' | 'timeout';
@@ -109,6 +111,9 @@ export default function HomeScreen() {
       if (prefs.gridSize)   setGridSize(prefs.gridSize);
       if (prefs.difficulty) setDiff(prefs.difficulty);
       if (prefs.timerSeconds !== undefined) setTimer(prefs.timerSeconds);
+      const soundPref = await loadSoundPref();
+      setSoundOn(soundPref);
+      setSoundEnabled(soundPref);
       const st = await loadStats();
       setStats(st);
       const seen = await getTutorialSeen();
@@ -209,6 +214,15 @@ export default function HomeScreen() {
     });
   }, [uid, p1Name, gridSize]);
 
+  const handleToggleSound = useCallback(() => {
+    setSoundOn(prev => {
+      const next = !prev;
+      setSoundEnabled(next);
+      saveSoundPref(next);
+      return next;
+    });
+  }, []);
+
   const handleCancelMatch = useCallback(async () => {
     if (!uid) return;
     if (matchTimeoutRef.current) clearTimeout(matchTimeoutRef.current);
@@ -254,6 +268,14 @@ export default function HomeScreen() {
           >
             <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
               ?
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onPress={handleToggleSound}
+          >
+            <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+              {soundOn ? '🔊' : '🔇'}
             </Text>
           </TouchableOpacity>
         </View>
