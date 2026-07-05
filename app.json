@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -49,7 +48,9 @@
         {
           "color": "#ffffff"
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-asset"
     ],
     "scheme": "dotsandboxes",
     "extra": {

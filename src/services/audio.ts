@@ -2,16 +2,16 @@
  * Programmatic audio engine — generates all game sounds from scratch using
  * PCM math. No external audio files required; works fully offline.
  *
- * Sounds are encoded as WAV data URIs and loaded via expo-av. Data URIs (rather
- * than writing to expo-file-system's cache dir) work identically on native and
- * web — the web build has no cache directory, which previously made every
- * sound fail to load silently.
- * Falls back silently if expo-av native module is unavailable (e.g. Expo Go SDK 55).
+ * Sounds are encoded as WAV data URIs and loaded via expo-audio. Data URIs
+ * (rather than writing to expo-file-system's cache dir) work identically on
+ * native and web — the web build has no cache directory, which previously made
+ * every sound fail to load silently.
+ * Falls back silently if the expo-audio native module is unavailable.
  */
-// Lazy import — expo-av native module may be absent in some Expo Go versions
-let Audio: any = null;
+// Lazy import — expo-audio native module may be absent in some Expo Go versions
+let AudioModule: any = null;
 try {
-  Audio = require('expo-av').Audio;
+  AudioModule = require('expo-audio');
 } catch (_) { /* audio unavailable */ }
 
 // ─── WAV encoder ─────────────────────────────────────────────────────────────
@@ -158,22 +158,21 @@ let soundEnabled = true;
 
 async function loadSound(name: SoundName, samples: Float32Array): Promise<void> {
   const uri = `data:audio/wav;base64,${buildWavBase64(samples)}`;
-  const { sound } = await Audio.Sound.createAsync({ uri }, { shouldPlay: false });
-  cache.set(name, sound);
+  const player = AudioModule.createAudioPlayer({ uri });
+  cache.set(name, player);
 }
 
 /** Call once at app startup (or before first game screen). Idempotent. */
 export async function initAudio(): Promise<void> {
-  if (!Audio) return;
+  if (!AudioModule) return;
   if (initDone) return;
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
     try {
       // Not all options apply on web; ignore failures and keep loading sounds.
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS:    true,
-        staysActiveInBackground: false,
+      await AudioModule.setAudioModeAsync({
+        playsInSilentMode: true,
       }).catch(() => {});
       await Promise.all([
         loadSound('click',     genClick()),
@@ -204,11 +203,11 @@ export function isSoundEnabled(): boolean {
 /** Play a named sound. No-ops gracefully if muted, not ready, or fails. */
 export async function playSound(name: SoundName): Promise<void> {
   if (!soundEnabled) return;
-  const s = cache.get(name);
-  if (!s) return;
+  const player = cache.get(name);
+  if (!player) return;
   try {
-    await s.setPositionAsync(0);
-    await s.playAsync();
+    await player.seekTo(0);
+    player.play();
   } catch (_) {
     // Sound busy or unloaded — ignore
   }
