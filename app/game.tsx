@@ -36,8 +36,7 @@ export default function GameScreen() {
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
   const confettiRef   = useRef<any>(null);
-  const chainConfettiMedRef = useRef<any>(null);
-  const chainConfettiBigRef = useRef<any>(null);
+  const [activeChainTier, setActiveChainTier] = useState<0 | 1 | 2>(0);
 
   const styles = makeStyles(theme);
 
@@ -70,8 +69,7 @@ export default function GameScreen() {
         const name  = player === 1 ? config.p1Name : config.p2Name;
         const color = player === 1 ? theme.p1 : theme.p2;
         showToast(`${celebration.label}${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
-        if (celebration.tier === 1) chainConfettiMedRef.current?.start();
-        if (celebration.tier === 2) chainConfettiBigRef.current?.start();
+        if (celebration.tier > 0) setActiveChainTier(celebration.tier);
         // Trigger box fill animations (staggered)
         setNewBoxes(boxKeys);
         setTimeout(() => setNewBoxes([]), 700); // clear after animations complete
@@ -358,27 +356,35 @@ export default function GameScreen() {
           colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
           fallSpeed={3500}
         />
-        {/* Chain-celebration bursts — scaled by chain length, fired from mid-board */}
-        <ConfettiCannon
-          ref={chainConfettiMedRef}
-          count={CHAIN_CONFETTI_COUNTS[1]}
-          origin={{ x: width / 2, y: height * 0.4 }}
-          autoStart={false}
-          fadeOut
-          explosionSpeed={250}
-          colors={[theme.p1, theme.p2, '#f5c842']}
-          fallSpeed={1800}
-        />
-        <ConfettiCannon
-          ref={chainConfettiBigRef}
-          count={CHAIN_CONFETTI_COUNTS[2]}
-          origin={{ x: width / 2, y: height * 0.4 }}
-          autoStart={false}
-          fadeOut
-          explosionSpeed={300}
-          colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
-          fallSpeed={2200}
-        />
+        {/* Chain-celebration bursts — scaled by chain length, fired from mid-board.
+            Mounted only while active: react-native-confetti-cannon renders its first
+            particle at rest (fully opaque) as soon as it mounts, even with
+            autoStart={false}, so keeping these always-mounted left a stray colored
+            square sitting at mid-board for the whole game. */}
+        {activeChainTier === 1 && (
+          <ConfettiCannon
+            count={CHAIN_CONFETTI_COUNTS[1]}
+            origin={{ x: width / 2, y: height * 0.4 }}
+            autoStart
+            fadeOut
+            explosionSpeed={250}
+            colors={[theme.p1, theme.p2, '#f5c842']}
+            fallSpeed={1800}
+            onAnimationEnd={() => setActiveChainTier(0)}
+          />
+        )}
+        {activeChainTier === 2 && (
+          <ConfettiCannon
+            count={CHAIN_CONFETTI_COUNTS[2]}
+            origin={{ x: width / 2, y: height * 0.4 }}
+            autoStart
+            fadeOut
+            explosionSpeed={300}
+            colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
+            fallSpeed={2200}
+            onAnimationEnd={() => setActiveChainTier(0)}
+          />
+        )}
       </View>
 
     </SafeAreaView>
