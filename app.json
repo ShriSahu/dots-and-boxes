@@ -27,7 +27,7 @@
         "backgroundColor": "#f5f0e8"
       },
       "package": "com.shrisahu.dotsandboxes",
-      "permissions": []
+      "permissions": ["INTERNET", "VIBRATE"]
     },
     "web": {
       "favicon": "./assets/favicon.png",
