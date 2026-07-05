@@ -322,6 +322,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
+            onPress={() => router.push('/arcade')}
+          >
+            <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+              🎮 Arcade
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
             onPress={() => setShowTutorial(true)}
           >
             <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>

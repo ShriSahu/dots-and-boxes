@@ -11,6 +11,14 @@ service cloud.firestore {
       allow delete: if false; // No deletes
     }
 
+    // ── Ultimate Tic-Tac-Toe rooms (online games) ──────────────────
+    match /ttt_rooms/{roomCode} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+
     // ── Matchmaking (quick match waiting pool) ────────────────────
     match /matchmaking/{uid} {
       // Any authenticated user can read all docs (needed to find a waiting partner)
