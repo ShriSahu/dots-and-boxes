@@ -12,11 +12,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#f5f0e8"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.shrisahu.dotsandboxes",
-      "buildNumber": "1"
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +28,6 @@
         "backgroundColor": "#f5f0e8"
       },
       "package": "com.shrisahu.dotsandboxes",
-      "versionCode": 1,
       "permissions": []
     },
     "web": {
@@ -50,9 +53,11 @@
     ],
     "scheme": "dotsandboxes",
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "15d75e27-daa3-4fa6-a62a-c4d8351e6dd4"
       }
-    }
+    },
+    "owner": "shrisahu"
   }
 }
