@@ -14,22 +14,28 @@ import GameBoard from '../src/components/GameBoard';
 import ScoreBar from '../src/components/ScoreBar';
 import { recordOnlineResult } from '../src/services/coins';
 import { initAudio, playSound } from '../src/services/audio';
+import { saveActiveRoom, clearActiveRoom } from '../src/utils/storage';
+import { leaveSpectator } from '../src/services/gameRoom';
+import { getChainCelebration } from '../src/utils/chainFeedback';
+import { fireChainHaptics, CHAIN_CONFETTI_COUNTS } from '../src/utils/chainHaptics';
 import type { GameConfig, GameResult, LineId, GridSize } from '../src/types/game.types';
 
 export default function OnlineGameScreen() {
   const { theme } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const params = useLocalSearchParams<{
     roomCode: string;
     isHost: string;
     myUid: string;
     gridSize: string;
+    spectate?: string;
   }>();
 
   const roomCode = params.roomCode as string;
   const isHost   = params.isHost === 'true';
   const myUid    = params.myUid as string;
   const gridSize = (parseInt(params.gridSize ?? '4', 10)) as GridSize;
+  const isSpectator = params.spectate === 'true';
 
   const [toast, setToast]             = useState<{ text: string; color: string } | null>(null);
   const [result, setResult]           = useState<GameResult | null>(null);
@@ -45,6 +51,8 @@ export default function OnlineGameScreen() {
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
   const confettiRef   = useRef<any>(null);
+  const chainConfettiMedRef = useRef<any>(null);
+  const chainConfettiBigRef = useRef<any>(null);
   const prevLastLine  = useRef<string>('');
   const lastMoveTimeRef = useRef(Date.now());
 
@@ -52,6 +60,20 @@ export default function OnlineGameScreen() {
   useEffect(() => {
     initAudio();
   }, []);
+
+  // ── Persist active room so a killed/reopened app can offer to rejoin ──────
+  // Spectators don't occupy a seat, so there's nothing to "rejoin" for them.
+  useEffect(() => {
+    if (!roomCode || !myUid || isSpectator) return;
+    saveActiveRoom({ roomCode, isHost, myUid, gridSize });
+    return () => { clearActiveRoom(); };
+  }, [roomCode, isHost, myUid, gridSize, isSpectator]);
+
+  // ── Spectators: leave the spectators list on unmount ──────────────────────
+  useEffect(() => {
+    if (!isSpectator) return;
+    return () => { leaveSpectator(roomCode, myUid); };
+  }, [roomCode, myUid, isSpectator]);
 
   const showToast = useCallback((text: string, color: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -71,14 +93,20 @@ export default function OnlineGameScreen() {
   const myColor = isHost ? theme.p1 : theme.p2;
   const myLight = isHost ? theme.p1Light : theme.p2Light;
 
-  const { room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine, abandon, requestRematch, timerRemaining } =
+  const {
+    room, state, isMyTurn, isSubmitting, opponentName, myName, lastLine, drawLine,
+    abandon, requestRematch, timerRemaining, opponentReconnecting, graceSecondsRemaining,
+  } =
     useOnlineGame(roomCode, myUid, isHost, gridSize, {
       onBoxClaimed: (count, player, boxKeys, line) => {
         playSound(count >= 3 ? 'chain' : 'pop');
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        const celebration = getChainCelebration(count);
+        fireChainHaptics(celebration.hapticPulses);
         const name  = player === 1 ? (isHost ? myName : opponentName) : (isHost ? opponentName : myName);
         const color = player === 1 ? theme.p1 : theme.p2;
-        showToast(`${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
+        showToast(`${celebration.label}${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
+        if (celebration.tier === 1) chainConfettiMedRef.current?.start();
+        if (celebration.tier === 2) chainConfettiBigRef.current?.start();
         setNewBoxes(boxKeys);
         setTimeout(() => setNewBoxes([]), 700);
       },
@@ -95,7 +123,7 @@ export default function OnlineGameScreen() {
       onAutoSkip: (playerName) => {
         showToast(`Time's up — ${playerName} skipped`, theme.textMuted);
       },
-    });
+    }, isSpectator);
 
   // Build config for GameBoard / ScoreBar
   const config: GameConfig = {
@@ -138,19 +166,20 @@ export default function OnlineGameScreen() {
         playSound('draw');
       }
 
-      // Fire confetti if local player wins
-      if (winner === (isHost ? 'p1' : 'p2')) {
+      // Fire confetti if local player wins (spectators have no side, so skip)
+      if (!isSpectator && winner === (isHost ? 'p1' : 'p2')) {
         setTimeout(() => confettiRef.current?.start(), 200);
       }
 
-      // Award coins
-      if (!coinsAwarded.current && myUid) {
+      // Award coins — spectators never played, so no result to record
+      if (!isSpectator && !coinsAwarded.current && myUid) {
         coinsAwarded.current = true;
         const myPlayer = isHost ? 'p1' : 'p2';
         const outcomeResult: 'win' | 'draw' | 'loss' =
           winner === myPlayer ? 'win' : winner === 'draw' ? 'draw' : 'loss';
+        const opponentUid = room ? (isHost ? room.guest.uid : room.host.uid) : null;
 
-        recordOnlineResult(myUid, outcomeResult, roomCode).then(coins => {
+        recordOnlineResult(myUid, outcomeResult, roomCode, room?.ranked ?? false, opponentUid).then(coins => {
           setCoinsEarned(coins);
           coinAnim.setValue(0);
           Animated.sequence([
@@ -164,8 +193,9 @@ export default function OnlineGameScreen() {
     if (!state.isGameOver) prevGameOver.current = false;
   }, [state.isGameOver]); // eslint-disable-line
 
-  // ── Watch for rematch room code ───────────────────────────────────────────
+  // ── Watch for rematch room code (players only — spectators just stay put) ──
   useEffect(() => {
+    if (isSpectator) return;
     if (room?.rematchRoomCode) {
       router.replace({
         pathname: '/online-game',
@@ -177,16 +207,17 @@ export default function OnlineGameScreen() {
         },
       });
     }
-  }, [room?.rematchRoomCode]); // eslint-disable-line
+  }, [room?.rematchRoomCode, isSpectator]); // eslint-disable-line
 
   // ── AFK: reset timer on new moves ─────────────────────────────────────────
   useEffect(() => {
     if (room?.moveCount) lastMoveTimeRef.current = Date.now();
   }, [room?.moveCount]);
 
-  // ── AFK watcher ───────────────────────────────────────────────────────────
+  // ── AFK watcher (players only — a spectator must never abandon the room) ──
   useEffect(() => {
-    if (state.isGameOver || result || disconnected || !room || room.status !== 'active') return;
+    if (isSpectator) return;
+    if (state.isGameOver || result || disconnected || opponentReconnecting || !room || room.status !== 'active') return;
     if (isMyTurn) {
       // Reset timer whenever it becomes my turn
       lastMoveTimeRef.current = Date.now();
@@ -204,7 +235,7 @@ export default function OnlineGameScreen() {
       }
     }, 10000);
     return () => clearInterval(check);
-  }, [isMyTurn, state.isGameOver, result, disconnected, room?.status]);
+  }, [isMyTurn, state.isGameOver, result, disconnected, opponentReconnecting, room?.status, isSpectator]);
 
   const handleLineTap = (line: LineId) => {
     if (!isMyTurn || state.isGameOver || isSubmitting) return;
@@ -219,7 +250,8 @@ export default function OnlineGameScreen() {
   };
 
   const handleLeave = () => {
-    abandon();
+    // Spectators must never end the room for the actual players.
+    if (!isSpectator) abandon();
     router.back();
   };
 
@@ -291,18 +323,22 @@ export default function OnlineGameScreen() {
             <Text style={{ color: theme.p2 }}>Boxes</Text>
           </Text>
           <Text style={[styles.headerSub, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
-            Online  ·  Room {roomCode}
+            {isSpectator ? '👀 Spectating' : (room?.ranked ? 'Ranked' : 'Online')}  ·  Room {roomCode}
+            {!isSpectator && (room?.spectators?.length ?? 0) > 0 ? `  ·  👀 ${room!.spectators!.length}` : ''}
           </Text>
         </View>
 
-        <View style={[styles.iconBtn, {
-          backgroundColor: isMyTurn ? myLight : theme.bgCard,
-          borderColor: isMyTurn ? myColor : theme.border,
-        }]}>
-          <Text style={[styles.iconBtnText, { color: isMyTurn ? myColor : theme.textMuted }]}>
-            {isMyTurn ? '●' : '○'}
-          </Text>
-        </View>
+        {!isSpectator && (
+          <View style={[styles.iconBtn, {
+            backgroundColor: isMyTurn ? myLight : theme.bgCard,
+            borderColor: isMyTurn ? myColor : theme.border,
+          }]}>
+            <Text style={[styles.iconBtnText, { color: isMyTurn ? myColor : theme.textMuted }]}>
+              {isMyTurn ? '●' : '○'}
+            </Text>
+          </View>
+        )}
+        {isSpectator && <View style={{ width: 44 }} />}
       </View>
 
       {/* ── Turn indicator ── */}
@@ -315,13 +351,24 @@ export default function OnlineGameScreen() {
             color: isMyTurn ? myColor : theme.textMuted,
             fontFamily: theme.fontSemiBold,
           }]}>
-            {isMyTurn ? '▶ Your turn' : `${opponentName} is thinking…`}
+            {isSpectator
+              ? `${room?.currentPlayerUid === room?.host.uid ? room?.host.name : room?.guest.name}'s turn`
+              : (isMyTurn ? '▶ Your turn' : `${opponentName} is thinking…`)}
+          </Text>
+        </View>
+      )}
+
+      {/* ── Reconnecting banner — opponent's heartbeat has gone stale ── */}
+      {opponentReconnecting && !state.isGameOver && !disconnected && (
+        <View style={[styles.afkBanner, { backgroundColor: '#ff9500', borderColor: '#ff6b00' }]}>
+          <Text style={[styles.afkText, { color: '#fff', fontFamily: theme.fontRegular }]}>
+            📵 {opponentName} disconnected — reconnecting… ({graceSecondsRemaining}s)
           </Text>
         </View>
       )}
 
       {/* ── AFK warning banner ── */}
-      {afkWarning && !state.isGameOver && (
+      {afkWarning && !state.isGameOver && !opponentReconnecting && (
         <View style={[styles.afkBanner, { backgroundColor: '#ff9500', borderColor: '#ff6b00' }]}>
           <Text style={[styles.afkText, { color: '#fff', fontFamily: theme.fontRegular }]}>
             Opponent hasn't moved in a while…
@@ -415,12 +462,14 @@ export default function OnlineGameScreen() {
               <Text style={[styles.resultScoreName, { color: theme.p2 }]}>{result.p2Name}</Text>
             </View>
 
-            {/* Coin award */}
-            <View style={styles.coinRow}>
-              <Text style={[styles.coinLabel, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
-                🪙 +{coinsEarned} coins earned
-              </Text>
-            </View>
+            {/* Coin award (players only) */}
+            {!isSpectator && (
+              <View style={styles.coinRow}>
+                <Text style={[styles.coinLabel, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
+                  🪙 +{coinsEarned} coins earned
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={[styles.resultBtnSecondary, { borderColor: theme.border }]}
@@ -441,6 +490,7 @@ export default function OnlineGameScreen() {
                 </Text>
               </TouchableOpacity>
 
+              {!isSpectator && (
               <TouchableOpacity
                 style={[styles.resultBtnPrimary, {
                   backgroundColor: rematchWaiting ? theme.bgCard : theme.text,
@@ -457,9 +507,10 @@ export default function OnlineGameScreen() {
                     </Text>
                 }
               </TouchableOpacity>
+              )}
             </View>
 
-            {rematchWaiting && (
+            {!isSpectator && rematchWaiting && (
               <Text style={[styles.rematchNote, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>
                 Waiting for opponent to accept…
               </Text>
@@ -493,6 +544,27 @@ export default function OnlineGameScreen() {
           fadeOut
           colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
           fallSpeed={3500}
+        />
+        {/* Chain-celebration bursts — scaled by chain length, fired from mid-board */}
+        <ConfettiCannon
+          ref={chainConfettiMedRef}
+          count={CHAIN_CONFETTI_COUNTS[1]}
+          origin={{ x: width / 2, y: height * 0.4 }}
+          autoStart={false}
+          fadeOut
+          explosionSpeed={250}
+          colors={[theme.p1, theme.p2, '#f5c842']}
+          fallSpeed={1800}
+        />
+        <ConfettiCannon
+          ref={chainConfettiBigRef}
+          count={CHAIN_CONFETTI_COUNTS[2]}
+          origin={{ x: width / 2, y: height * 0.4 }}
+          autoStart={false}
+          fadeOut
+          explosionSpeed={300}
+          colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
+          fallSpeed={2200}
         />
       </View>
 

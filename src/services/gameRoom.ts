@@ -62,6 +62,7 @@ export async function createRoom(
   hostName: string,
   gridSize: GridSize,
   timerSeconds: TimerOption = 0,
+  ranked: boolean = false,
 ): Promise<string> {
   let roomCode = generateRoomCode();
   // Ensure uniqueness (max 5 tries)
@@ -74,9 +75,10 @@ export async function createRoom(
   const board = emptyBoard(gridSize);
   const room: Omit<OnlineRoom, 'roomCode'> = {
     status: 'waiting',
+    ranked,
     gridSize,
     timerSeconds,
-    host: { uid: hostUid, name: hostName, score: 0 },
+    host: { uid: hostUid, name: hostName, score: 0, lastActive: serverTimestamp() },
     guest: { uid: null, name: null, score: 0 },
     currentPlayerUid: hostUid,
     moveCount: 0,
@@ -93,33 +95,103 @@ export async function createRoom(
   return roomCode;
 }
 
+/**
+ * Joins a room as guest, or — if the caller's uid already occupies a seat
+ * (host or guest) — reconnects them to it instead of erroring. This is the
+ * mechanism a disconnected player uses to resume a game after re-entering
+ * the room code or tapping "Rejoin" from the home screen.
+ */
 export async function joinRoom(
   roomCode: string,
   guestUid: string,
   guestName: string,
-): Promise<OnlineRoom> {
+): Promise<{ room: OnlineRoom; isHost: boolean }> {
   const ref = doc(db, 'rooms', roomCode.toUpperCase());
 
   return runTransaction(db, async tx => {
     const snap = await tx.get(ref);
     if (!snap.exists()) throw new Error('Room not found. Check the code and try again.');
     const data = snap.data() as OnlineRoom;
-    if (data.status !== 'waiting') throw new Error('Room is full or game already started.');
-    if (data.host.uid === guestUid) throw new Error('Cannot join your own room.');
 
+    // Rejoin: this uid already occupies a seat in the room.
+    if (data.host.uid === guestUid) {
+      if (data.status === 'finished' || data.status === 'abandoned') {
+        throw new Error('That game has already ended.');
+      }
+      return { room: { ...data, roomCode }, isHost: true };
+    }
+    if (data.guest.uid === guestUid) {
+      if (data.status === 'finished' || data.status === 'abandoned') {
+        throw new Error('That game has already ended.');
+      }
+      return { room: { ...data, roomCode }, isHost: false };
+    }
+
+    if (data.status !== 'waiting') throw new Error('Room is full or game already started.');
+
+    const guest = { uid: guestUid, name: guestName, score: 0, lastActive: serverTimestamp() };
     tx.update(ref, {
-      guest: { uid: guestUid, name: guestName, score: 0 },
+      guest,
       status: 'active',
       updatedAt: serverTimestamp(),
     });
 
     return {
-      ...data,
-      roomCode,
-      guest: { uid: guestUid, name: guestName, score: 0 },
-      status: 'active' as const,
+      room: { ...data, roomCode, guest, status: 'active' as const },
+      isHost: false,
     };
   });
+}
+
+/**
+ * Read-only room snapshot for validating a rejoin/spectate attempt without
+ * subscribing. Used by the home screen's "Rejoin" banner and spectator join.
+ */
+export async function peekRoom(roomCode: string): Promise<OnlineRoom | null> {
+  const snap = await getDoc(doc(db, 'rooms', roomCode.toUpperCase()));
+  return snap.exists() ? { ...(snap.data() as OnlineRoom), roomCode: snap.id } : null;
+}
+
+/** Periodic presence signal — written by each seat while its screen is mounted. */
+export async function heartbeat(roomCode: string, seat: 'host' | 'guest'): Promise<void> {
+  try {
+    await updateDoc(doc(db, 'rooms', roomCode.toUpperCase()), {
+      [`${seat}.lastActive`]: serverTimestamp(),
+    });
+  } catch (_) {}
+}
+
+/** Joins a room as a read-only spectator — never occupies a player seat. */
+export async function joinAsSpectator(
+  roomCode: string,
+  uid: string,
+  name: string,
+): Promise<OnlineRoom> {
+  const ref = doc(db, 'rooms', roomCode.toUpperCase());
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists()) throw new Error('Room not found. Check the code and try again.');
+    const data = snap.data() as OnlineRoom;
+    if (data.host.uid === uid || data.guest.uid === uid) {
+      throw new Error('Players cannot spectate their own room.');
+    }
+    const spectators = (data.spectators ?? []).filter(s => s.uid !== uid);
+    spectators.push({ uid, name });
+    tx.update(ref, { spectators });
+    return { ...data, roomCode, spectators };
+  });
+}
+
+/** Removes a spectator on leave. Never touches room/player status. */
+export async function leaveSpectator(roomCode: string, uid: string): Promise<void> {
+  try {
+    const ref  = doc(db, 'rooms', roomCode.toUpperCase());
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() as OnlineRoom;
+    const spectators = (data.spectators ?? []).filter(s => s.uid !== uid);
+    await updateDoc(ref, { spectators });
+  } catch (_) {}
 }
 
 export function subscribeToRoom(
@@ -204,10 +276,11 @@ export function buildInitialRoomDoc(
   const board = emptyBoard(gridSize);
   return {
     status: 'active' as const,
+    ranked: true, // Quick Match games are always ranked; room-code games are casual
     gridSize,
     timerSeconds: 15 as TimerOption,
-    host:  { uid: hostUid,  name: hostName,  score: 0 },
-    guest: { uid: guestUid, name: guestName, score: 0 },
+    host:  { uid: hostUid,  name: hostName,  score: 0, lastActive: serverTimestamp() },
+    guest: { uid: guestUid, name: guestName, score: 0, lastActive: serverTimestamp() },
     currentPlayerUid: hostUid,
     moveCount: 0,
     ...board,
@@ -255,10 +328,11 @@ export async function requestRematch(
 
       tx.set(doc(db, 'rooms', newCode), {
         status: 'active',
+        ranked: data.ranked ?? false,
         gridSize: data.gridSize,
         timerSeconds: 0,
-        host:  { uid: newHostUid,  name: newHostName,  score: 0 },
-        guest: { uid: newGuestUid, name: newGuestName, score: 0 },
+        host:  { uid: newHostUid,  name: newHostName,  score: 0, lastActive: serverTimestamp() },
+        guest: { uid: newGuestUid, name: newGuestName, score: 0, lastActive: serverTimestamp() },
         currentPlayerUid: newHostUid,
         moveCount: 0,
         ...board,

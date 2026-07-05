@@ -6,11 +6,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
-import { loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTutorialSeen, loadSoundPref, saveSoundPref } from '../src/utils/storage';
+import {
+  loadPrefs, savePrefs, loadStats, resetStats as resetStatsStorage, getTutorialSeen,
+  loadSoundPref, saveSoundPref, loadActiveRoom, clearActiveRoom, ActiveRoomInfo,
+} from '../src/utils/storage';
 import { setSoundEnabled } from '../src/services/audio';
 import TutorialOverlay from '../src/components/TutorialOverlay';
 import { getAnonymousUid } from '../src/services/firebase';
-import { ensureUserProfile, subscribeToBalance, checkAndAwardDailyBonus } from '../src/services/coins';
+import { ensureUserProfile, subscribeToBalance, subscribeToProfile, checkAndAwardDailyBonus } from '../src/services/coins';
+import { peekRoom } from '../src/services/gameRoom';
 import {
   joinQueue, cancelQueue,
   subscribeToMyMatch, subscribeToWaitingPool, attemptMatch,
@@ -84,6 +88,9 @@ export default function HomeScreen() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeenState] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
+  const [rejoinInfo, setRejoinInfo] = useState<ActiveRoomInfo | null>(null);
+  const [elo, setElo] = useState<number | null>(null);
+  const [rankedRecord, setRankedRecord] = useState({ w: 0, l: 0, d: 0 });
   const dailyChallengeCard = getDailyChallenge();
 
   type MatchState = 'idle' | 'waiting' | 'timeout';
@@ -143,6 +150,50 @@ export default function HomeScreen() {
     const unsub = subscribeToBalance(uid, setCoins);
     return unsub;
   }, [uid]);
+
+  // Subscribe to ranked Elo + record in real-time
+  useEffect(() => {
+    if (!uid) return;
+    const unsub = subscribeToProfile(uid, profile => {
+      setElo(profile.elo);
+      setRankedRecord({ w: profile.rankedWins, l: profile.rankedLosses, d: profile.rankedDraws });
+    });
+    return unsub;
+  }, [uid]);
+
+  // ── Offer to rejoin an in-progress online game (e.g. app was killed) ─────
+  useEffect(() => {
+    if (!uid) return;
+    (async () => {
+      const info = await loadActiveRoom();
+      if (!info || info.myUid !== uid) { if (info) await clearActiveRoom(); return; }
+      const room = await peekRoom(info.roomCode);
+      const stillMine = room && (room.host.uid === uid || room.guest.uid === uid);
+      if (!room || !stillMine || room.status === 'finished' || room.status === 'abandoned') {
+        await clearActiveRoom();
+        return;
+      }
+      setRejoinInfo(info);
+    })();
+  }, [uid]);
+
+  const handleRejoin = useCallback(() => {
+    if (!rejoinInfo) return;
+    router.push({
+      pathname: '/online-game',
+      params: {
+        roomCode: rejoinInfo.roomCode,
+        isHost: rejoinInfo.isHost ? 'true' : 'false',
+        myUid: rejoinInfo.myUid,
+        gridSize: String(rejoinInfo.gridSize),
+      },
+    });
+  }, [rejoinInfo]);
+
+  const handleDismissRejoin = useCallback(() => {
+    clearActiveRoom();
+    setRejoinInfo(null);
+  }, []);
 
   const startGame = useCallback(async () => {
     if (mode === 'online') {
@@ -246,6 +297,13 @@ export default function HomeScreen() {
               🪙 {coins}
             </Text>
           </View>
+          {elo !== null && (
+            <View style={[s.coinBadge, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+              <Text style={[s.coinText, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
+                ⚔️ {elo}
+              </Text>
+            </View>
+          )}
           <TouchableOpacity
             style={[s.shopBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]}
             onPress={() => router.push('/leaderboard')}
@@ -290,6 +348,32 @@ export default function HomeScreen() {
               +{dailyBonus} 🪙 Daily bonus!
             </Text>
           </Animated.View>
+        )}
+
+        {/* ── Rejoin in-progress online game ── */}
+        {rejoinInfo && (
+          <View style={[s.card, { backgroundColor: theme.p1Light, borderColor: theme.p1, width: '100%' }]}>
+            <Text style={[s.cardTitle, { color: theme.p1, fontFamily: theme.fontSemiBold, marginBottom: 6 }]}>
+              🔌  Game in progress
+            </Text>
+            <Text style={{ color: theme.text, fontFamily: theme.fontRegular, fontSize: 14, marginBottom: 12 }}>
+              You have an unfinished online game in room {rejoinInfo.roomCode}.
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                style={[s.shopBtn, { flex: 1, alignItems: 'center', borderColor: theme.p1, backgroundColor: theme.p1 }]}
+                onPress={handleRejoin}
+              >
+                <Text style={[s.shopBtnText, { color: '#fff', fontFamily: theme.fontSemiBold }]}>Rejoin →</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.shopBtn, { borderColor: theme.border }]}
+                onPress={handleDismissRejoin}
+              >
+                <Text style={[s.shopBtnText, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Dismiss</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
         {/* ── Title ── */}
@@ -544,6 +628,37 @@ export default function HomeScreen() {
             </View>
           )}
         </View>
+
+        {/* ── Ranked ladder ── */}
+        {elo !== null && (
+          <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+            <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>⚔️  Ranked Ladder</Text>
+            <View style={s.statsRow}>
+              <View style={s.statItem}>
+                <Text style={[s.statNum, { color: theme.p1, fontFamily: theme.fontHandwritten }]}>{elo}</Text>
+                <Text style={[s.statLbl, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Elo</Text>
+              </View>
+              <Text style={[s.statSep, { color: theme.border, fontFamily: theme.fontRegular }]}>—</Text>
+              <View style={s.statItem}>
+                <Text style={[s.statNum, { color: theme.text, fontFamily: theme.fontHandwritten }]}>{rankedRecord.w}</Text>
+                <Text style={[s.statLbl, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Wins</Text>
+              </View>
+              <Text style={[s.statSep, { color: theme.border, fontFamily: theme.fontRegular }]}>—</Text>
+              <View style={s.statItem}>
+                <Text style={[s.statNum, { color: theme.text, fontFamily: theme.fontHandwritten }]}>{rankedRecord.l}</Text>
+                <Text style={[s.statLbl, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Losses</Text>
+              </View>
+              <Text style={[s.statSep, { color: theme.border, fontFamily: theme.fontRegular }]}>—</Text>
+              <View style={s.statItem}>
+                <Text style={[s.statNum, { color: theme.text, fontFamily: theme.fontHandwritten }]}>{rankedRecord.d}</Text>
+                <Text style={[s.statLbl, { color: theme.textMuted, fontFamily: theme.fontRegular }]}>Draws</Text>
+              </View>
+            </View>
+            <Text style={{ color: theme.textMuted, fontFamily: theme.fontRegular, fontSize: 12, marginTop: 8, textAlign: 'center' }}>
+              Elo updates from ranked Quick Match games only — room-code games are casual.
+            </Text>
+          </View>
+        )}
 
         <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
           <Text style={[s.cardTitle, { color: theme.textMuted, fontFamily: theme.fontSemiBold }]}>

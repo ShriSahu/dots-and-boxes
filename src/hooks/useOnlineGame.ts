@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { AppState } from 'react-native';
 import { GameState, LineId, Player, BoxOwner, OnlineRoom, GridSize } from '../types/game.types';
 import {
-  subscribeToRoom, applyMove, abandonRoom,
+  subscribeToRoom, applyMove, abandonRoom, heartbeat,
   requestRematch as reqRematch, unflattenBoard, skipTurn,
 } from '../services/gameRoom';
 import { getCompletedBoxes } from '../utils/gameHelpers';
 import { buildInitialState } from '../utils/gameHelpers';
+import { notifyYourTurn, requestNotificationPermissions } from '../services/notifications';
 
 export interface OnlineGameEvents {
   onBoxClaimed?: (count: number, player: Player, boxKeys: string[], line: LineId) => void;
@@ -15,12 +17,27 @@ export interface OnlineGameEvents {
   onAutoSkip?: (playerName: string) => void;
 }
 
+// Presence tuning: heartbeat every 8s; opponent flagged as disconnected once
+// their last heartbeat is older than STALE_MS; if they don't reconnect within
+// GRACE_MS of first going stale, the room is marked abandoned.
+const HEARTBEAT_MS = 8000;
+const STALE_MS      = 14000;
+const GRACE_MS      = 45000;
+
+function toMillis(ts: any): number | null {
+  if (ts == null) return null;
+  if (typeof ts === 'number') return ts;
+  if (typeof ts?.toMillis === 'function') return ts.toMillis();
+  return null;
+}
+
 export function useOnlineGame(
   roomCode: string,
   myUid: string,
   isHost: boolean,
   gridSize: GridSize,
   events: OnlineGameEvents = {},
+  isSpectator: boolean = false,
 ) {
   const [room, setRoom]       = useState<OnlineRoom | null>(null);
   const [state, setState]     = useState<GameState>(() => buildInitialState(gridSize));
@@ -28,6 +45,10 @@ export function useOnlineGame(
   const [lastLine, setLastLine]         = useState<LineId | null>(null);
   const [timerRemaining, setTimerRemaining] = useState(0);
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [opponentReconnecting, setOpponentReconnecting] = useState(false);
+  const [graceSecondsRemaining, setGraceSecondsRemaining] = useState(0);
+  const disconnectDetectedAtRef  = useRef<number | null>(null);
+  const graceExpiredHandledRef   = useRef(false);
 
   const prevMoveCount  = useRef(-1);
   const prevStatus     = useRef<OnlineRoom['status'] | null>(null);
@@ -114,6 +135,14 @@ export function useOnlineGame(
         // Turn switched if the current player is different from who just moved
         if (r.currentPlayerUid !== movedUid) {
           setTimeout(() => eventsRef.current.onTurnSwitch?.(), 0);
+
+          // It's now my turn and the app is backgrounded — nudge with a local
+          // notification. Only fires while this JS instance is still alive
+          // (backgrounded, not force-quit); true always-on delivery needs
+          // remote push (APNs/FCM), which isn't wired up.
+          if (r.currentPlayerUid === myUid && AppState.currentState !== 'active') {
+            notifyYourTurn(roomCode);
+          }
         }
       }
       prevMoveCount.current = r.moveCount;
@@ -146,6 +175,7 @@ export function useOnlineGame(
 
   // ── Draw a line (only when it's my turn) ────────────────────────────────
   const drawLine = useCallback(async (line: LineId) => {
+    if (isSpectator) return;
     if (!room) return;
     if (room.currentPlayerUid !== myUid) return;
     if (room.status !== 'active') return;
@@ -237,7 +267,7 @@ export function useOnlineGame(
     } finally {
       setIsSubmitting(false);
     }
-  }, [room, myUid, isHost, roomCode, isSubmitting]);
+  }, [room, myUid, isHost, roomCode, isSubmitting, isSpectator]);
 
   const abandon = useCallback(() => abandonRoom(roomCode), [roomCode]);
 
@@ -253,6 +283,63 @@ export function useOnlineGame(
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     };
   }, []);
+
+  // ── Prime notification permission for turn alerts (players only) ─────────
+  useEffect(() => {
+    if (isSpectator) return;
+    requestNotificationPermissions();
+  }, [isSpectator]);
+
+  // ── Presence heartbeat — signals "I'm still here" while this seat is mounted ──
+  // Spectators never occupy a seat, so they must never write host/guest fields.
+  useEffect(() => {
+    if (isSpectator) return;
+    if (room?.status !== 'active') return;
+    const seat = isHost ? 'host' : 'guest';
+    heartbeat(roomCode, seat);
+    const id = setInterval(() => heartbeat(roomCode, seat), HEARTBEAT_MS);
+    return () => clearInterval(id);
+  }, [roomCode, isHost, isSpectator, room?.status]);
+
+  // ── Opponent staleness watcher — grace-period rejoin window ──────────────
+  useEffect(() => {
+    if (isSpectator || !room || room.status !== 'active') {
+      disconnectDetectedAtRef.current = null;
+      graceExpiredHandledRef.current  = false;
+      setOpponentReconnecting(false);
+      setGraceSecondsRemaining(0);
+      return;
+    }
+
+    const check = () => {
+      const oppSeat = isHost ? room.guest : room.host;
+      const lastMs  = toMillis(oppSeat?.lastActive);
+      const stale   = oppSeat?.uid != null && lastMs != null && (Date.now() - lastMs) > STALE_MS;
+
+      if (!stale) {
+        disconnectDetectedAtRef.current = null;
+        graceExpiredHandledRef.current  = false;
+        setOpponentReconnecting(false);
+        setGraceSecondsRemaining(0);
+        return;
+      }
+
+      if (disconnectDetectedAtRef.current == null) disconnectDetectedAtRef.current = Date.now();
+      const elapsed   = Date.now() - disconnectDetectedAtRef.current;
+      const remaining = Math.max(0, Math.ceil((GRACE_MS - elapsed) / 1000));
+      setOpponentReconnecting(true);
+      setGraceSecondsRemaining(remaining);
+
+      if (elapsed >= GRACE_MS && !graceExpiredHandledRef.current) {
+        graceExpiredHandledRef.current = true;
+        abandonRoom(roomCode).catch(() => {});
+      }
+    };
+
+    check();
+    const id = setInterval(check, 1000);
+    return () => clearInterval(id);
+  }, [room, isHost, isSpectator, roomCode]);
 
   const isMyTurn     = room?.currentPlayerUid === myUid && room?.status === 'active';
   const opponentName = room
@@ -274,5 +361,7 @@ export function useOnlineGame(
     drawLine,
     abandon,
     requestRematch,
+    opponentReconnecting,
+    graceSecondsRemaining,
   };
 }

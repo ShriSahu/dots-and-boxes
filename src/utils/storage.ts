@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GameConfig, GameMode, Stats } from '../types/game.types';
+import { GameConfig, GameMode, GridSize, Stats } from '../types/game.types';
 
 const KEYS = {
   p1:         'db_p1',
@@ -12,7 +12,31 @@ const KEYS = {
   sound:      'db_sound',
   streak:     'db_streak',
   bestStreak: 'db_best',
+  activeRoom: 'db_active_room',
 };
+
+export interface ActiveRoomInfo {
+  roomCode: string;
+  isHost:   boolean;
+  myUid:    string;
+  gridSize: GridSize;
+}
+
+/** Persisted so a killed/reopened app can offer to rejoin an in-progress online game. */
+export async function saveActiveRoom(info: ActiveRoomInfo): Promise<void> {
+  try { await AsyncStorage.setItem(KEYS.activeRoom, JSON.stringify(info)); } catch (_) {}
+}
+
+export async function loadActiveRoom(): Promise<ActiveRoomInfo | null> {
+  try {
+    const raw = await AsyncStorage.getItem(KEYS.activeRoom);
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) { return null; }
+}
+
+export async function clearActiveRoom(): Promise<void> {
+  try { await AsyncStorage.removeItem(KEYS.activeRoom); } catch (_) {}
+}
 
 const TUTORIAL_KEY = 'db_tutorial_seen';
 

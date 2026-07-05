@@ -3,6 +3,7 @@ import {
   increment, addDoc, collection, onSnapshot,
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { computeNewElo, STARTING_ELO } from './elo';
 import type { UserProfile } from '../types/game.types';
 
 export async function ensureUserProfile(uid: string, displayName: string): Promise<void> {
@@ -13,6 +14,10 @@ export async function ensureUserProfile(uid: string, displayName: string): Promi
       displayName,
       coins: 0,
       onlineWins: 0,
+      elo: STARTING_ELO,
+      rankedWins: 0,
+      rankedLosses: 0,
+      rankedDraws: 0,
       createdAt:  new Date(),
       lastSeenAt: new Date(),
       stats: { onlineWins: 0, onlineLosses: 0, onlineDraws: 0 },
@@ -20,6 +25,22 @@ export async function ensureUserProfile(uid: string, displayName: string): Promi
   } else {
     await updateDoc(ref, { lastSeenAt: new Date() });
   }
+}
+
+export function subscribeToProfile(
+  uid: string,
+  cb: (profile: { coins: number; elo: number; rankedWins: number; rankedLosses: number; rankedDraws: number }) => void,
+): () => void {
+  return onSnapshot(doc(db, 'users', uid), snap => {
+    const d = snap.data();
+    cb({
+      coins:        d?.coins ?? 0,
+      elo:          d?.elo ?? STARTING_ELO,
+      rankedWins:   d?.rankedWins ?? 0,
+      rankedLosses: d?.rankedLosses ?? 0,
+      rankedDraws:  d?.rankedDraws ?? 0,
+    });
+  });
 }
 
 export async function loadCoinBalance(uid: string): Promise<number> {
@@ -78,11 +99,17 @@ export async function checkAndAwardDailyBonus(uid: string): Promise<number> {
   return 0;
 }
 
-/** Records the result of an online game: awards coins and updates stats. */
+/**
+ * Records the result of an online game: awards coins, updates stats, and —
+ * for ranked games only — settles both players' Elo rating. Casual room-code
+ * games (ranked=false) never touch Elo.
+ */
 export async function recordOnlineResult(
   uid: string,
   result: 'win' | 'draw' | 'loss',
   roomCode: string,
+  ranked: boolean = false,
+  opponentUid: string | null = null,
 ): Promise<number> {
   const coinMap:   Record<string, number> = { win: 25, draw: 3, loss: 1 };
   const statField: Record<string, string> = {
@@ -90,15 +117,31 @@ export async function recordOnlineResult(
     draw: 'stats.onlineDraws',
     loss: 'stats.onlineLosses',
   };
+  const rankedField: Record<string, string> = {
+    win: 'rankedWins', draw: 'rankedDraws', loss: 'rankedLosses',
+  };
   const coins  = coinMap[result];
   const reason = result === 'win' ? 'win' : result === 'draw' ? 'draw' : 'participation';
 
-  await updateDoc(doc(db, 'users', uid), {
+  const updates: Record<string, any> = {
     coins: increment(coins),
     [statField[result]]: increment(1),
     // Denormalised top-level field for leaderboard queries
     ...(result === 'win' ? { onlineWins: increment(1) } : {}),
-  });
+  };
+
+  if (ranked && opponentUid) {
+    const [mySnap, oppSnap] = await Promise.all([
+      getDoc(doc(db, 'users', uid)),
+      getDoc(doc(db, 'users', opponentUid)),
+    ]);
+    const myElo  = mySnap.exists()  ? (mySnap.data().elo  ?? STARTING_ELO) : STARTING_ELO;
+    const oppElo = oppSnap.exists() ? (oppSnap.data().elo ?? STARTING_ELO) : STARTING_ELO;
+    updates.elo = computeNewElo(myElo, oppElo, result);
+    updates[rankedField[result]] = increment(1);
+  }
+
+  await updateDoc(doc(db, 'users', uid), updates);
   await addDoc(collection(db, 'coinTransactions'), {
     uid, delta: coins, reason, roomCode, createdAt: new Date(),
   });

@@ -64,10 +64,11 @@ export interface Stats {
 export interface OnlineRoom {
   roomCode:          string;
   status:            RoomStatus;
+  ranked?:           boolean;
   gridSize:          GridSize;
   timerSeconds:      TimerOption;
-  host:  { uid: string;        name: string;        score: number };
-  guest: { uid: string | null; name: string | null; score: number };
+  host:  { uid: string;        name: string;        score: number; lastActive?: any };
+  guest: { uid: string | null; name: string | null; score: number; lastActive?: any };
   currentPlayerUid:  string;
   moveCount:         number;
   hLines:  boolean[];
@@ -79,6 +80,7 @@ export interface OnlineRoom {
   rematchRequestedBy: string | null;
   rematchRoomCode:    string | null;
   turnStartedAt:      number | null;
+  spectators?:        { uid: string; name: string }[];
 }
 
 export interface CoinTransaction {
@@ -95,6 +97,10 @@ export interface UserProfile {
   coins:        number;
   lastDailyBonus?: any;
   stats: { onlineWins: number; onlineLosses: number; onlineDraws: number };
+  elo?:         number;
+  rankedWins?:  number;
+  rankedLosses?: number;
+  rankedDraws?: number;
 }
 
 export interface MatchmakingDoc {

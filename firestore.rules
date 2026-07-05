@@ -25,8 +25,10 @@ service cloud.firestore {
 
     // ── Users (profile, theme, coins) ─────────────────────────────
     match /users/{uid} {
-      // Users can read their own doc; public fields readable by all
-      allow read: if request.auth != null && request.auth.uid == uid;
+      // Readable by any authenticated user — needed for the leaderboard and
+      // for reading an opponent's ELO when settling a ranked game. No PII is
+      // stored here (anonymous auth, display name is user-chosen).
+      allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 

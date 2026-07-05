@@ -8,10 +8,10 @@ import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
 import { getAnonymousUid } from '../src/services/firebase';
 import { ensureUserProfile } from '../src/services/coins';
-import { createRoom, joinRoom, subscribeToRoom, abandonRoom } from '../src/services/gameRoom';
+import { createRoom, joinRoom, subscribeToRoom, abandonRoom, joinAsSpectator } from '../src/services/gameRoom';
 import type { GridSize, OnlineRoom, TimerOption } from '../src/types/game.types';
 
-type LobbyView = 'menu' | 'create-settings' | 'waiting' | 'join-input';
+type LobbyView = 'menu' | 'create-settings' | 'waiting' | 'join-input' | 'spectate-input';
 
 const GRID_SIZES: GridSize[] = [3, 4, 5, 6];
 const GRID_LABELS = ['3×3', '4×4', '5×5', '6×6'];
@@ -101,7 +101,33 @@ export default function LobbyScreen() {
     setError('');
     try {
       await ensureUserProfile(myUid, name);
-      const room = await joinRoom(code, myUid, name);
+      const { room, isHost } = await joinRoom(code, myUid, name);
+      router.replace({
+        pathname: '/online-game',
+        params: {
+          roomCode: code,
+          isHost: isHost ? 'true' : 'false',
+          myUid,
+          gridSize: String(room.gridSize),
+        },
+      });
+    } catch (e: any) {
+      setError(e.message ?? 'Failed to join room.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── Spectate a room ──────────────────────────────────────────────────────
+  const handleSpectate = async () => {
+    const code = joinCode.trim().toUpperCase();
+    if (code.length !== 6) { setError('Enter a 6-character room code.'); return; }
+    const name = playerName.trim() || 'Spectator';
+    setLoading(true);
+    setError('');
+    try {
+      await ensureUserProfile(myUid, name);
+      const room = await joinAsSpectator(code, myUid, name);
       router.replace({
         pathname: '/online-game',
         params: {
@@ -109,10 +135,11 @@ export default function LobbyScreen() {
           isHost: 'false',
           myUid,
           gridSize: String(room.gridSize),
+          spectate: 'true',
         },
       });
     } catch (e: any) {
-      setError(e.message ?? 'Failed to join room.');
+      setError(e.message ?? 'Failed to join as spectator.');
     } finally {
       setLoading(false);
     }
@@ -178,6 +205,17 @@ export default function LobbyScreen() {
               <View>
                 <Text style={[s.bigBtnTitle, { color: '#fff' }]}>Join Room</Text>
                 <Text style={[s.bigBtnSub, { color: 'rgba(255,255,255,0.75)' }]}>Enter a friend's room code</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[s.bigBtn, { backgroundColor: theme.bgCard, borderWidth: 1.5, borderColor: theme.border }]}
+              onPress={() => setView('spectate-input')}
+            >
+              <Text style={s.bigBtnIcon}>👀</Text>
+              <View>
+                <Text style={[s.bigBtnTitle, { color: theme.text }]}>Spectate</Text>
+                <Text style={[s.bigBtnSub, { color: theme.textMuted }]}>Watch a game live, read-only</Text>
               </View>
             </TouchableOpacity>
 
@@ -308,6 +346,42 @@ export default function LobbyScreen() {
               {loading
                 ? <ActivityIndicator color="#fff" />
                 : <Text style={[s.actionBtnText, { fontFamily: theme.fontHandwritten }]}>Join →</Text>
+              }
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { setView('menu'); setError(''); }}>
+              <Text style={[s.cancelText, { color: theme.textMuted }]}>← Back</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* ── Spectate room ── */}
+        {view === 'spectate-input' && (
+          <>
+            <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
+              <Text style={[s.cardTitle, { color: theme.textMuted }]}>Room Code</Text>
+              <TextInput
+                style={[s.codeInput, { borderColor: theme.border, color: theme.text, fontFamily: theme.fontHandwritten }]}
+                value={joinCode}
+                onChangeText={t => setJoinCode(t.toUpperCase())}
+                placeholder="ABC123"
+                placeholderTextColor={theme.border}
+                maxLength={6}
+                autoCapitalize="characters"
+                autoFocus
+              />
+            </View>
+
+            {error ? <Text style={[s.error, { color: theme.p2 }]}>{error}</Text> : null}
+
+            <TouchableOpacity
+              style={[s.actionBtn, { backgroundColor: theme.text }, loading && { opacity: 0.6 }]}
+              onPress={handleSpectate}
+              disabled={loading}
+            >
+              {loading
+                ? <ActivityIndicator color="#fff" />
+                : <Text style={[s.actionBtnText, { fontFamily: theme.fontHandwritten }]}>Watch →</Text>
               }
             </TouchableOpacity>
 
