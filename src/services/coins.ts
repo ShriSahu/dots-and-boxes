@@ -131,14 +131,20 @@ export async function recordOnlineResult(
   };
 
   if (ranked && opponentUid) {
-    const [mySnap, oppSnap] = await Promise.all([
-      getDoc(doc(db, 'users', uid)),
-      getDoc(doc(db, 'users', opponentUid)),
-    ]);
-    const myElo  = mySnap.exists()  ? (mySnap.data().elo  ?? STARTING_ELO) : STARTING_ELO;
-    const oppElo = oppSnap.exists() ? (oppSnap.data().elo ?? STARTING_ELO) : STARTING_ELO;
-    updates.elo = computeNewElo(myElo, oppElo, result);
-    updates[rankedField[result]] = increment(1);
+    // Reading the opponent's profile needs the users/{uid} read rule opened up
+    // beyond "owner only" (see firestore.rules). If that hasn't been deployed
+    // yet, fail soft — still award coins/stats, just skip the Elo update
+    // rather than throwing and dropping the whole result.
+    try {
+      const [mySnap, oppSnap] = await Promise.all([
+        getDoc(doc(db, 'users', uid)),
+        getDoc(doc(db, 'users', opponentUid)),
+      ]);
+      const myElo  = mySnap.exists()  ? (mySnap.data().elo  ?? STARTING_ELO) : STARTING_ELO;
+      const oppElo = oppSnap.exists() ? (oppSnap.data().elo ?? STARTING_ELO) : STARTING_ELO;
+      updates.elo = computeNewElo(myElo, oppElo, result);
+      updates[rankedField[result]] = increment(1);
+    } catch (_) {}
   }
 
   await updateDoc(doc(db, 'users', uid), updates);
