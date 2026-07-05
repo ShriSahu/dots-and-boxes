@@ -40,6 +40,12 @@
           "image": "./assets/splash.png",
           "imageWidth": 200
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#ffffff"
+        }
       ]
     ],
     "scheme": "dotsandboxes",
