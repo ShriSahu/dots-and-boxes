@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
+import HowToPlayModal from '../src/components/HowToPlayModal';
+import { TTT_HOW_TO_PLAY } from '../src/constants/howToPlay';
 import type { TTTConfig, TTTDifficulty, TTTMode } from '../src/types/ttt.types';
 
 const DIFFICULTIES: TTTDifficulty[] = ['easy', 'medium', 'hard'];
@@ -15,6 +17,7 @@ export default function TTTSetupScreen() {
   const [p1Name, setP1Name] = useState('');
   const [p2Name, setP2Name] = useState('');
   const [difficulty, setDifficulty] = useState<TTTDifficulty>('medium');
+  const [showHelp, setShowHelp] = useState(false);
 
   const startGame = () => {
     if (mode === 'online') {
@@ -40,7 +43,9 @@ export default function TTTSetupScreen() {
           <Text style={[s.title, { color: theme.text, fontFamily: theme.fontHandwritten }]}>
             Ultimate Tic-Tac-Toe
           </Text>
-          <View style={{ width: 44 }} />
+          <TouchableOpacity style={[s.backBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]} onPress={() => setShowHelp(true)}>
+            <Text style={[s.backText, { color: theme.text, fontSize: 18 }]}>?</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
@@ -115,6 +120,9 @@ export default function TTTSetupScreen() {
           <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>Start Game →</Text>
         </TouchableOpacity>
       </ScrollView>
+      {showHelp && (
+        <HowToPlayModal title="Ultimate Tic-Tac-Toe" steps={TTT_HOW_TO_PLAY} onClose={() => setShowHelp(false)} />
+      )}
     </SafeAreaView>
   );
 }

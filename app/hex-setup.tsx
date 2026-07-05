@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
+import HowToPlayModal from '../src/components/HowToPlayModal';
+import { HEX_HOW_TO_PLAY } from '../src/constants/howToPlay';
 import type { HexBoardSize, HexConfig, HexMode } from '../src/types/hex.types';
 
 const SIZES: HexBoardSize[] = [9, 11, 13];
@@ -15,6 +17,7 @@ export default function HexSetupScreen() {
   const [p1Name, setP1Name] = useState('');
   const [p2Name, setP2Name] = useState('');
   const [boardSize, setBoardSize] = useState<HexBoardSize>(11);
+  const [showHelp, setShowHelp] = useState(false);
 
   const startGame = () => {
     if (mode === 'online') {
@@ -38,7 +41,9 @@ export default function HexSetupScreen() {
             <Text style={[s.backText, { color: theme.text }]}>←</Text>
           </TouchableOpacity>
           <Text style={[s.title, { color: theme.text, fontFamily: theme.fontHandwritten }]}>Hex</Text>
-          <View style={{ width: 44 }} />
+          <TouchableOpacity style={[s.backBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]} onPress={() => setShowHelp(true)}>
+            <Text style={[s.backText, { color: theme.text, fontSize: 18 }]}>?</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={[s.card, { backgroundColor: theme.bgCard, borderColor: theme.border }]}>
@@ -111,6 +116,9 @@ export default function HexSetupScreen() {
           <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>Start Game →</Text>
         </TouchableOpacity>
       </ScrollView>
+      {showHelp && (
+        <HowToPlayModal title="Hex" steps={HEX_HOW_TO_PLAY} onClose={() => setShowHelp(false)} />
+      )}
     </SafeAreaView>
   );
 }

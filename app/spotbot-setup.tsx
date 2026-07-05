@@ -3,11 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../src/hooks/useTheme';
+import HowToPlayModal from '../src/components/HowToPlayModal';
+import { SPOTBOT_HOW_TO_PLAY } from '../src/constants/howToPlay';
 
 export default function SpotBotSetupScreen() {
   const { theme } = useTheme();
   const s = makeStyles(theme);
   const [name, setName] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
 
   const start = () => {
     router.push({ pathname: '/spotbot', params: { name: name.trim() || 'Player' } });
@@ -21,7 +24,9 @@ export default function SpotBotSetupScreen() {
             <Text style={[s.backText, { color: theme.text }]}>←</Text>
           </TouchableOpacity>
           <Text style={[s.title, { color: theme.text, fontFamily: theme.fontHandwritten }]}>Spot the Bot</Text>
-          <View style={{ width: 44 }} />
+          <TouchableOpacity style={[s.backBtn, { backgroundColor: theme.bgCard, borderColor: theme.border }]} onPress={() => setShowHelp(true)}>
+            <Text style={[s.backText, { color: theme.text, fontSize: 18 }]}>?</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={[s.card, { backgroundColor: theme.p1Light, borderColor: theme.p1 }]}>
@@ -43,6 +48,9 @@ export default function SpotBotSetupScreen() {
           <Text style={[s.startBtnText, { color: theme.bg, fontFamily: theme.fontHandwritten }]}>Find Opponent →</Text>
         </TouchableOpacity>
       </ScrollView>
+      {showHelp && (
+        <HowToPlayModal title="Spot the Bot" steps={SPOTBOT_HOW_TO_PLAY} onClose={() => setShowHelp(false)} />
+      )}
     </SafeAreaView>
   );
 }
