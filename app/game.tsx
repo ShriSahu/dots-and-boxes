@@ -16,12 +16,14 @@ import type { GameConfig, GameResult, LineId } from '../src/types/game.types';
 import { recordStat } from '../src/utils/storage';
 import { getAnonymousUid } from '../src/services/firebase';
 import { awardCoins } from '../src/services/coins';
+import { getChainCelebration } from '../src/utils/chainFeedback';
+import { fireChainHaptics, CHAIN_CONFETTI_COUNTS } from '../src/utils/chainHaptics';
 
 export default function GameScreen() {
   const params = useLocalSearchParams<{ config: string }>();
   const config: GameConfig = JSON.parse(params.config as string);
   const { theme } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const [toast, setToast]         = useState<{ text: string; color: string } | null>(null);
   const [result, setResult]       = useState<GameResult | null>(null);
@@ -34,6 +36,8 @@ export default function GameScreen() {
   const prevGameOver  = useRef(false);
   const coinsAwarded  = useRef(false);
   const confettiRef   = useRef<any>(null);
+  const chainConfettiMedRef = useRef<any>(null);
+  const chainConfettiBigRef = useRef<any>(null);
 
   const styles = makeStyles(theme);
 
@@ -61,10 +65,13 @@ export default function GameScreen() {
     useGameEngine(config, {
       onBoxClaimed: (count, player, boxKeys, line) => {
         playSound(count >= 3 ? 'chain' : 'pop');
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        const celebration = getChainCelebration(count);
+        fireChainHaptics(celebration.hapticPulses);
         const name  = player === 1 ? config.p1Name : config.p2Name;
         const color = player === 1 ? theme.p1 : theme.p2;
-        showToast(`${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
+        showToast(`${celebration.label}${name} +${count} box${count > 1 ? 'es' : ''}!`, color);
+        if (celebration.tier === 1) chainConfettiMedRef.current?.start();
+        if (celebration.tier === 2) chainConfettiBigRef.current?.start();
         // Trigger box fill animations (staggered)
         setNewBoxes(boxKeys);
         setTimeout(() => setNewBoxes([]), 700); // clear after animations complete
@@ -350,6 +357,27 @@ export default function GameScreen() {
           fadeOut
           colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
           fallSpeed={3500}
+        />
+        {/* Chain-celebration bursts — scaled by chain length, fired from mid-board */}
+        <ConfettiCannon
+          ref={chainConfettiMedRef}
+          count={CHAIN_CONFETTI_COUNTS[1]}
+          origin={{ x: width / 2, y: height * 0.4 }}
+          autoStart={false}
+          fadeOut
+          explosionSpeed={250}
+          colors={[theme.p1, theme.p2, '#f5c842']}
+          fallSpeed={1800}
+        />
+        <ConfettiCannon
+          ref={chainConfettiBigRef}
+          count={CHAIN_CONFETTI_COUNTS[2]}
+          origin={{ x: width / 2, y: height * 0.4 }}
+          autoStart={false}
+          fadeOut
+          explosionSpeed={300}
+          colors={[theme.p1, theme.p2, '#f5c842', '#4ECDC4', '#ffffff']}
+          fallSpeed={2200}
         />
       </View>
 
